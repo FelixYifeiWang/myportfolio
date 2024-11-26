@@ -31,14 +31,14 @@
             top: 50%;
             left: 25vw;
             transform: translate(-50%, -50%);
-            animation: fadeInLeftHand 2s ease-in 3s forwards;
+            animation: fadeInLeftHand 2s ease-in 2s forwards;
         }
 
         .right-hand {
             top: 50%;
             right: 25vw;
             transform: translate(50%, -50%);
-            animation: fadeInRightHand 2s ease-in 3s forwards;
+            animation: fadeInRightHand 2s ease-in 2s forwards;
         }
 
         .content {
@@ -47,6 +47,7 @@
             color: #fff;
             z-index: 0;
             opacity: 0;
+            margin-top: -10vh;
             animation: fadeInText 2s ease-in forwards;
         }
 
@@ -147,9 +148,83 @@
                 transform: translate(50%, -50%);
             }
         }
+        .prompt {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 0.8vw;
+            opacity: 0;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 5px;
+            animation: showPrompt 2s ease-in 3s, blink 3s infinite 5s; /* Delay of 5s */
+        }
+
+        @keyframes showPrompt {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0.2;
+            }
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                opacity: 0.2;
+            }
+        }
+        /* Updated Overlay for the expanding light */
+        .overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            opacity: 0;
+            animation: none;
+            pointer-events: none; /* Prevent interaction with overlay */
+        }
+
+        /* Updated Expanding Light Animation */
+        @keyframes expandLight {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
+            }
+            90% {
+                opacity: 1;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
+                width: 30vmax;
+                height: 30vmax;
+            }
+            100% {
+                width: 250vmax;
+                height: 250vmax;
+                background: white;
+                opacity: 1;
+            }
+        }
+
+
     </style>
 </head>
 <body>
+    <div class="overlay"></div>
     <!-- Left hand -->
     <img src="assets/left-hand.png" alt="Left Hand" class="left-hand">
     <!-- Right hand -->
@@ -158,6 +233,31 @@
     <div class="content">
         <h1 id="dynamic-text">Yifei Felix<br><br>Wang</h1>
     </div>
+    <div class="prompt">
+        Press ANY button to continue
+    </div>
+    <script>
+        let isInteractive = false;
+
+        // Enable interaction after 3 seconds
+        setTimeout(() => {
+            isInteractive = true;
+        }, 3000);
+
+        // Trigger effects on button press or click
+        const activateEffect = () => {
+            if (!isInteractive) return; // Prevent early activation
+
+            // Trigger the light expansion
+            const overlay = document.querySelector('.overlay');
+            overlay.style.animation = 'expandLight 5s forwards ease-out';
+        };
+
+        // Listen for button presses and clicks
+        document.addEventListener('keydown', activateEffect);
+        document.addEventListener('click', activateEffect);
+    </script>
+    
 </body>
 
 </html>
