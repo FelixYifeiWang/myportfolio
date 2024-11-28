@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selected Works</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Zen Dots', sans-serif;
+            background-color: gray; /* Match the ending color of the previous page */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Fade-in Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                background-color: gray; /* Match ending color of previous page */
+            }
+            to {
+                opacity: 1;
+                background-color: #ffffff; /* Final color */
+            }
+        }
+
+        .background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; /* Ensure the background doesn't overflow */
+            z-index: 0;
+        }
+
+        .background-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image covers the container */
+            position: absolute;
+        }
+
+        .sw {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: 1;
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <div class="background">
+        <img src="assets/colorbg.png" alt="Background" class="background-img">
+        <img src="assets/swlabel_on.png" alt="Selected Works" class="sw" id="swImage">
+    </div>
+    
+    <script>
+        // Check if navigated from index.html
+        const urlParams = new URLSearchParams(window.location.search);
+        const fromIndex = urlParams.get('from') === '0';
+
+        if (fromIndex) {
+            // Add fade-in animation if navigated from index.html
+            document.body.style.animation = 'fadeIn 2s ease-in forwards';
+
+            const currentUrl = window.location.href; // Get the full URL
+            const newUrl = currentUrl.split('?')[0]; // Remove the query string part
+            window.history.replaceState({}, document.title, newUrl);
+        }
+
+        const backgroundImg = document.querySelector('.background-img');
+        const swElement = document.querySelector('.sw');
+
+        function positionSW() {
+            const fixedWidth = 1920;
+            const fixedHeight = 1080;
+            const aspectRatio = fixedWidth / fixedHeight;
+
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * 0.57) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swY = (bgHeight * 0.75) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+
+            // Update `.sw` position
+            swElement.style.left = `${swX}px`;
+            swElement.style.top = `${swY}px`;
+
+            // Set `.sw` width proportional to the actual visible background width
+            const swWidth = bgWidth * 0.25; // Maintain proportional scaling
+            swElement.style.width = `${swWidth}px`;
+        }
+
+
+
+
+        // Recalculate position on window resize
+        window.addEventListener('resize', positionSW);
+
+        // Initial positioning
+        positionSW();
+
+        const swImage = document.getElementById('swImage');
+
+        // Toggle the image source when clicked
+        swImage.addEventListener('click', () => {
+            if (swImage.src.includes('swlabel_on.png')) {
+                swImage.src = 'assets/swlabel_off.png';
+            } else {
+                swImage.src = 'assets/swlabel_on.png';
+            }
+        });
+    </script>
+</body>
+</html>

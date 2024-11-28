@@ -19,36 +19,42 @@
             position: relative;
         }
 
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevents any unexpected scrolling */
+        }
+
+
         .left-hand, .right-hand {
             position: absolute;
             width: 55vw; /* Adjust size as necessary */
             pointer-events: none;
             opacity: 0;
-            z-index: 1;
+            z-index: 2;
         }
 
         .left-hand {
             top: 50%;
             left: 25vw;
             transform: translate(-50%, -50%);
-            animation: fadeInLeftHand 2s ease-in 2s forwards;
+            animation: fadeInLeftHand 1.5s ease-in 2s forwards;
         }
 
         .right-hand {
             top: 50%;
             right: 25vw;
             transform: translate(50%, -50%);
-            animation: fadeInRightHand 2s ease-in 2s forwards;
+            animation: fadeInRightHand 1.5s ease-in 2s forwards;
         }
 
         .content {
             position: relative;
             text-align: center;
             color: #fff;
-            z-index: 0;
+            z-index: 1;
             opacity: 0;
-            margin-top: -10vh;
-            animation: fadeInText 2s ease-in forwards;
+            animation: fadeInText 1s ease-in forwards;
         }
 
         .content h1 {
@@ -67,6 +73,28 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        /* Text light-on effect like a bulb turning on */
+        @keyframes bulbLightOn {
+            0%, 10% {
+                opacity: 0;
+            }
+            20%, 70% {
+                opacity: 1;
+            }
+            75% {
+                opacity: 0.7;
+            }
+            85% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            95%, 100% {
+                opacity: 1;
             }
         }
 
@@ -156,10 +184,10 @@
             color: #fff;
             font-size: 0.8vw;
             opacity: 0;
-            background: rgba(0, 0, 0, 0.5);
             padding: 10px 20px;
             border-radius: 5px;
             animation: showPrompt 2s ease-in 3s, blink 3s infinite 5s; /* Delay of 5s */
+            z-index: 1;
         }
 
         @keyframes showPrompt {
@@ -204,27 +232,70 @@
                 width: 0;
                 height: 0;
                 opacity: 1;
-                background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
+                background: white;
             }
             90% {
                 opacity: 1;
-                background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
-                width: 30vmax;
-                height: 30vmax;
+                background: white;
+                width: 5vmax;
+                height: 5vmax;
             }
             100% {
                 width: 250vmax;
                 height: 250vmax;
-                background: white;
+                background: gray;
                 opacity: 1;
             }
         }
+        /* Text fade-out like a bulb losing connection */
+        @keyframes bulbDisconnect {
+            0%, 30% {
+                opacity: 1;
+            }
+            34% {
+                opacity: 0;
+            }
+            40% {
+                opacity: 1;
+            }
+            46% {
+                opacity: 0;
+            }
+            52% {
+                opacity: 1;
+            }
+            60% {
+                opacity: 0.5;
+            }
+            80%, 100% {
+                opacity: 0;
+            }
+        }
 
+        /* Prompt fade-out animation */
+        @keyframes fadeOutPrompt {
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw; /* Cover full viewport width */
+            height: 100vh; /* Cover full viewport height */
+            z-index: 0; /* Place behind everything else */
+            object-fit: cover; /* Ensure the image fits without distortion */
+            pointer-events: none; /* Prevent interaction with the background */
+        }
 
     </style>
 </head>
 <body>
     <div class="overlay"></div>
+    <img src="assets/bwbg.png" alt="Background" class="bg">
     <!-- Left hand -->
     <img src="assets/left-hand.png" alt="Left Hand" class="left-hand">
     <!-- Right hand -->
@@ -248,9 +319,21 @@
         const activateEffect = () => {
             if (!isInteractive) return; // Prevent early activation
 
-            // Trigger the light expansion
-            const overlay = document.querySelector('.overlay');
-            overlay.style.animation = 'expandLight 5s forwards ease-out';
+            const nameElement = document.querySelector('.content');
+            nameElement.style.animation = 'bulbDisconnect 3s forwards';
+
+            // Fade out the prompt
+            const promptElement = document.querySelector('.prompt');
+            promptElement.style.animation = 'fadeOutPrompt 3s forwards';
+
+            // Trigger the light expansion after text disappears
+            setTimeout(() => {
+                const overlay = document.querySelector('.overlay');
+                overlay.style.animation = 'expandLight 3s forwards ease-out';
+                setTimeout(() => {
+                    window.location.href = 'selected-works.html?from=0';
+                }, 3000);
+            }, 3000); // Wait for text animations to complete
         };
 
         // Listen for button presses and clicks
