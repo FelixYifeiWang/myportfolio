@@ -24,11 +24,11 @@
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                background-color: gray; /* Match ending color of previous page */
+                background-color: black; /* Match ending color of previous page */
             }
             to {
                 opacity: 1;
-                background-color: #ffffff; /* Final color */
+                background-color: black; /* Final color */
             }
         }
 
@@ -55,6 +55,7 @@
             transform: translate(-50%, -50%);
             object-fit: cover;
             z-index: 1;
+            cursor: pointer;
         }
         
         .pj1 {
@@ -68,6 +69,7 @@
             z-index: 20;
             opacity: 0.7;
             transition: opacity 0.3s ease;
+            cursor: pointer;
         }
 
         .cover1:hover {
@@ -85,6 +87,7 @@
             z-index: 20;
             opacity: 0.6;
             transition: opacity 0.3s ease;
+            cursor: pointer;
         }
 
         .cover2:hover {
@@ -102,6 +105,7 @@
             z-index: 20;
             opacity: 0.7;
             transition: opacity 0.3s ease;
+            cursor: pointer;
         }
 
         .cover3:hover {
@@ -119,6 +123,7 @@
             z-index: 20;
             opacity: 0.6;
             transition: opacity 0.3s ease; /* Smooth transition for the opacity change */
+            cursor: pointer;
         }
 
         .cover4:hover {
@@ -137,6 +142,7 @@
             z-index: 20;
             opacity: 0.5;
             transition: opacity 0.3s ease;
+            cursor: pointer;
         }
 
         .cover5:hover {
@@ -211,6 +217,7 @@
             width: min(7vw,10vh);
             top: 10vh;
             left: 10vh;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -274,7 +281,9 @@
         // Check if navigated from index.html
         //#region start
         const urlParams = new URLSearchParams(window.location.search);
-        const fromIndex = urlParams.get('from') === '0';
+        var fromIndex = urlParams.get('from') === '0';
+
+        fromIndex = true;
 
         if (fromIndex) {
             // Add fade-in animation if navigated from index.html

@@ -182,7 +182,7 @@
             left: 50%;
             transform: translateX(-50%);
             color: #fff;
-            font-size: 0.8vw;
+            font-size: max(1vw, 1.78vh);
             opacity: 0;
             padding: 10px 20px;
             border-radius: 5px;
@@ -243,7 +243,7 @@
             100% {
                 width: 250vmax;
                 height: 250vmax;
-                background: gray;
+                background: black;
                 opacity: 1;
             }
         }
@@ -313,6 +313,7 @@
         // Enable interaction after 3 seconds
         setTimeout(() => {
             isInteractive = true;
+            document.body.style.cursor = "pointer";
         }, 3000);
 
         // Trigger effects on button press or click
