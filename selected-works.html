@@ -55,8 +55,92 @@
             object-fit: cover;
             z-index: 1;
         }
+        
+        .pj1 {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: 10;
+        }
+
+        .cover1 {
+            z-index: 20;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .cover1:hover {
+            opacity: 0.35; /* Reduced opacity on hover */
+        }
+
+        .pj2 {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: 10;
+        }
+
+        .cover2 {
+            z-index: 20;
+            opacity: 0.45;
+            transition: opacity 0.3s ease;
+        }
+
+        .cover2:hover {
+            opacity: 0.1; /* Reduced opacity on hover */
+        }
+
+        .pj3 {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: 10;
+        }
+
+        .cover3 {
+            z-index: 20;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .cover3:hover {
+            opacity: 0.35; /* Reduced opacity on hover */
+        }
+
+        .pj4 {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: 10;
+        }
+
+        .cover4 {
+            z-index: 20;
+            opacity: 0.6;
+            transition: opacity 0.3s ease; /* Smooth transition for the opacity change */
+        }
+
+        .cover4:hover {
+            opacity: 0.3; /* Reduced opacity on hover */
+        }
 
 
+        .pj5 {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: 10;
+        }
+
+        .cover5 {
+            z-index: 20;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .cover5:hover {
+            opacity: 0; /* Reduced opacity on hover */
+        }
 
     </style>
 </head>
@@ -64,6 +148,31 @@
     <div class="background">
         <img src="assets/colorbg.png" alt="Background" class="background-img">
         <img src="assets/swlabel_on.png" alt="Selected Works" class="sw" id="swImage">
+    </div>
+
+    <div>
+        <img src="assets/cover1.png" alt="Project 1" class="pj1 cover1">
+        <img src="assets/pj1.png" alt="Project 1" class="pj1">
+    </div>
+
+    <div>
+        <img src="assets/cover2.png" alt="Project 2" class="pj2 cover2">
+        <img src="assets/pj2.png" alt="Project 2" class="pj2">
+    </div>
+
+    <div>
+        <img src="assets/cover3.png" alt="Project 3" class="pj3 cover3">
+        <img src="assets/pj3.png" alt="Project 3" class="pj3">
+    </div>
+
+    <div>
+        <img src="assets/cover4.png" alt="Project 4" class="pj4 cover4">
+        <img src="assets/pj4.png" alt="Project 4" class="pj4">
+    </div>
+
+    <div>
+        <img src="assets/cover5.png" alt="Project 5" class="pj5 cover5">
+        <img src="assets/pj5.png" alt="Project 5" class="pj5">
     </div>
     
     <script>
@@ -82,12 +191,17 @@
 
         const backgroundImg = document.querySelector('.background-img');
         const swElement = document.querySelector('.sw');
+        const p1Elements = document.querySelectorAll('.pj1');
+        const p2Elements = document.querySelectorAll('.pj2');
+        const p3Elements = document.querySelectorAll('.pj3');
+        const p4Elements = document.querySelectorAll('.pj4');
+        const p5Elements = document.querySelectorAll('.pj5');
+
+        const fixedWidth = 1920;
+        const fixedHeight = 1080;
+        const aspectRatio = fixedWidth / fixedHeight;
 
         function positionSW() {
-            const fixedWidth = 1920;
-            const fixedHeight = 1080;
-            const aspectRatio = fixedWidth / fixedHeight;
-
             // Get the current viewport dimensions
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
@@ -117,14 +231,160 @@
             swElement.style.width = `${swWidth}px`;
         }
 
+        function positionProj1() {
 
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
 
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * 0.162) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swWidth = bgWidth * 0.307; // Maintain proportional scaling
+            p1Elements.forEach((element, index) => {
+                element.style.left = `${swX}px`;
+                element.style.width = `${swWidth}px`;
+            });
+        }
+
+        function positionProj2() {
+                // Get the current viewport dimensions
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                // Determine the scaling factor based on the larger dimension
+                let bgWidth, bgHeight;
+                if (viewportWidth / viewportHeight < aspectRatio) {
+                    // Viewport is wider than 1920:1080; scale by height
+                    bgHeight = viewportHeight;
+                    bgWidth = viewportHeight * aspectRatio;
+                } else {
+                    // Viewport is taller than 1920:1080; scale by width
+                    bgWidth = viewportWidth;
+                    bgHeight = viewportWidth / aspectRatio;
+                }
+
+                // Calculate `.sw`'s position relative to the scaled background
+                const swX = (bgWidth * 0.38) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+                const swY = (bgHeight * 0.29) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+                const swWidth = bgWidth * 0.075; // Maintain proportional scaling
+                p2Elements.forEach((element, index) => {
+                    element.style.left = `${swX}px`;
+                    element.style.top = `${swY}px`;
+                    element.style.width = `${swWidth}px`;
+                });
+        }
+
+        function positionProj3() {
+                // Get the current viewport dimensions
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                // Determine the scaling factor based on the larger dimension
+                let bgWidth, bgHeight;
+                if (viewportWidth / viewportHeight < aspectRatio) {
+                    // Viewport is wider than 1920:1080; scale by height
+                    bgHeight = viewportHeight;
+                    bgWidth = viewportHeight * aspectRatio;
+                } else {
+                    // Viewport is taller than 1920:1080; scale by width
+                    bgWidth = viewportWidth;
+                    bgHeight = viewportWidth / aspectRatio;
+                }
+
+                // Calculate `.sw`'s position relative to the scaled background
+                const swX = (bgWidth * 0.476) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+                const swY = (bgHeight * 0.36) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+                const swWidth = bgWidth * 0.069; // Maintain proportional scaling
+                p3Elements.forEach((element, index) => {
+                    element.style.left = `${swX}px`;
+                    element.style.top = `${swY}px`;
+                    element.style.width = `${swWidth}px`;
+                });
+        }
+
+        function positionProj4() {
+                // Get the current viewport dimensions
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                // Determine the scaling factor based on the larger dimension
+                let bgWidth, bgHeight;
+                if (viewportWidth / viewportHeight < aspectRatio) {
+                    // Viewport is wider than 1920:1080; scale by height
+                    bgHeight = viewportHeight;
+                    bgWidth = viewportHeight * aspectRatio;
+                } else {
+                    // Viewport is taller than 1920:1080; scale by width
+                    bgWidth = viewportWidth;
+                    bgHeight = viewportWidth / aspectRatio;
+                }
+
+                // Calculate `.sw`'s position relative to the scaled background
+                const swX = (bgWidth * 0.543) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+                const swY = (bgHeight * 0.174) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+                const swWidth = bgWidth * 0.051; // Maintain proportional scaling
+                p4Elements.forEach((element, index) => {
+                    element.style.left = `${swX}px`;
+                    element.style.top = `${swY}px`;
+                    element.style.width = `${swWidth}px`;
+                });
+        }
+
+        function positionProj5() {
+                // Get the current viewport dimensions
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                // Determine the scaling factor based on the larger dimension
+                let bgWidth, bgHeight;
+                if (viewportWidth / viewportHeight < aspectRatio) {
+                    // Viewport is wider than 1920:1080; scale by height
+                    bgHeight = viewportHeight;
+                    bgWidth = viewportHeight * aspectRatio;
+                } else {
+                    // Viewport is taller than 1920:1080; scale by width
+                    bgWidth = viewportWidth;
+                    bgHeight = viewportWidth / aspectRatio;
+                }
+
+                // Calculate `.sw`'s position relative to the scaled background
+                const swX = (bgWidth * 0.594) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+                const swY = (bgHeight * 0.445) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+                const swWidth = bgWidth * 0.122; // Maintain proportional scaling
+                p5Elements.forEach((element, index) => {
+                    element.style.left = `${swX}px`;
+                    element.style.top = `${swY}px`;
+                    element.style.width = `${swWidth}px`;
+                });
+        }
 
         // Recalculate position on window resize
         window.addEventListener('resize', positionSW);
+        window.addEventListener('resize', positionProj1);
+        window.addEventListener('resize', positionProj2);
+        window.addEventListener('resize', positionProj3);
+        window.addEventListener('resize', positionProj4);
+        window.addEventListener('resize', positionProj5);
 
         // Initial positioning
         positionSW();
+        positionProj1();
+        positionProj2();
+        positionProj3();
+        positionProj4();
+        positionProj5();
 
         const swImage = document.getElementById('swImage');
 
