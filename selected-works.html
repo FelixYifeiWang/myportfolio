@@ -159,14 +159,21 @@
             pointer-events: none;
         }
 
-        .desc{
+        .desc {
             opacity: 0;
             display: none;
-            position: absolute;
+            position: fixed; /* Ensures the overlay spans the viewport */
+            top: 0;
+            left: 0;
             width: 100vw;
-            height: 100vh;
+            height: 100vh; /* Full viewport height */
+            overflow: auto; /* Allows scrolling for overflowing content */
             z-index: 40;
             animation: none; /* Default, no animation */
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box; /* Include padding in the dimensions */
+            scrollbar-width: none;
         }
         @keyframes bulbConnect {
             0% {
@@ -214,10 +221,44 @@
             position: absolute;
             object-fit: cover;
             z-index: 50;
-            width: min(7vw,10vh);
+            width: 3vw;
             top: 10vh;
             left: 10vh;
             cursor: pointer;
+        }
+
+        .profile {
+            position: absolute;
+            object-fit: cover;
+            z-index: 40;
+            width: 100vw;
+            top: 0;
+            left: 0;
+        }
+        
+        .weblink {
+            width: 35.66%;
+            position: absolute;
+            object-fit: cover;
+            z-index: 50;
+            top: 297.34vw;
+            left: 32.18%;
+            transition: opacity 0.3s ease;
+        }
+
+        .weblink:hover {
+            opacity: 0.4;
+        }
+
+        .video1 {
+            position: absolute;
+            z-index: 50;
+            top: 309.63vw;
+            left: 21.81vw;
+            width: 56.38vw;
+            height: 31.71vw;
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
@@ -258,6 +299,11 @@
     <img src="assets/label5.png" class="label label5">
     <div class="desc1 desc">
         <img src="assets/x.png" alt="X" class="close">
+        <img src="assets/profile1.png" class="profile">
+        <a href="https://www.echoofmobius.com" target="_blank">
+            <img src="assets/weblink.png" class="weblink" alt="Web Link">
+        </a>
+        <iframe src="https://www.youtube.com/embed/izohRj-1sfM?si=lLVlqXmC7bcq8ca-" title="Echo of Mobius" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="video1"></iframe>
     </div>
     <div class="desc2 desc">
         <img src="assets/x.png" alt="X" class="close">
@@ -798,7 +844,7 @@
             desc1.style.display = 'block';
             setTimeout(() => {
                 desc1.classList.add('bulb-on');
-            }, 600);
+            }, 1500);
 
         });
 
