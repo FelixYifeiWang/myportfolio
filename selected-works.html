@@ -67,7 +67,7 @@
 
         .cover1 {
             z-index: 20;
-            opacity: 0.7;
+            opacity: 0.9;
             transition: opacity 0.3s ease;
             cursor: pointer;
         }
@@ -85,7 +85,7 @@
 
         .cover2 {
             z-index: 20;
-            opacity: 0.6;
+            opacity: 0.8;
             transition: opacity 0.3s ease;
             cursor: pointer;
         }
@@ -103,7 +103,7 @@
 
         .cover3 {
             z-index: 20;
-            opacity: 0.7;
+            opacity: 0.9;
             transition: opacity 0.3s ease;
             cursor: pointer;
         }
@@ -121,7 +121,7 @@
 
         .cover4 {
             z-index: 20;
-            opacity: 0.6;
+            opacity: 0.8;
             transition: opacity 0.3s ease; /* Smooth transition for the opacity change */
             cursor: pointer;
         }
@@ -140,7 +140,7 @@
 
         .cover5 {
             z-index: 20;
-            opacity: 0.5;
+            opacity: 0.7;
             transition: opacity 0.3s ease;
             cursor: pointer;
         }
@@ -290,7 +290,46 @@
             margin: 0;
             padding: 0;
         }
+        /* Cover 1 visited state */
+        .cover1.visited {
+            opacity: 0.35; /* Hovered opacity becomes the default */
+        }
+        .cover1.visited:hover {
+            opacity: 0.5;
+        }
+
+        /* Cover 2 visited state */
+        .cover2.visited {
+            opacity: 0.1; /* Hovered opacity becomes the default */
+        }
+        .cover2.visited:hover {
+            opacity: 0.4;
+        }
+
+        /* Repeat for other covers */
+        .cover3.visited {
+            opacity: 0.15; /* Hovered opacity becomes the default */
+        }
+        .cover3.visited:hover {
+            opacity: 0.5;
+        }
+
+        .cover4.visited {
+            opacity: 0.3; /* Hovered opacity becomes the default */
+        }
+        .cover4.visited:hover {
+            opacity: 0.4;
+        }
+
+        .cover5.visited {
+            opacity: 0; /* Hovered opacity becomes the default */
+        }
+        .cover5.visited:hover {
+            opacity: 0.3;
+        }
+
     </style>
+    <link rel="preload" as="image" href="assets/profile1.png">
 </head>
 <body>
     <div class="background">
@@ -322,14 +361,14 @@
         <img src="assets/cover5.png" alt="Project 5" class="pj5 cover5">
         <img src="assets/pj5.png" alt="Project 5" class="pj5">
     </div>
-    <img src="assets/label1.png" class="label label1">
-    <img src="assets/label2.png" class="label label2">
-    <img src="assets/label3.png" class="label label3">
-    <img src="assets/label4.png" class="label label4">
-    <img src="assets/label5.png" class="label label5">
+    <img src="assets/label1.png" alt="Project 1" class="label label1">
+    <img src="assets/label2.png" alt="Project 2" class="label label2">
+    <img src="assets/label3.png" alt="Project 3" class="label label3">
+    <img src="assets/label4.png" alt="Project 4" class="label label4">
+    <img src="assets/label5.png" alt="Project 5" class="label label5">
     <div class="desc1 desc">
         <img src="assets/x.png" alt="X" class="close">
-        <img src="assets/profile1.png" class="profile">
+        <img src="assets/profile1.png" alt="Project 1" class="profile">
         <a href="https://www.echoofmobius.com" target="_blank">
             <img src="assets/weblink.png" class="weblink" alt="Web Link">
         </a>
@@ -337,26 +376,27 @@
     </div>
     <div class="desc2 desc">
         <img src="assets/x.png" alt="X" class="close">
-        <img src="assets/profile2.png" class="profile">
+        <img src="assets/profile2.png" alt="Project 2" class="profile">
         <iframe src="https://www.youtube.com/embed/XPgQ4WrfZw0?si=8QhAm7F-E3O5y0Aq" title="Orpheus" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="video2"></iframe>
     </div>
     <div class="desc3 desc">
         <img src="assets/x.png" alt="X" class="close">
-        <img src="assets/profile3.png" class="profile">
+        <img src="assets/profile3.png" alt="Project 3" class="profile">
     </div>
     <div class="desc4 desc">
         <img src="assets/x.png" alt="X" class="close">
-        <img src="assets/profile4.png" class="profile">
+        <img src="assets/profile4.png" alt="Project 4" class="profile">
         <iframe src="https://www.youtube.com/embed/nVDoVkEmD04" title="VR Archaeology" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="video4"></iframe>
     </div>
     <div class="desc5 desc">
         <img src="assets/x.png" alt="X" class="close">
-        <img src="assets/profile5.png" class="profile">
+        <img src="assets/profile5.png" alt="Project 5" class="profile">
         <iframe src="https://www.youtube.com/embed/b8Zba4JSr6g?si=eixWVM6ENfghChsS" title="DreamIn" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="video5"></iframe>
     </div>
 
-
-
+    <audio id="clickSound" src="assets/click.aac"></audio>
+    <audio id="openSound" src="assets/windowopen.aac"></audio>
+    <audio id="closeSound" src="assets/windowclose.aac"></audio>
     
     <script>
         var overlay = false;
@@ -837,6 +877,21 @@
                 positionLabel3();
                 positionLabel4();
                 positionLabel5();
+                if (desc1.style.display === 'block') {
+                    cover1.classList.add('visited');
+                }
+                if (desc2.style.display === 'block') {
+                    cover2.classList.add('visited');
+                }
+                if (desc3.style.display === 'block') {
+                    cover3.classList.add('visited');
+                }
+                if (desc4.style.display === 'block') {
+                    cover4.classList.add('visited');
+                }
+                if (desc5.style.display === 'block') {
+                    cover5.classList.add('visited');
+                }
                 desc1.style.display = 'none';
                 desc2.style.display = 'none';
                 desc3.style.display = 'none';
@@ -847,10 +902,16 @@
                 label3.style.opacity = '0';
                 label4.style.opacity = '0';
                 label5.style.opacity = '0';
+                desc1.classList.remove('bulb-on');
+                desc2.classList.remove('bulb-on');
+                desc3.classList.remove('bulb-on');
+                desc4.classList.remove('bulb-on');
+                desc5.classList.remove('bulb-on');
             })
         });
 
         cover1.addEventListener('click', () => {
+            windowOpenSound();
             label1.src = "assets/pw.png";
             label1.style.opacity = '1';
             const viewportWidth = window.innerWidth;
@@ -881,11 +942,12 @@
             desc1.style.display = 'block';
             setTimeout(() => {
                 desc1.classList.add('bulb-on');
-            }, 1500);
+            }, 300);
 
         });
 
         cover2.addEventListener('click', () => {
+            windowOpenSound();
             label2.src = "assets/pw.png";
             label2.style.opacity = '1';
             const viewportWidth = window.innerWidth;
@@ -916,10 +978,11 @@
             desc2.style.display = 'block';
             setTimeout(() => {
                 desc2.classList.add('bulb-on');
-            }, 600);
+            }, 300);
 
         });
         cover3.addEventListener('click', () => {
+            windowOpenSound();
             label3.src = "assets/pw.png";
             label3.style.opacity = '1';
             const viewportWidth = window.innerWidth;
@@ -950,10 +1013,11 @@
             desc3.style.display = 'block';
             setTimeout(() => {
                 desc3.classList.add('bulb-on');
-            }, 600);
+            }, 300);
 
         });
         cover4.addEventListener('click', () => {
+            windowOpenSound();
             label4.src = "assets/pw.png";
             label4.style.opacity = '1';
             const viewportWidth = window.innerWidth;
@@ -984,10 +1048,11 @@
             desc4.style.display = 'block';
             setTimeout(() => {
                 desc4.classList.add('bulb-on');
-            }, 600);
+            }, 300);
 
         });
         cover5.addEventListener('click', () => {
+            windowOpenSound();
             label5.src = "assets/pw.png";
             label5.style.opacity = '1';
             const viewportWidth = window.innerWidth;
@@ -1018,7 +1083,7 @@
             desc5.style.display = 'block';
             setTimeout(() => {
                 desc5.classList.add('bulb-on');
-            }, 600);
+            }, 300);
 
         });
         //#endregion
@@ -1037,7 +1102,29 @@
         });
         //#endregion
 
+        const playSound = () => {
+            const clickSound = document.getElementById('clickSound');
+            clickSound.currentTime = 0; // Reset the sound to the start
+            clickSound.play();
+        };
+        document.addEventListener('keydown', () => {
+            playSound();
+        });
+        document.addEventListener('click', () => {
+            playSound();
+        });
 
+        const windowOpenSound = () => {
+            const clickSound = document.getElementById('openSound');
+            clickSound.currentTime = 0; // Reset the sound to the start
+            clickSound.volume = 0.6;
+            clickSound.play();
+        };
+        const windowCloseSound = () => {
+            const clickSound = document.getElementById('closeSound');
+            clickSound.currentTime = 0; // Reset the sound to the start
+            clickSound.play();
+        };
     </script>
 </body>
 </html>

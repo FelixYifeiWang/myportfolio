@@ -62,6 +62,7 @@
             margin: 0;
             text-shadow: 0 0 10px #fff;
             line-height: 8vw;
+            user-select: none;
         }
 
         /* Animations */
@@ -307,8 +308,18 @@
     <div class="prompt">
         Press ANY button to continue
     </div>
+    <audio id="clickSound" src="assets/click-heavy.mp3"></audio>
+    <audio id="lightdown" src="assets/lightdown.aac"></audio>
+
     <script>
         let isInteractive = false;
+        const playSound = () => {
+            const clickSound = document.getElementById('clickSound');
+            clickSound.currentTime = 0; // Reset the sound to the start
+            clickSound.play();
+        };
+
+        
 
         // Enable interaction after 3 seconds
         setTimeout(() => {
@@ -319,7 +330,12 @@
         // Trigger effects on button press or click
         const activateEffect = () => {
             if (!isInteractive) return; // Prevent early activation
-
+            const lightdownSound = document.getElementById('lightdown');
+            setTimeout(() => {
+                lightdownSound.volume = 0.39;
+                lightdownSound.play();
+            }, 800);
+            
             const nameElement = document.querySelector('.content');
             nameElement.style.animation = 'bulbDisconnect 3s forwards';
 
@@ -330,6 +346,7 @@
             // Trigger the light expansion after text disappears
             setTimeout(() => {
                 const overlay = document.querySelector('.overlay');
+                
                 overlay.style.animation = 'expandLight 3s forwards ease-out';
                 setTimeout(() => {
                     window.location.href = 'selected-works.html?from=0';
@@ -337,9 +354,14 @@
             }, 3000); // Wait for text animations to complete
         };
 
-        // Listen for button presses and clicks
-        document.addEventListener('keydown', activateEffect);
-        document.addEventListener('click', activateEffect);
+        document.addEventListener('keydown', () => {
+            playSound();
+            activateEffect();
+        });
+        document.addEventListener('click', () => {
+            playSound();
+            activateEffect();
+        });
     </script>
     
 </body>
