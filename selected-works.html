@@ -18,6 +18,7 @@
             overflow: hidden;
             position: relative;
             transition: filter 1s ease;
+            opacity: 0;
         }
 
         /* Fade-in Animation */
@@ -67,7 +68,7 @@
 
         .cover1 {
             z-index: 20;
-            opacity: 0.9;
+            opacity: 0.8;
             transition: opacity 0.3s ease;
             cursor: pointer;
         }
@@ -85,7 +86,7 @@
 
         .cover2 {
             z-index: 20;
-            opacity: 0.8;
+            opacity: 0.7;
             transition: opacity 0.3s ease;
             cursor: pointer;
         }
@@ -103,7 +104,7 @@
 
         .cover3 {
             z-index: 20;
-            opacity: 0.9;
+            opacity: 0.8;
             transition: opacity 0.3s ease;
             cursor: pointer;
         }
@@ -121,7 +122,7 @@
 
         .cover4 {
             z-index: 20;
-            opacity: 0.8;
+            opacity: 0.7;
             transition: opacity 0.3s ease; /* Smooth transition for the opacity change */
             cursor: pointer;
         }
@@ -292,7 +293,7 @@
         }
         /* Cover 1 visited state */
         .cover1.visited {
-            opacity: 0.35; /* Hovered opacity becomes the default */
+            opacity: 0.25; /* Hovered opacity becomes the default */
         }
         .cover1.visited:hover {
             opacity: 0.5;
@@ -300,7 +301,7 @@
 
         /* Cover 2 visited state */
         .cover2.visited {
-            opacity: 0.1; /* Hovered opacity becomes the default */
+            opacity: 0; /* Hovered opacity becomes the default */
         }
         .cover2.visited:hover {
             opacity: 0.4;
@@ -308,14 +309,14 @@
 
         /* Repeat for other covers */
         .cover3.visited {
-            opacity: 0.15; /* Hovered opacity becomes the default */
+            opacity: 0.05; /* Hovered opacity becomes the default */
         }
         .cover3.visited:hover {
             opacity: 0.5;
         }
 
         .cover4.visited {
-            opacity: 0.3; /* Hovered opacity becomes the default */
+            opacity: 0.2; /* Hovered opacity becomes the default */
         }
         .cover4.visited:hover {
             opacity: 0.4;
@@ -410,7 +411,7 @@
 
         if (fromIndex) {
             // Add fade-in animation if navigated from index.html
-            document.body.style.animation = 'fadeIn 2s ease-in forwards';
+            document.body.style.animation = 'fadeIn 1.5s ease-in forwards';
 
             const currentUrl = window.location.href; // Get the full URL
             const newUrl = currentUrl.split('?')[0]; // Remove the query string part
