@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yifei Felix Wang</title>
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap');
 
@@ -60,7 +61,7 @@
         .content h1 {
             font-size: 15vw;
             margin: 0;
-            text-shadow: 0 0 10px #fff;
+            text-shadow: 0 0 1.1vw #fff;
             line-height: 8vw;
             user-select: none;
         }
@@ -189,6 +190,20 @@
             border-radius: 5px;
             animation: showPrompt 2s ease-in 2s, blink 3s infinite 4s; /* Delay of 5s */
             z-index: 1;
+            text-align: center;
+            width: 100vw;
+        }
+
+        @media screen and (max-aspect-ratio: 3/4) {
+            .left-hand, .right-hand {
+                display: none;
+            }
+
+            .content h1 {
+                font-size: 20vw;
+                line-height: 13vw;
+                text-align: right;
+            }
         }
 
         @keyframes showPrompt {
@@ -336,6 +351,20 @@
             playSound();
             activateEffect();
         });
+        function adjustContentForAspectRatio() {
+            const dynamicText = document.getElementById('dynamic-text');
+            const aspectRatio = window.innerWidth / window.innerHeight;
+
+            if (aspectRatio <= 0.75) { // If aspect ratio is less than or equal to 3:4
+                dynamicText.innerHTML = "Yifei<br><br>Felix<br><br>Wang";
+            } else {
+                dynamicText.innerHTML = "Yifei Felix<br><br>Wang";
+            }
+        }
+
+        // Adjust content on load and resize
+        window.addEventListener('load', adjustContentForAspectRatio);
+        window.addEventListener('resize', adjustContentForAspectRatio);
     </script>
     
 </body>
