@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selected Works</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MTFBJ9W9EY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-MTFBJ9W9EY');
+    </script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            
+            background-image: url('assets/whitebg.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+
+        /* Fixed left column */
+        .left-column {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32vw;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .left-column h1 {
+            font-size: 3.33vw;
+            line-height: 2.33vw;
+            font-family: 'Zen Dots', sans-serif;
+            font-weight: 300;
+            margin-top: 6vh;
+            margin-left: 3vw;
+        }
+
+        .left-column ul {
+            list-style-type: none;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-weight: 400;
+            font-size: 0.8325vw;
+            padding: 0;
+            margin-left: 3vw;
+            margin-top: 10vh;
+        }
+
+        .left-column ul li {
+            margin: 35px 0;
+        }
+
+        .left-column ul li a {
+            text-decoration: none;
+            color: #AEAEAE;
+        }
+
+        .left-column .immersive-view {
+            position: fixed;
+            margin-top: 0;
+            margin-left: 3vw;
+            bottom: 6vh;
+            text-align: left;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 0.624vw;
+        }
+
+        .left-column .immersive-view button {
+            padding: 0.6vw 1.6vw;
+            border: 0.18vw solid #333;
+            background: none;
+            cursor: pointer;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 1.04vw;
+        }
+
+        .left-column .cat-icon {
+            position: fixed;
+            text-align: left;
+            margin-left: 3vw;
+            bottom: 16vh;
+        }
+
+        .left-column .cat-icon img {
+            width: 6.04vw;
+            height: auto;
+        }
+
+        /* Scrolling content */
+        .content {
+            position: fixed;
+            margin-left: 31.6vw;
+            top: 27vh;
+            width: 67.4vw;
+            height: 73vh;
+            overflow-y: auto;
+            font-family: 'Poppins', Arial, sans-serif;
+            scrollbar-width: none;
+        }
+        
+        .content::-webkit-scrollbar {
+            display: none; /* For Chrome, Safari, and Edge */
+        }
+
+        .project {
+            margin-bottom: 5.94vw;
+            margin-right: 3vw;
+        }
+
+        .project img {
+            width: 100%;
+        }
+
+        .project h2 {
+            font-size: 1.665vw;
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .project p {
+            font-size: 1.04vw;
+            color: #AEAEAE;
+            text-align: right;
+        }
+
+        #chosen {
+            color: black;
+        }
+
+
+        @media (orientation: portrait) {
+            .left-column ul{
+                display: none;
+            }
+            .left-column .immersive-view {
+                display: none;
+            }
+            .left-column .cat-icon{
+                display: none;
+            }
+            .left-column h1{
+                margin-top: 2vh;
+                font-size: 5vw;
+                line-height: 3vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .content {
+                width: 80vw;
+                margin-left: 10vw;
+                top: 17vh;
+                height: 83vh;
+            }
+            .project h2 {
+                font-size: 1.665vw;
+                font-weight: 400;
+                text-align: right;
+            }
+
+            .project p {
+                font-size: 1.04vw;
+                color: #AEAEAE;
+                text-align: right;
+            }
+        }
+
+        @media (max-aspect-ratio: 1.45/1) {
+            .left-column .immersive-view {
+                display: none;
+            }
+            .left-column .cat-icon{
+                display: none;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .left-column ul {
+                font-size: 1.6vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 2vw;
+            }
+
+            .project p {
+                font-size: 1.6vw;
+                color: #AEAEAE;
+                text-align: right;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 4vw;
+            }
+
+            .project p {
+                font-size: 2.3vw;
+                color: #AEAEAE;
+                text-align: right;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-column">
+        <h1>Yifei Felix<br><br>Wang</h1>
+        <ul>
+            <li><a href="#about">About Me</a></li>
+            <li><a href="#selected" id="chosen">Selected Works</a></li>
+            <li><a href="#other">Other Works</a></li>
+            <!-- <li><a href="#contact">Contact</a></li> -->
+        </ul>
+        <div class="cat-icon">
+            <img src="assets/cat1.png" alt="Cat Icon">
+        </div>
+        <div class="immersive-view">
+            <p>Try something fun and a little quirky ↓</p>
+            <a href="selected-works.html?from=0"><button>Immersive View</button></a>
+        </div>
+        
+    </div>
+
+    <div class="content">
+        <div class="project">
+            <a href="proj1.html"><img src="assets/flat1.png" alt="Project 1"></a>
+            <h2>Echo of Mobius</h2>
+            <p>A role-playing video game with infinite AI characters.</p>
+        </div>
+
+        <div class="project">
+            <img src="assets/flat2.png" alt="Project 2">
+            <h2>Orpheus</h2>
+            <p>An AI mental well-being support chatbot with EEG monitoring.</p>
+        </div>
+
+        <div class="project">
+            <img src="assets/flat3.png" alt="Project 2">
+            <h2>Undeciber</h2>
+            <p>A 2020-themed social impact driven fashion brand.</p>
+        </div>
+
+        <div class="project">
+            <img src="assets/flat4.png" alt="Project 2">
+            <h2>DreamIn Engine</h2>
+            <p>A prompt-based AI game engine with no technical barrier.</p>
+        </div>
+
+        <div class="project">
+            <img src="assets/flat5.png" alt="Project 2">
+            <h2>RelicVR</h2>
+            <p>An immersive VR application visualizing archaeological sites.</p>
+        </div>
+        <div class="project">
+            <p></p>
+        </div>
+        <!-- Add more projects as needed -->
+    </div>
+    <script>
+        function positionItem(item, x, y, w) {
+            if (overlay) {
+                return;
+            }
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * x) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swY = (bgHeight * y) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+            const swWidth = bgWidth * w; // Maintain proportional scaling
+            item.style.left = `${swX}px`;
+            item.style.top = `${swY}px`;
+            item.style.width = `${swWidth}px`;
+        }
+    </script>
+</body>
+</html>
