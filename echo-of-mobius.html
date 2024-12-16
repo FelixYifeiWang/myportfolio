@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo of Mobius</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MTFBJ9W9EY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-MTFBJ9W9EY');
+    </script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            
+            background-image: url('assets/whitebg.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-color: white;
+        }
+
+        /* Fixed left column */
+        .left-column {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32vw;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .left-column h1 {
+            font-size: 3.33vw;
+            line-height: 2.33vw;
+            font-family: 'Zen Dots', sans-serif;
+            font-weight: 300;
+            margin-top: 6vh;
+            margin-left: 3vw;
+        }
+
+        .left-column ul {
+            list-style-type: none;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-weight: 400;
+            font-size: 0.8325vw;
+            padding: 0;
+            margin-left: 3vw;
+            margin-top: 10vh;
+        }
+
+        .left-column ul li {
+            margin: 35px 0;
+        }
+
+        .left-column ul li a {
+            text-decoration: none;
+            color: #AEAEAE;
+        }
+
+        .left-column .immersive-view {
+            position: fixed;
+            margin-top: 0;
+            margin-left: 3vw;
+            bottom: 6vh;
+            text-align: left;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 0.624vw;
+        }
+
+        .left-column .immersive-view button {
+            padding: 0.6vw 1.6vw;
+            border: 0.18vw solid #333;
+            background: none;
+            cursor: pointer;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 1.04vw;
+        }
+
+        .left-column .cat-icon {
+            position: fixed;
+            text-align: left;
+            margin-left: 3vw;
+            bottom: 6vh;
+        }
+
+        .left-column .cat-icon img {
+            width: 3vw;
+            height: auto;
+        }
+
+        /* Scrolling content */
+        .content {
+            position: fixed;
+            margin-left: 31.6vw;
+            top: 27vh;
+            width: 67.4vw;
+            height: 73vh;
+            overflow-y: auto;
+            font-family: 'Poppins', Arial, sans-serif;
+            scrollbar-width: none;
+        }
+        
+        .content::-webkit-scrollbar {
+            display: none; /* For Chrome, Safari, and Edge */
+        }
+
+        .project {
+            margin-bottom: 5.94vw;
+            margin-right: 3vw;
+        }
+
+        .project img {
+            width: 100%;
+        }
+
+        .project .illustration {
+            text-align: center;
+            width: 80%;
+            margin-left: 10%;
+            margin-top: 6vh;
+        }
+
+        .project h2 {
+            font-size: 1.665vw;
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .project h3 {
+            font-size: 1.3vw;
+            font-weight: 400;
+            text-align: left;
+            margin-left: 3vw;
+            color: #AEAEAE;
+        }
+
+        .project p {
+            font-size: 0.8vw;
+            color: black;
+            text-align: left;
+            margin-left: 3vw;
+        }
+
+        #chosen {
+            color: black;
+        }
+
+
+        @media (orientation: portrait) {
+            .left-column ul{
+                display: none;
+            }
+            .left-column .immersive-view {
+                display: none;
+            }
+            .left-column .cat-icon{
+                display: none;
+            }
+            .left-column h1{
+                margin-top: 2vh;
+                font-size: 5vw;
+                line-height: 3vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .content {
+                width: 80vw;
+                margin-left: 10vw;
+                top: 17vh;
+                height: 83vh;
+            }
+            .project h2 {
+                font-size: 1.665vw;
+                font-weight: 400;
+            }
+
+            .project h3 {
+                font-size: 1.4vw;
+                font-weight: 400;
+            }
+
+            .project p {
+                font-size: 1.04vw;
+            }
+        }
+
+        @media (max-aspect-ratio: 1.45/1) {
+            .left-column .immersive-view {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .left-column ul {
+                font-size: 1.3vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 2vw;
+            }
+            .project h3 {
+                font-size: 1.8vw;
+            }
+
+            .project p {
+                font-size: 1.3vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 4vw;
+            }
+
+            .project h3 {
+                font-size: 3.2vw;
+            }
+
+            .project p {
+                font-size: 2.3vw;
+            }
+        }
+
+        .custom-line {
+            border: none;
+            margin-bottom: 3vw;
+            height: 0.5px;
+            background-color: black;
+            width: 100%;
+        }
+
+        .iframe-container {
+            position: relative;
+            width: 80%;
+            margin-left: 10%;
+            margin-top: 6vh;
+            padding-bottom: 45%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-column">
+        <h1>Echo of<br><br>Mobius</h1>
+        <ul>
+            <li>Infinite Game with AI Characters</li>
+            <li>Oct. 2024</li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">My Roles:</li>
+            <li><dd> Team Lead / Game Design <br> Game Dev / AI & ML Dev </dd></li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">Project Type:</li>
+            <li><dd> Startup </dd></li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">Core Tech Stacks:</li>
+            <li><dd> Generative AI / Unity <br> Blender / Cloud Infra </dd></li>
+        </ul>
+        <div class="cat-icon">
+            <a href="selected-works-plain.html"><img src="assets/back.png" alt="Back Icon"></a>
+        </div>
+        
+    </div>
+
+    <div class="content">
+        <div class="project">
+            <img src="assets/proj1.png" alt="Project 1">
+            <h2>Nobody wants their AI companions stay in a chat box.</h2>
+        </div>
+
+        <div class="project">
+            <hr class="custom-line">
+            <h3>Initiative</h3>
+            <p>AI accompaniment is gradually becoming a part of more and more people's lives, and it has become a new content carrier. However, most AI companion apps on the market limit its potential to boring chat boxes.<br><br>As passionate gamers and early adopters of AI characters, my startup team launched this project to create an immersive game world where users can interact with AI characters in more fun and engaging ways.</p>
+        </div>
+
+        <div class="project">
+            <h3>Research & Ideation</h3>
+            <p>
+                Our team started with a ton of market research. By "a ton," I mean we tried almost every AI chatbot app out there. We also spent hours daily in Reddit communities, joining discussions and interviewing users about why they quit or stayed hooked. Then, we explored role-playing games to find the best gameplay modes.</p>
+            <img class="illustration" src="assets/i1-1.png" alt="Ideation Images">
+            <img class="illustration" src="assets/i1-2.png" alt="User Persona Images">
+        </div>
+
+        <div class="project">
+            <h3>Prototyping</h3>
+            <p>
+                Building a full game is a huge effort, so we wanted to make sure we were on the right track first. Instead of diving straight in, we created a simple Discord bot as our MVP. With it, users could create and chat with characters, take them on text adventures, battle others (purely random winners), and watch them evolve. Our testers loved the community, and it grew organically.
+            </p>
+            <img class="illustration" src="assets/i1-3.png" alt="Discord Bot Images">
+            
+        </div>
+        <div class="project">
+            <h3>Product Development</h3>
+            <p>
+                With our MVP validating demand, we moved forward with building the game. From our market research, we identified turn-based battles and CRPG text-pic adventures as the best gameplay modes because of the broad audience and creative space, and are relatively simple to implement. We developed a basic draft and recruited about 30 testers to help us refine visuals and balance gameplay mechanics.
+                <br><br>
+                On the technical side, the main challenge was integrating generative AI seamlessly into a production-level game. Our team of three 2D artists (including myself) created 130 virtual characters as a training dataset. We fine-tuned SDXL (later replaced with Flux) using LoRA techniques. To standardize the generated images, I developed a CV sequence algorithm that handled tasks like background removal, and adjustments to exposure, saturation, and size.
+                <br><br>
+                For character interactions, we used APIs from both OpenAI and Anthropic. GPT excelled at command interactions, while Claude generated more engaging narratives and dialogues. Each character was paired with a memory system designed by us to track player choices, which could influence the character’s development. To enhance immersion, we implemented fixed-perspective 3D scenes for the game’s visuals.
+            </p>
+            <img class="illustration" src="assets/i1-4.png" alt="Dev Log Images">
+            
+        </div>
+
+        <div class="project">
+            <h3>Growth & Operation</h3>
+            <p>
+                Our main growth strategy is collaborating with streamers. The game's creative freedom makes it easy for them to create engaging content, often leading to their highest-ever CCV. Many streamers promoted our game for free because of this. Additionally, the UGC ecosystem has driven organic growth, as players naturally share and expand the game themselves.
+            </p>
+            <img class="illustration" src="assets/i1-5.png" alt="Streamer Images">
+            
+        </div>
+
+        <div class="project">
+            <h3>Impact</h3>
+            <p>
+                • Launched in late October, now with <b>2,000+</b> users and <b>300+</b> paying players, still growing rapidly.<br><br>
+                • Over <b>20,000</b> unique characters created, making it the game with the most playable characters worldwide.<br><br>
+                • Achieved a second-week retention rate of <b>26%</b> and an average session time of <b>30+</b> minutes.<br><br>
+                • Over 30 streamers featured the game, reaching <b>50k+</b> views across platforms.<br><br>
+                • Established a sustainable business model with a <b>90%</b> profit margin.
+            </p>
+        </div>
+        <div class="project">
+            <h3>Official Website: &ensp;<b><a href="https://www.echoofmobius.com" target="_blank" style="color: black;text-decoration: none;">www.echoofmobius.com</a></b></h3>
+        </div>
+        <div class="project">
+            <h3>Gallery</h3>
+            <div class="iframe-container">
+                <iframe 
+                src="https://www.youtube.com/embed/izohRj-1sfM?si=lLVlqXmC7bcq8ca-" 
+                title="Echo of Mobius" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+                </iframe>
+            </div>
+            <img class="illustration" src="assets/i1-6.png" alt="Gallary Images">
+            <img class="illustration" src="assets/i1-7.png" alt="Gallary Images">
+            <img class="illustration" src="assets/i1-8.png" alt="Gallary Images">
+            <img class="illustration" src="assets/i1-9.png" alt="Gallary Images">
+        </div>
+        
+    </div>
+    <script>
+        function positionItem(item, x, y, w) {
+            if (overlay) {
+                return;
+            }
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * x) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swY = (bgHeight * y) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+            const swWidth = bgWidth * w; // Maintain proportional scaling
+            item.style.left = `${swX}px`;
+            item.style.top = `${swY}px`;
+            item.style.width = `${swWidth}px`;
+        }
+    </script>
+</body>
+</html>

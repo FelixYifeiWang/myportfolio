@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RelicVR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MTFBJ9W9EY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-MTFBJ9W9EY');
+    </script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            
+            background-image: url('assets/whitebg.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-color: white;
+        }
+
+        /* Fixed left column */
+        .left-column {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32vw;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .left-column h1 {
+            font-size: 3.33vw;
+            line-height: 2.33vw;
+            font-family: 'Zen Dots', sans-serif;
+            font-weight: 300;
+            margin-top: 6vh;
+            margin-left: 3vw;
+        }
+
+        .left-column ul {
+            list-style-type: none;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-weight: 400;
+            font-size: 0.8325vw;
+            padding: 0;
+            margin-left: 3vw;
+            margin-top: 10vh;
+        }
+
+        .left-column ul li {
+            margin: 35px 0;
+        }
+
+        .left-column ul li a {
+            text-decoration: none;
+            color: #AEAEAE;
+        }
+
+        .left-column .immersive-view {
+            position: fixed;
+            margin-top: 0;
+            margin-left: 3vw;
+            bottom: 6vh;
+            text-align: left;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 0.624vw;
+        }
+
+        .left-column .immersive-view button {
+            padding: 0.6vw 1.6vw;
+            border: 0.18vw solid #333;
+            background: none;
+            cursor: pointer;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 1.04vw;
+        }
+
+        .left-column .cat-icon {
+            position: fixed;
+            text-align: left;
+            margin-left: 3vw;
+            bottom: 6vh;
+        }
+
+        .left-column .cat-icon img {
+            width: 3vw;
+            height: auto;
+        }
+
+        /* Scrolling content */
+        .content {
+            position: fixed;
+            margin-left: 31.6vw;
+            top: 27vh;
+            width: 67.4vw;
+            height: 73vh;
+            overflow-y: auto;
+            font-family: 'Poppins', Arial, sans-serif;
+            scrollbar-width: none;
+        }
+        
+        .content::-webkit-scrollbar {
+            display: none; /* For Chrome, Safari, and Edge */
+        }
+
+        .project {
+            margin-bottom: 5.94vw;
+            margin-right: 3vw;
+        }
+
+        .project img {
+            width: 100%;
+        }
+
+        .project .illustration {
+            text-align: center;
+            width: 80%;
+            margin-left: 10%;
+            margin-top: 6vh;
+        }
+
+        .project h2 {
+            font-size: 1.665vw;
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .project h3 {
+            font-size: 1.3vw;
+            font-weight: 400;
+            text-align: left;
+            margin-left: 3vw;
+            color: #AEAEAE;
+        }
+
+        .project p {
+            font-size: 0.8vw;
+            color: black;
+            text-align: left;
+            margin-left: 3vw;
+        }
+
+        #chosen {
+            color: black;
+        }
+
+
+        @media (orientation: portrait) {
+            .left-column ul{
+                display: none;
+            }
+            .left-column .immersive-view {
+                display: none;
+            }
+            .left-column .cat-icon{
+                display: none;
+            }
+            .left-column h1{
+                margin-top: 2vh;
+                font-size: 5vw;
+                line-height: 3vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .content {
+                width: 80vw;
+                margin-left: 10vw;
+                top: 17vh;
+                height: 83vh;
+            }
+            .project h2 {
+                font-size: 1.665vw;
+                font-weight: 400;
+            }
+
+            .project h3 {
+                font-size: 1.4vw;
+                font-weight: 400;
+            }
+
+            .project p {
+                font-size: 1.04vw;
+            }
+        }
+
+        @media (max-aspect-ratio: 1.45/1) {
+            .left-column .immersive-view {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .left-column ul {
+                font-size: 1.3vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 2vw;
+            }
+            .project h3 {
+                font-size: 1.8vw;
+            }
+
+            .project p {
+                font-size: 1.3vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 4vw;
+            }
+
+            .project h3 {
+                font-size: 3.2vw;
+            }
+
+            .project p {
+                font-size: 2.3vw;
+            }
+        }
+
+        .custom-line {
+            border: none;
+            margin-bottom: 3vw;
+            height: 0.5px;
+            background-color: black;
+            width: 100%;
+        }
+
+        .iframe-container {
+            position: relative;
+            width: 80%;
+            margin-left: 10%;
+            margin-top: 6vh;
+            padding-bottom: 45%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-column">
+        <h1>RelicVR</h1>
+        <ul>
+            <li>VR Archaeological Data Visualization</li>
+            <li>Mar. 2023</li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">My Roles:</li>
+            <li><dd> Software Dev / Product Design <br> UIUX Design / UIUX Design </dd></li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">Project Type:</li>
+            <li><dd> Individual </dd></li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">Core Tech Stacks:</li>
+            <li><dd> Unity VR / Data Processing <br>  CloudCompare / Blender </dd></li>
+        </ul>
+        <div class="cat-icon">
+            <a href="selected-works-plain.html"><img src="assets/back.png" alt="Back Icon"></a>
+        </div>
+        
+    </div>
+
+    <div class="content">
+        <div class="project">
+            <img src="assets/proj4.png" alt="Project 2">
+            <h2>The preview mode of a time machine.</h2>
+        </div>
+
+        <div class="project">
+            <hr class="custom-line">
+            <h3>Initiative</h3>
+            <p>VR technology has revolutionized visual experiences. Despite its limitations, applications like Google Earth and medical tools have shown the immense value of immersive data visualization. Meanwhile, archaeological data remains largely inaccessible and unfriendly to the general public, presenting an ideal opportunity for innovation.<br><br>This project uses open-source datasets from Open Heritage to reconstruct ancient sites in an immersive virtual space, enabling users to explore and interact with history like never before.</p>
+        </div>
+
+        <div class="project">
+            <h3>Research & Ideation</h3>
+            <p>Google Earth VR was a major inspiration during the ideation process. It provided an unprecedented experience, allowing me to fly over a realistic visualization of Earth and navigate to places like my college dorm or favorite art museum.</p>
+            <img class="illustration" style="margin-bottom: 6vh;" src="assets/i4-1.png" alt="Google Earth Images">
+            <p>It felt natural to consider an archaeology application. As a player, I’ve seen many games based on historical settings, with VR emerging as a powerful new medium. Combining both to create a valuable experience was intuitive. I explored various related applications, many of which were academic and highly inspiring. Most importantly, I discovered OpenHeritage, which provided the data needed to bring this idea to life.</p>
+            <img class="illustration" src="assets/i4-2.png" alt="Applications Images">
+        </div>
+
+        <div class="project">
+            <h3>Product Design & Development</h3>
+            <p>
+                The OpenHeritage website features an embedded application that allows users to view data through a WebGL-based Point Cloud viewer, developed by Vienna University of Technology in collaboration with UCSD. This tool, which is open-sourced, provided a solid foundation for my work. I decided to build upon it, focusing on exploring interaction and visualization capabilities that go beyond what is possible on a flat PC webpage.
+            </p>
+            <img class="illustration" style="margin-bottom: 6vh;" src="assets/i4-3.png" alt="Open Sourced Code Images">
+            <p>
+                The main challenge was converting the LiDAR data into a mesh model suitable for Unity VR applications. I used a tool called CloudCompare to import, clean, and downsample the LiDAR dataset. The processed point cloud was then imported into Blender using the Point Cloud Visualizer plugin to create the mesh. The rest of the process was more familiar to me, focusing on implementing VR interactions using controllers and simple hand gestures. For instance, one cool feature allowed users to quickly swing down the controllers or their hands to randomly switch to a different historical site.
+            </p>
+            <img class="illustration" src="assets/i4-5.png" alt="Unity Images">
+        </div>
+
+        <div class="project">
+            <h3>Outcome</h3>
+            <p>
+                • Successfully recreated native VR versions of ancient sites, enabling users to experience archaeology interactively.<br><br>
+                • Received positive feedback from <b>10+</b> testers, highlighting the project's potential for education and cultural preservation.<br><br>
+                • <b>80%</b> of participants said they would be <b>more interested</b> in learning about archaeology if presented in this interactive format.<br><br>
+                • Demonstrated how VR technology, supported by open-source data and tools, can bridge the gap between physical heritage sites and modern audiences.
+            </p>
+        </div>
+        <div class="project">
+            <h3>Gallery</h3>
+            <div class="iframe-container">
+                <iframe 
+                src="https://www.youtube.com/embed/nVDoVkEmD04" 
+                title="RelicVR" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+                </iframe>
+            </div>
+            <img class="illustration" src="assets/i4-6.png" alt="Gallary Images">
+            <img class="illustration" src="assets/i4-7.png" alt="Gallary Images">
+            <img class="illustration" src="assets/i4-8.png" alt="Gallary Images">
+        </div>
+        
+    </div>
+    <script>
+        function positionItem(item, x, y, w) {
+            if (overlay) {
+                return;
+            }
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * x) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swY = (bgHeight * y) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+            const swWidth = bgWidth * w; // Maintain proportional scaling
+            item.style.left = `${swX}px`;
+            item.style.top = `${swY}px`;
+            item.style.width = `${swWidth}px`;
+        }
+    </script>
+</body>
+</html>

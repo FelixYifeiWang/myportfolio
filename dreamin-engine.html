@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamIn Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MTFBJ9W9EY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-MTFBJ9W9EY');
+    </script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            
+            background-image: url('assets/whitebg.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-color: white;
+        }
+
+        /* Fixed left column */
+        .left-column {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32vw;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .left-column h1 {
+            font-size: 3.33vw;
+            line-height: 2.33vw;
+            font-family: 'Zen Dots', sans-serif;
+            font-weight: 300;
+            margin-top: 6vh;
+            margin-left: 3vw;
+        }
+
+        .left-column ul {
+            list-style-type: none;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-weight: 400;
+            font-size: 0.8325vw;
+            padding: 0;
+            margin-left: 3vw;
+            margin-top: 10vh;
+        }
+
+        .left-column ul li {
+            margin: 35px 0;
+        }
+
+        .left-column ul li a {
+            text-decoration: none;
+            color: #AEAEAE;
+        }
+
+        .left-column .immersive-view {
+            position: fixed;
+            margin-top: 0;
+            margin-left: 3vw;
+            bottom: 6vh;
+            text-align: left;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 0.624vw;
+        }
+
+        .left-column .immersive-view button {
+            padding: 0.6vw 1.6vw;
+            border: 0.18vw solid #333;
+            background: none;
+            cursor: pointer;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 1.04vw;
+        }
+
+        .left-column .cat-icon {
+            position: fixed;
+            text-align: left;
+            margin-left: 3vw;
+            bottom: 6vh;
+        }
+
+        .left-column .cat-icon img {
+            width: 3vw;
+            height: auto;
+        }
+
+        /* Scrolling content */
+        .content {
+            position: fixed;
+            margin-left: 31.6vw;
+            top: 27vh;
+            width: 67.4vw;
+            height: 73vh;
+            overflow-y: auto;
+            font-family: 'Poppins', Arial, sans-serif;
+            scrollbar-width: none;
+        }
+        
+        .content::-webkit-scrollbar {
+            display: none; /* For Chrome, Safari, and Edge */
+        }
+
+        .project {
+            margin-bottom: 5.94vw;
+            margin-right: 3vw;
+        }
+
+        .project img {
+            width: 100%;
+        }
+
+        .project .illustration {
+            text-align: center;
+            width: 80%;
+            margin-left: 10%;
+            margin-top: 6vh;
+        }
+
+        .project h2 {
+            font-size: 1.665vw;
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .project h3 {
+            font-size: 1.3vw;
+            font-weight: 400;
+            text-align: left;
+            margin-left: 3vw;
+            color: #AEAEAE;
+        }
+
+        .project p {
+            font-size: 0.8vw;
+            color: black;
+            text-align: left;
+            margin-left: 3vw;
+        }
+
+        #chosen {
+            color: black;
+        }
+
+
+        @media (orientation: portrait) {
+            .left-column ul{
+                display: none;
+            }
+            .left-column .immersive-view {
+                display: none;
+            }
+            .left-column .cat-icon{
+                display: none;
+            }
+            .left-column h1{
+                margin-top: 2vh;
+                font-size: 5vw;
+                line-height: 3vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .content {
+                width: 80vw;
+                margin-left: 10vw;
+                top: 17vh;
+                height: 83vh;
+            }
+            .project h2 {
+                font-size: 1.665vw;
+                font-weight: 400;
+            }
+
+            .project h3 {
+                font-size: 1.4vw;
+                font-weight: 400;
+            }
+
+            .project p {
+                font-size: 1.04vw;
+            }
+        }
+
+        @media (max-aspect-ratio: 1.45/1) {
+            .left-column .immersive-view {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .left-column ul {
+                font-size: 1.3vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 2vw;
+            }
+            .project h3 {
+                font-size: 1.8vw;
+            }
+
+            .project p {
+                font-size: 1.3vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 4vw;
+            }
+
+            .project h3 {
+                font-size: 3.2vw;
+            }
+
+            .project p {
+                font-size: 2.3vw;
+            }
+        }
+
+        .custom-line {
+            border: none;
+            margin-bottom: 3vw;
+            height: 0.5px;
+            background-color: black;
+            width: 100%;
+        }
+
+        .iframe-container {
+            position: relative;
+            width: 80%;
+            margin-left: 10%;
+            margin-top: 6vh;
+            padding-bottom: 45%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-column">
+        <h1>DreamIn<br><br>Engine</h1>
+        <ul>
+            <li>Prompt-based AI Game Engine</li>
+            <li>Nov. 2023</li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">My Roles:</li>
+            <li><dd> Team Lead / Product Design <br> AI & ML Dev / UIUX Design </dd></li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">Project Type:</li>
+            <li><dd> Startup </dd></li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">Core Tech Stacks:</li>
+            <li><dd> Generative AI / Cloud Infra <br> CV Algorithm / Full-stack Dev </dd></li>
+        </ul>
+        <div class="cat-icon">
+            <a href="selected-works-plain.html"><img src="assets/back.png" alt="Back Icon"></a>
+        </div>
+        
+    </div>
+
+    <div class="content">
+        <div class="project">
+            <img src="assets/proj3.png" alt="Project 2">
+            <h2>God took 7 days to create the world. Now, you can create yours in minutes.</h2>
+        </div>
+
+        <div class="project">
+            <hr class="custom-line">
+            <h3>Initiative</h3>
+            <p>Video games are one of the most popular content mediums worldwide, with over 3 billion gamers. Yet, unlike text, images, or videos, most gaming enthusiasts lack the tools or skills to create games themselves.
+                <br><br>
+                This project seeks to democratize game development. By leveraging generative AI and cloud gaming, we enable anyone to create fully functional games in minutes, eliminating technical barriers. Just as platforms like e-books, Twitter, Instagram, and YouTube revolutionized content creation for text, images, and videos, we aim to bring the same decentralization to gaming.</p>
+        </div>
+
+        <div class="project">
+            <h3>Research & Ideation</h3>
+            <p>
+                My cofounders and I are passionate indie game developers, naturally surrounded by gamers. A common request we hear is from people sharing their game ideas. Some are artists, some are writers, and some are just gamers with vivid imaginations. We've recommended tools like Godot, RPG Maker, or Roblox to help them, but none fully met their needs. While these tools aren’t the ultimate solution, they’ve inspired us in shaping our approach.</p>
+            <img class="illustration" style="margin-bottom: 6vh;" accesskey=""src="assets/i3-1.png" alt="Game Engines Images">
+            <p>After researching all lightweight game engines on the market and collectively conducting nearly 100 hours of interviews with people sharing this need, we created our user persona storyboard.</p>
+            <img class="illustration" src="assets/i3-2.png" alt="User Persona Images">
+        </div>
+
+        <div class="project">
+            <h3>Prototyping</h3>
+            <p>
+                To validate the need, we built a minimum viable product on an emerging online social platform called Gather Town. Using its built-in multiplayer and visual features, we developed a plug-in that, with some manual effort, transformed a testing user's paragraph description into an interactive, game-like experience. We then distributed these experiences to other testing users and formed a small community. The result was a high satisfaction and recommendation rate among the test group.</p>
+            <img class="illustration" accesskey=""src="assets/i3-4.png" alt="Game Engines Images">
+        </div>
+
+        <div class="project">
+            <h3>Product Design & Development</h3>
+            <p>
+                Drawing inspiration from Midjourney, we built our user community on Discord, leveraging its adaptable APIs to create an efficient content distribution system. To ensure both quality and accessibility for our game content and engine, we developed an integrated website closely tied to our Discord community. Users can create games through the same link, and each game is assigned a unique URL that is automatically shared within the community.
+            </p>
+            <img class="illustration" style="margin-bottom: 6vh;" src="assets/i3-3.png" alt="Community Images">
+            <p>
+                The game experience and engine were built using Unity. Our core feature was a conversational interface, where an AI copilot guides the creator by asking questions and generating corresponding game assets based on their answers. We created a custom training dataset of around 30 images for characters and game maps, training separate image generation models. For dialogues and certain game mechanics, we utilized GPT-3.5. To kickstart the project, we collaborated with two game dev-focused YouTubers, which proved successful.
+            </p>
+            <img class="illustration" src="assets/i3-5.png" alt="Dev Log Images">
+        </div>
+
+        <div class="project">
+            <h3>Outcome</h3>
+            <p>
+                • Within 3 months of beta testing, over <b>3,000</b> users were involved, with <b>2,000+</b> still on the waitlist.<br><br>
+                • <b>3,200+</b> games were created, surpassing <b>the number of games uploaded to Steam</b> during the same period.<br><br>
+                • Logged over <b>200,000</b> gameplay sessions.<br><br>
+                • The most popular YouTube video about our project garnered over <b>200k</b> views.<br><br>
+                • Gained a deeper understanding of the potential and current limitations of AI in game creation, laying the groundwork for future improvements.
+            </p>
+        </div>
+        <div class="project">
+            <h3>Gallery</h3>
+            <div class="iframe-container">
+                <iframe 
+                src="https://www.youtube.com/embed/b8Zba4JSr6g?si=eixWVM6ENfghChsS" 
+                title="DreamIn Engine" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+                </iframe>
+            </div>
+            <img class="illustration" src="assets/i3-6.png" alt="Gallary Images">
+            <img class="illustration" src="assets/i3-7.png" alt="Gallary Images">
+            <img class="illustration" src="assets/i3-8.png" alt="Gallary Images">
+        </div>
+        
+    </div>
+    <script>
+        function positionItem(item, x, y, w) {
+            if (overlay) {
+                return;
+            }
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * x) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swY = (bgHeight * y) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+            const swWidth = bgWidth * w; // Maintain proportional scaling
+            item.style.left = `${swX}px`;
+            item.style.top = `${swY}px`;
+            item.style.width = `${swWidth}px`;
+        }
+    </script>
+</body>
+</html>

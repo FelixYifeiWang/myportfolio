@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orpheus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MTFBJ9W9EY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-MTFBJ9W9EY');
+    </script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            
+            background-image: url('assets/whitebg.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-color: white;
+        }
+
+        /* Fixed left column */
+        .left-column {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32vw;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .left-column h1 {
+            font-size: 3.33vw;
+            line-height: 2.33vw;
+            font-family: 'Zen Dots', sans-serif;
+            font-weight: 300;
+            margin-top: 6vh;
+            margin-left: 3vw;
+        }
+
+        .left-column ul {
+            list-style-type: none;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-weight: 400;
+            font-size: 0.8325vw;
+            padding: 0;
+            margin-left: 3vw;
+            margin-top: 10vh;
+        }
+
+        .left-column ul li {
+            margin: 35px 0;
+        }
+
+        .left-column ul li a {
+            text-decoration: none;
+            color: #AEAEAE;
+        }
+
+        .left-column .immersive-view {
+            position: fixed;
+            margin-top: 0;
+            margin-left: 3vw;
+            bottom: 6vh;
+            text-align: left;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 0.624vw;
+        }
+
+        .left-column .immersive-view button {
+            padding: 0.6vw 1.6vw;
+            border: 0.18vw solid #333;
+            background: none;
+            cursor: pointer;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 1.04vw;
+        }
+
+        .left-column .cat-icon {
+            position: fixed;
+            text-align: left;
+            margin-left: 3vw;
+            bottom: 6vh;
+        }
+
+        .left-column .cat-icon img {
+            width: 3vw;
+            height: auto;
+        }
+
+        /* Scrolling content */
+        .content {
+            position: fixed;
+            margin-left: 31.6vw;
+            top: 27vh;
+            width: 67.4vw;
+            height: 73vh;
+            overflow-y: auto;
+            font-family: 'Poppins', Arial, sans-serif;
+            scrollbar-width: none;
+        }
+        
+        .content::-webkit-scrollbar {
+            display: none; /* For Chrome, Safari, and Edge */
+        }
+
+        .project {
+            margin-bottom: 5.94vw;
+            margin-right: 3vw;
+        }
+
+        .project img {
+            width: 100%;
+        }
+
+        .project .illustration {
+            text-align: center;
+            width: 80%;
+            margin-left: 10%;
+            margin-top: 6vh;
+        }
+
+        .project h2 {
+            font-size: 1.665vw;
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .project h3 {
+            font-size: 1.3vw;
+            font-weight: 400;
+            text-align: left;
+            margin-left: 3vw;
+            color: #AEAEAE;
+        }
+
+        .project p {
+            font-size: 0.8vw;
+            color: black;
+            text-align: left;
+            margin-left: 3vw;
+        }
+
+        #chosen {
+            color: black;
+        }
+
+
+        @media (orientation: portrait) {
+            .left-column ul{
+                display: none;
+            }
+            .left-column .immersive-view {
+                display: none;
+            }
+            .left-column .cat-icon{
+                display: none;
+            }
+            .left-column h1{
+                margin-top: 2vh;
+                font-size: 5vw;
+                line-height: 3vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .content {
+                width: 80vw;
+                margin-left: 10vw;
+                top: 17vh;
+                height: 83vh;
+            }
+            .project h2 {
+                font-size: 1.665vw;
+                font-weight: 400;
+            }
+
+            .project h3 {
+                font-size: 1.4vw;
+                font-weight: 400;
+            }
+
+            .project p {
+                font-size: 1.04vw;
+            }
+        }
+
+        @media (max-aspect-ratio: 1.45/1) {
+            .left-column .immersive-view {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .left-column ul {
+                font-size: 1.3vw;
+            }
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 2vw;
+            }
+            .project h3 {
+                font-size: 1.8vw;
+            }
+
+            .project p {
+                font-size: 1.3vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-column {
+                width: 100vw;
+            }
+            .project h2 {
+                font-size: 4vw;
+            }
+
+            .project h3 {
+                font-size: 3.2vw;
+            }
+
+            .project p {
+                font-size: 2.3vw;
+            }
+        }
+
+        .custom-line {
+            border: none;
+            margin-bottom: 3vw;
+            height: 0.5px;
+            background-color: black;
+            width: 100%;
+        }
+
+        .iframe-container {
+            position: relative;
+            width: 80%;
+            margin-left: 10%;
+            margin-top: 6vh;
+            padding-bottom: 45%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-column">
+        <h1>Orpheus</h1>
+        <ul>
+            <li>Brainwave Sensing AI Chatbot</li>
+            <li>Mar. 2024</li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">My Roles:</li>
+            <li><dd> Product Design / BCI Dev <br> AI & ML Dev / UIUX Design </dd></li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">Project Type:</li>
+            <li><dd> Individual </dd></li>
+            <li  style="color: #AEAEAE; margin-bottom: -1vw;">Core Tech Stacks:</li>
+            <li><dd> EEG Hardware / Data Processing <br> Generative AI / Full-stack Dev </dd></li>
+        </ul>
+        <div class="cat-icon">
+            <a href="selected-works-plain.html"><img src="assets/back.png" alt="Back Icon"></a>
+        </div>
+        
+    </div>
+
+    <div class="content">
+        <div class="project">
+            <img src="assets/proj2.png" alt="Project 2">
+            <h2>Can a machine listen to the whispers of your soul?</h2>
+        </div>
+
+        <div class="project">
+            <hr class="custom-line">
+            <h3>Initiative</h3>
+            <p>In an era of rapid AI evolution, people often ask: where is the line between AI and living beings? A common answer is that AI lacks feelings. But is that really true? What does it even mean to "feel"?<br><br>Today, neurotechnology has advanced to the point where mental states can be partially monitored as data streams. This experimental project combines these cutting-edge technologies to create an AI bot with an innovative interactive interface. Designed to support well-being, the bot also explores how AI perceives and responds to emotions.</p>
+        </div>
+
+        <div class="project">
+            <h3>Research & Ideation</h3>
+            <p>This project was inspired by my first neuroscience course, where I was fascinated by the idea of representing human minds as data. It got me thinking about the potential for a new generation of interfaces (BCI) and whether AI could be trained using this data. Although the project only required entry-level neurotech knowledge, I had to dive deeper into academic research and prepare for processing EEG signals. Based on my understanding of the technology's capabilities and potential outcomes, I developed a simple user persona.</p>
+            <img class="illustration" src="assets/i2-2.png" alt="User Persona Images">
+            <p>Finding the right hardware was also crucial. I chose a consumer-grade device to make testing accessible to a broader audience, ultimately selecting the Muse 2 for its portability and affordability.</p>
+            <img class="illustration" src="assets/i2-1.png" alt="Hardware Images">
+        </div>
+
+        <div class="project">
+            <h3>Product Design & Development</h3>
+            <p>
+                My first step was to build a simple prototype to retrieve data from the device and display it in a chart. However, I found that the headset often introduced significant noise when not worn properly or disrupted by user movements. Since these issues are difficult to control, I implemented a data processing algorithm to filter out outliers and normalize the data for better comparison.
+            </p>
+            <img class="illustration" style="margin-bottom: 6vh;" src="assets/i2-3.png" alt="Prototype Images">
+            <p>
+                The frontend design was inspired by Neuralink's functional minimalism, EVA's dynamic AT Field visuals, and the sleek mystery of the device in Her. These elements guided me to create a blackhole-shaped display, using color and particle movements to represent different mental states.
+            </p>
+            <img class="illustration" style="margin-bottom: 6vh;" src="assets/i2-4.png" alt="Inspiration Images">
+            <p>
+                Then, as planned, I integrated the LLM with processed numerical data and corresponding states. This allowed it to recognize basic emotions or at least a binary mental state. I refined the data processing algorithms through several iterations for better accuracy. Using Three.js, I created a dynamic particle system with BufferGeometry and PointsMaterial, where particle movements are driven by EEG data processed via WebSockets, visually representing mental states in real time.
+            </p>
+            <img class="illustration" src="assets/i2-6.png" alt="Dev Log Images">
+        </div>
+
+        <div class="project">
+            <h3>Outcome</h3>
+            <p>
+                • Engaged <b>20+</b> participants to interact with the system, gathering valuable insights on usability and the emotional accuracy of the AI's responses.<br><br>
+                • The most frequently mentioned word in the feedback was <b>"special"</b>, highlighting how users found the experience unique and unprecedented. Some even felt it understood their emotions better than they did themselves.<br><br>
+                • <b>50%</b> of participants agreed that the AI bot has potential well-being support value, helping users recognize and manage their emotions.<br><br>
+                •  While this simple implementation doesn’t enable the AI to actively generate feelings or emotions, it does allow for a basic understanding of them, offering a novel user experience. It showcases the potential for brainwave-driven emotional AI systems.
+            </p>
+        </div>
+        <div class="project">
+            <h3>Gallery</h3>
+            <div class="iframe-container">
+                <iframe 
+                src="https://www.youtube.com/embed/XPgQ4WrfZw0?si=8QhAm7F-E3O5y0Aq" 
+                title="Orpheus" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+                </iframe>
+            </div>
+            <img class="illustration" src="assets/i2-7.png" alt="Gallary Images">
+            <img class="illustration" src="assets/i2-8.png" alt="Gallary Images">
+            <img class="illustration" src="assets/i2-9.png" alt="Gallary Images">
+        </div>
+        
+    </div>
+    <script>
+        function positionItem(item, x, y, w) {
+            if (overlay) {
+                return;
+            }
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * x) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swY = (bgHeight * y) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+            const swWidth = bgWidth * w; // Maintain proportional scaling
+            item.style.left = `${swX}px`;
+            item.style.top = `${swY}px`;
+            item.style.width = `${swWidth}px`;
+        }
+    </script>
+</body>
+</html>
