@@ -53,6 +53,27 @@
             z-index: 0;
         }
 
+        .exit {
+            z-index: 100000;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        .door {
+            z-index: 99999;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .door:hover {
+            opacity: 1;
+        }
+
         .background-img {
             width: 100%;
             height: 100%;
@@ -300,6 +321,21 @@
             margin: 0;
             padding: 0;
         }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                background-color: black; /* Match ending color of previous page */
+            }
+            to {
+                opacity: 0;
+                background-color: black; /* Final color */
+            }
+        }
+
+        .fadeout {
+            animation: fadeOut 1.5s ease-out forwards;
+        }
         /* Cover 1 visited state */
         .cover1.visited {
             opacity: 0.25; /* Hovered opacity becomes the default */
@@ -379,6 +415,8 @@
     <img src="assets/label3.png" alt="Project 3" class="label label3">
     <img src="assets/label4.png" alt="Project 4" class="label label4">
     <img src="assets/label5.png" alt="Project 5" class="label label5">
+    <img src="assets/exit.png" alt="Exit" class="exit">
+    <a href="selected-works-plain.html?from=0"><img src="assets/doorlight.png" alt="Door" class="door"></a>
     <div class="desc1 desc">
         <img src="assets/x.png" alt="X" class="close">
         <img src="assets/profile1.png" alt="Project 1" class="profile">
@@ -641,6 +679,8 @@
         const label3 = document.querySelector('.label3');
         const label4 = document.querySelector('.label4');
         const label5 = document.querySelector('.label5');
+        const exit = document.querySelector('.exit');
+        const door = document.querySelector('.door');
 
         cover1.addEventListener('mouseover', () => {
             if (!overlay && !shown){
@@ -857,6 +897,68 @@
         }
         window.addEventListener('resize', positionLabel5);
         positionLabel5();
+
+        function positionExit() {
+            if (overlay) {
+                return;
+            }
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * 0.833) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swY = (bgHeight * 0.313) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+            const swWidth = bgWidth * 0.0534; // Maintain proportional scaling
+            exit.style.left = `${swX}px`;
+            exit.style.top = `${swY}px`;
+            exit.style.width = `${swWidth}px`;
+        }
+        window.addEventListener('resize', positionExit);
+        positionExit();
+
+        function positionDoor() {
+            if (overlay) {
+                return;
+            }
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * 0.8) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swY = (bgHeight * 0.4023) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+            const swWidth = bgWidth * 0.1289; // Maintain proportional scaling
+            door.style.left = `${swX}px`;
+            door.style.top = `${swY}px`;
+            door.style.width = `${swWidth}px`;
+        }
+        window.addEventListener('resize', positionDoor);
+        positionDoor();
         //#endregion
 
         //#region loadWindow
@@ -1120,9 +1222,9 @@
             clickSound.currentTime = 0; // Reset the sound to the start
             clickSound.play();
         };
-        document.addEventListener('keydown', () => {
-            playSound();
-        });
+        // document.addEventListener('keydown', () => {
+        //     playSound();
+        // });
         document.addEventListener('click', () => {
             playSound();
         });
@@ -1138,6 +1240,29 @@
             clickSound.currentTime = 0; // Reset the sound to the start
             clickSound.play();
         };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const internalLinks = document.querySelectorAll('a[href^="selected-works-plain.html?from=0"]');
+
+            internalLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    // Check if the link has an href attribute
+                    if (!this.getAttribute('href')) return;
+
+                    event.preventDefault(); // Prevent immediate navigation
+
+                    const destination = this.href; // Get the link's destination
+
+                    // Add the fade-out class to start the animation
+                    document.body.style.animation = 'fadeOut 1s ease-out forwards';
+
+                    // After the animation duration, navigate to the destination
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 1000); // Match the animation duration (1.5s)
+                });
+            });
+        });
     </script>
 </body>
 </html>

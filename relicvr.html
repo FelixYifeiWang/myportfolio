@@ -15,6 +15,32 @@
         gtag('config', 'G-MTFBJ9W9EY');
     </script>
     <style>
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                background-color: white; /* Match ending color of previous page */
+            }
+            to {
+                opacity: 0;
+                background-color: white; /* Final color */
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                background-color: white; /* Match ending color of previous page */
+            }
+            to {
+                opacity: 1;
+                background-color: white; /* Final color */
+            }
+        }
+        .fadein {
+            animation: fadeIn 0.3s ease-in forwards;
+        }
+        .fadeout {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
         body {
             margin: 0;
             overflow: hidden;
@@ -368,6 +394,30 @@
             item.style.top = `${swY}px`;
             item.style.width = `${swWidth}px`;
         }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select all internal links
+            document.body.classList.add('fadein');
+            const internalLinks = document.querySelectorAll('a[href^="selected-works-plain.html"]');
+
+            internalLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    // Check if the link has an href attribute
+                    if (!this.getAttribute('href')) return;
+
+                    event.preventDefault(); // Prevent immediate navigation
+
+                    const destination = this.href; // Get the link's destination
+
+                    // Add the fade-out class to start the animation
+                    document.body.classList.add('fadeout');
+
+                    // After the animation duration, navigate to the destination
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 300); // Match the animation duration (1.5s)
+                });
+            });
+        });
     </script>
 </body>
 </html>
