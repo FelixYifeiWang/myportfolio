@@ -114,6 +114,11 @@
             cursor: pointer;
             font-family: 'Poppins', Arial, sans-serif;
             font-size: 1.04vw;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .left-column .immersive-view button:hover{
+            opacity: 0.6;
         }
 
         .left-column .cat-icon {
@@ -138,6 +143,7 @@
             overflow-y: auto;
             font-family: 'Poppins', Arial, sans-serif;
             scrollbar-width: none;
+            scroll-behavior: smooth;
         }
         
         .content::-webkit-scrollbar {
@@ -312,35 +318,35 @@
     </div>
 
     <div class="content">
-        <div class="project">
+        <section class="project" id="project1">
             <a href="echo-of-mobius.html"><img src="assets/flat1.png" alt="Project 1"></a>
             <h2>Echo of Mobius</h2>
             <p>A role-playing video game with infinite AI characters.</p>
-        </div>
+        </section>
 
-        <div class="project">
+        <section class="project" id="project2">
             <a href="orpheus.html"><img src="assets/flat2.png" alt="Project 2"></a>
             <h2>Orpheus</h2>
             <p>An AI mental well-being support chatbot with EEG monitoring.</p>
-        </div>
+        </section>
       
-        <div class="project">
+        <section class="project" id="project3">
             <a href="dreamin-engine.html"><img src="assets/flat4.png" alt="Project 3"></a>
             <h2>DreamIn Engine</h2>
             <p>A prompt-based AI game engine with no technical barrier.</p>
-        </div>
+        </section>
 
-        <div class="project">
+        <section class="project" id="project4">
             <a href="relicvr.html"><img src="assets/flat5.png" alt="Project 4"></a>
             <h2>RelicVR</h2>
             <p>An immersive VR application visualizing archaeological sites.</p>
-        </div>
+        </section>
 
-        <div class="project">
+        <section class="project" id="project5">
             <a href="undecimber.html"><img src="assets/flat3.png" alt="Project 5"></a>
             <h2>Undeciber</h2>
             <p>A 2020-themed social impact driven fashion brand.</p>
-        </div>
+        </section>
         <div class="project">
             <p></p>
         </div>
