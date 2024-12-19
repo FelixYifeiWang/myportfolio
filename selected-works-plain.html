@@ -94,7 +94,7 @@
 
         .left-column ul li a {
             text-decoration: none;
-            color: #AEAEAE;
+            color: #949494;
         }
 
         .left-column .immersive-view {
@@ -167,7 +167,7 @@
 
         .project p {
             font-size: 1.04vw;
-            color: #AEAEAE;
+            color: #949494;
             text-align: right;
         }
 
@@ -208,7 +208,7 @@
 
             .project p {
                 font-size: 1.04vw;
-                color: #AEAEAE;
+                color: #949494;
                 text-align: right;
             }
         }
@@ -235,7 +235,7 @@
 
             .project p {
                 font-size: 1.6vw;
-                color: #AEAEAE;
+                color: #949494;
                 text-align: right;
             }
         }
@@ -250,7 +250,7 @@
 
             .project p {
                 font-size: 2.3vw;
-                color: #AEAEAE;
+                color: #949494;
                 text-align: right;
             }
         }
@@ -294,6 +294,18 @@
         .fadeoutBlack {
             animation: fadeOutBlack 1s ease-out forwards;
         }
+
+        .project video {
+            width: 100%;
+            height: auto;
+            object-fit: cover; /* Ensure videos maintain aspect ratio */
+            display: block;
+        }
+
+        .project a {
+            pointer-events: all; /* Ensure links remain clickable */
+        }
+
     </style>
 </head>
 <body>
@@ -319,31 +331,41 @@
 
     <div class="content">
         <section class="project" id="project1">
-            <a href="echo-of-mobius.html"><img src="assets/flat1.png" alt="Project 1"></a>
+            <a href="echo-of-mobius.html">
+                <video src="assets/v1.mp4" muted loop></video>
+            </a>
             <h2>Echo of Mobius</h2>
             <p>A role-playing video game with infinite AI characters.</p>
         </section>
 
         <section class="project" id="project2">
-            <a href="orpheus.html"><img src="assets/flat2.png" alt="Project 2"></a>
+            <a href="orpheus.html">
+                <video src="assets/v4.mp4" muted loop></video>
+            </a>
             <h2>Orpheus</h2>
             <p>An AI mental well-being support chatbot with EEG monitoring.</p>
         </section>
       
         <section class="project" id="project3">
-            <a href="dreamin-engine.html"><img src="assets/flat4.png" alt="Project 3"></a>
+            <a href="dreamin-engine.html">
+                <video src="assets/v2.mp4" muted loop></video>
+            </a>
             <h2>DreamIn Engine</h2>
-            <p>A prompt-based AI game engine with no technical barrier.</p>
+            <p>A prompt-based AI game engine with no technical barriers.</p>
         </section>
 
         <section class="project" id="project4">
-            <a href="relicvr.html"><img src="assets/flat5.png" alt="Project 4"></a>
+            <a href="relicvr.html">
+                <video src="assets/v3.mp4" muted loop></video>
+            </a>
             <h2>RelicVR</h2>
-            <p>An immersive VR application visualizing archaeological sites.</p>
+            <p>An immersive VR application for visualizing archaeological sites.</p>
         </section>
 
         <section class="project" id="project5">
-            <a href="undecimber.html"><img src="assets/flat3.png" alt="Project 5"></a>
+            <a href="undecimber.html">
+                <video src="assets/v5.mp4" muted loop></video>
+            </a>
             <h2>Undeciber</h2>
             <p>A 2020-themed social impact driven fashion brand.</p>
         </section>
@@ -405,6 +427,23 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+
+            const videos = document.querySelectorAll('.project video');
+
+            console.log(videos);
+
+            videos.forEach(video => {
+                video.addEventListener('mouseenter', () => {
+                    console.log(1);
+                    video.play();
+                });
+
+                video.addEventListener('mouseleave', () => {
+                    video.pause();
+                    console.log(2);
+                    video.currentTime = 0; // Reset to the beginning for looping effect
+                });
+            });
             // Select all internal links
             const internalLinks = document.querySelectorAll('a[href^="about-me.html"], a[href^="other-works.html"], a[href^="echo-of-mobius.html"], a[href^="orpheus.html"], a[href^="dreamin-engine.html"], a[href^="relicvr.html"], a[href^="undecimber.html"]');
 
