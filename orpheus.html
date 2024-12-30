@@ -75,7 +75,7 @@
             list-style-type: none;
             font-family: 'Poppins', Arial, sans-serif;
             font-weight: 400;
-            font-size: 0.8325vw;
+            font-size: max(0.8325vw, 1.75vh);
             padding: 0;
             margin-left: 3vw;
             margin-top: 10vh;
@@ -159,13 +159,13 @@
         }
 
         .project h2 {
-            font-size: 1.665vw;
+            font-size: max(1.665vw, 3vh);
             font-weight: 400;
             text-align: right;
         }
 
         .project h3 {
-            font-size: 1.3vw;
+            font-size: max(1.3vw, 2.73vh);
             font-weight: 400;
             text-align: left;
             margin-left: 3vw;
@@ -173,7 +173,7 @@
         }
 
         .project p {
-            font-size: 0.8vw;
+            font-size: max(0.8vw, 1.7vh);
             color: black;
             text-align: left;
             margin-left: 3vw;
@@ -192,7 +192,12 @@
                 display: none;
             }
             .left-column .cat-icon{
-                display: none;
+                top: 9vw;
+                right: 9vw;
+            }
+            .left-column .cat-icon img {
+                width: 10vw;
+                height: auto;
             }
             .left-column h1{
                 margin-top: 2vh;
@@ -244,7 +249,7 @@
             }
 
             .project p {
-                font-size: 1.3vw;
+                font-size: 1.4vw;
             }
         }
 
@@ -257,11 +262,11 @@
             }
 
             .project h3 {
-                font-size: 3.2vw;
+                font-size: 3.5vw;
             }
 
             .project p {
-                font-size: 2.3vw;
+                font-size: 2.8vw;
             }
         }
 
@@ -320,7 +325,7 @@
         <div class="project">
             <hr class="custom-line">
             <h3>Initiative</h3>
-            <p>In an era of rapid AI evolution, people often ask: where is the line between AI and living beings? A common answer is that AI lacks feelings. But is that really true? What does it even mean to "feel"? And if AI could feel, what value might that bring to us?<br><br>Today, neurotechnology has advanced to the point where mental states can be partially monitored as data streams. This experimental project combines these cutting-edge technologies to create an AI bot with an innovative interactive interface that integrates brainwave signal monitoring. Designed to support well-being, the bot also explores how AI perceives and responds to emotions.</p>
+            <p>In an era of rapid AI evolution, people often ask: where is the line between AI and living beings? A common answer is that AI lacks feelings. But is that really true? What does it even mean to "feel"? And if AI could feel, what value might that bring to us?<br><br>Today, neurotechnology has advanced to the point where mental states can be partially monitored as data streams. This experimental project combines these cutting-edge technologies to create an AI bot with an innovative interactive interface that integrates brainwave signal monitoring. Designed to support well-being, the bot also explores how AI perceives and responds to emotions, including calmness versus tension and cognitive load variations.</p>
         </div>
 
         <div class="project">
@@ -334,7 +339,7 @@
         <div class="project">
             <h3>Product Design & Development</h3>
             <p>
-                My first step was to build a simple prototype to retrieve data from the device and display it in a chart. However, I found that the headset often introduced significant noise when not worn properly or disrupted by user movements. Since these issues are difficult to control, I implemented a data processing algorithm to filter out outliers and normalize the data for better comparison.
+                My first step was to build a simple prototype to retrieve data from the device and display it in a chart. However, I found that the headset often introduced significant noise when not worn properly or disrupted by user movements. Since these issues are difficult to control, I implemented a data processing algorithm to filter out outliers and normalize the data for better comparison. Artifact removal uses Independent Component Analysis (ICA) to isolate noise from eye blinks and muscle activity. A Savitzky–Golay filter smooths EEG waveforms to improve visualization accuracy.
             </p>
             <img class="illustration" style="margin-bottom: 6vh;" src="assets/i2-3.png" alt="Prototype Images">
             <p>
@@ -342,7 +347,7 @@
             </p>
             <img class="illustration" style="margin-bottom: 6vh;" src="assets/i2-4.png" alt="Inspiration Images">
             <p>
-                Then, as planned, I integrated the LLM with processed numerical data and corresponding states. This allowed it to recognize basic emotions or at least a binary mental state. I refined the data processing algorithms through several iterations for better accuracy. Using Three.js, I created a dynamic particle system with BufferGeometry and PointsMaterial, where particle movements are driven by EEG data processed via WebSockets, visually representing mental states in real time.
+                Then, as planned, I integrated the LLM with processed numerical data and corresponding states. This allowed it to recognize basic emotions or at least a binary mental state. I refined the data processing algorithms through several iterations for better accuracy. Using Three.js, I created a dynamic particle system with BufferGeometry and PointsMaterial, where particle movements are driven by EEG data processed via WebSockets, visually representing mental states in real time. The point cloud's circle size represents signal amplitude, color gradients (red to blue) denote emotional valence, and dynamic shape transitions correspond to frequency shifts detected through Short-Time Fourier Transform (STFT).
             </p>
             <img class="illustration" src="assets/i2-6.png" alt="Dev Log Images">
         </div>
@@ -350,10 +355,10 @@
         <div class="project">
             <h3>Outcome</h3>
             <p>
-                • Engaged <b>20+</b> participants to interact with the system, gathering valuable insights on usability and the emotional accuracy of the AI's responses.<br><br>
+                • Engaged <b>20+</b> participants to interact with the system, gathering valuable insights on usability and the emotional accuracy of the AI's responses. Testing involved scenarios such as listening to calming versus fast-paced music or watching different types of videos.<br><br>
                 • The most frequently mentioned word in the feedback was <b>"special"</b>, highlighting how users found the experience unique and unprecedented. Some even felt it understood their emotions better than they did themselves.<br><br>
-                • <b>50%</b> of participants agreed that the AI bot has potential well-being support value, helping users recognize and manage their emotions.<br><br>
-                •  While this simple implementation doesn’t enable the AI to actively generate feelings or emotions, it does allow for a basic understanding of them, offering a novel user experience. It showcases the potential for brainwave-driven emotional AI systems.
+                • <b>50%</b> of participants agreed that the AI bot has potential well-being support value, helping users recognize and manage their emotions. After each round of testing, participants' self-reported emotional scores were compared with AI-reported scores, achieving an 85% accuracy rate in detecting cognitive load changes.<br><br>
+                • Building on this foundational interface, future developments could include a more advanced AI mental counselor that integrates domain-specific expertise and enhanced user interactions. Additionally, creative applications like emotion-driven games and AI-generated art, responding dynamically to emotional shifts, present exciting possibilities for entertainment and self-expression.
             </p>
         </div>
         <div class="project">

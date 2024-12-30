@@ -75,7 +75,7 @@
             list-style-type: none;
             font-family: 'Poppins', Arial, sans-serif;
             font-weight: 400;
-            font-size: 0.8325vw;
+            font-size: max(0.8325vw, 1.75vh);
             padding: 0;
             margin-left: 3vw;
             margin-top: 10vh;
@@ -97,7 +97,7 @@
             bottom: 6vh;
             text-align: left;
             font-family: 'Poppins', Arial, sans-serif;
-            font-size: 0.624vw;
+            font-size: max(0.624vw, 1.31vh);
         }
 
         .left-column .immersive-view button {
@@ -158,13 +158,13 @@
         }
 
         .project h2 {
-            font-size: 1.665vw;
+            font-size: max(1.665vw, 3vh);
             font-weight: 400;
             text-align: right;
         }
 
         .project h3 {
-            font-size: 1.3vw;
+            font-size: max(1.3vw, 2.73vh);
             font-weight: 400;
             text-align: left;
             margin-left: 3vw;
@@ -172,7 +172,7 @@
         }
 
         .project p {
-            font-size: 0.8vw;
+            font-size: max(0.8vw, 1.7vh);
             color: black;
             text-align: left;
             margin-left: 3vw;
@@ -248,7 +248,7 @@
             }
 
             .project p {
-                font-size: 1.3vw;
+                font-size: 1.4vw;
             }
         }
 
@@ -261,11 +261,11 @@
             }
 
             .project h3 {
-                font-size: 3.2vw;
+                font-size: 3.5vw;
             }
 
             .project p {
-                font-size: 2.3vw;
+                font-size: 2.8vw;
             }
         }
 
@@ -332,7 +332,7 @@
             <p>
                 Our team started with a ton of market research. By "a ton," I mean we tried almost every AI chatbot app out there. We also spent hours daily in Reddit communities, joining discussions and interviewing users about why they quit or stayed hooked. Then, we explored role-playing games to find the best gameplay modes.</p>
             <img class="illustration" src="assets/i1-1.png" style="margin-bottom: 6vh;"  alt="Ideation Images">
-            <p>From our research, we found a significant overlap between AI chatbot users and RPG players. Both groups consist primarily of creative and imaginative young people and teenagers who are willing to treat virtual characters as real beings. It is clear that they expect the experience to become more immersive and interactive. Some AI chatbot users are beginning to lose interest due to repetitive and simplistic interactions. Based on these insights, we developed this simple user persona.</p>
+            <p>From our research, we found a significant overlap between AI chatbot users and RPG players. Both groups consist primarily of creative and imaginative young people and teenagers who are willing to treat virtual characters as real beings. Our surveys revealed 73% of AI chatbot users seek deeper interactivity, while 68% of RPG players expressed interest in AI-driven dynamic storytelling. It is clear that they expect the experience to become more immersive and interactive. Some AI chatbot users are beginning to lose interest due to repetitive and simplistic interactions. Based on these insights, we developed this simple user persona.</p>
             <img class="illustration" src="assets/i1-2.png" alt="User Persona Images">
         </div>
 
@@ -349,9 +349,9 @@
             <p>
                 With our MVP validating demand, we moved forward with building the game. From our market research, we identified turn-based battles and CRPG text-pic adventures as the best gameplay modes because of the broad audience and creative space, and are relatively simple to implement. We first developed a basic draft and recruited about 30 testers to help us refine visuals and balance gameplay mechanics.
                 <br><br>
-                On the technical side, the main challenge was integrating generative AI seamlessly into a production-level game. Our team of three 2D artists (including myself) created 130 virtual characters as a training dataset. We fine-tuned SDXL (later replaced with Flux) using LoRA techniques. To standardize the generated images, I developed a CV sequence algorithm that handled tasks like background removal, and adjustments to exposure, saturation, and size.
+                On the technical side, the main challenge was integrating generative AI seamlessly into a production-level game. Our team of three 2D artists (including myself) created 130 virtual characters as a training dataset. We fine-tuned SDXL (later replaced with Flux) using LoRA techniques. To standardize the generated images, I developed a CV sequence algorithm that handled tasks like background removal, and adjustments to exposure, saturation, and size using techniques such as Gaussian blur or histogram equalization.
                 <br><br>
-                For character interactions, we used APIs from both OpenAI and Anthropic. GPT excelled at command interactions, while Claude generated more engaging narratives and dialogues. Each character was paired with a memory system designed by us to track player choices, which could influence the character’s development. To enhance immersion, we implemented fixed-perspective 3D scenes for the game’s visuals.
+                For character interactions, we used APIs from both OpenAI and Anthropic. GPT excelled at command interactions, while Claude generated more engaging narratives and dialogues. Each character was paired with a memory system designed by us to track player choices. For these memory systems, we employed vector databases to encode and retrieve past interactions, enabling characters to exhibit behavior influenced by historical player choices. To enhance immersion, we implemented fixed-perspective 3D scenes for the game’s visuals.
             </p>
             <img class="illustration" src="assets/i1-4.png" alt="Dev Log Images">
             

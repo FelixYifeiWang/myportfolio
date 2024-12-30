@@ -75,7 +75,7 @@
             list-style-type: none;
             font-family: 'Poppins', Arial, sans-serif;
             font-weight: 400;
-            font-size: 0.8325vw;
+            font-size: max(0.8325vw, 1.75vh);
             padding: 0;
             margin-left: 3vw;
             margin-top: 10vh;
@@ -97,7 +97,7 @@
             bottom: 6vh;
             text-align: left;
             font-family: 'Poppins', Arial, sans-serif;
-            font-size: 0.624vw;
+            font-size: max(0.624vw, 1.31vh);
         }
 
         .left-column .immersive-view button {
@@ -159,13 +159,13 @@
         }
 
         .project h2 {
-            font-size: 1.665vw;
+            font-size: max(1.665vw, 3vh);
             font-weight: 400;
             text-align: right;
         }
 
         .project h3 {
-            font-size: 1.3vw;
+            font-size: max(1.3vw, 2.73vh);
             font-weight: 400;
             text-align: left;
             margin-left: 3vw;
@@ -173,7 +173,7 @@
         }
 
         .project p {
-            font-size: 0.8vw;
+            font-size: max(0.8vw, 1.7vh);
             color: black;
             text-align: left;
             margin-left: 3vw;
@@ -192,7 +192,12 @@
                 display: none;
             }
             .left-column .cat-icon{
-                display: none;
+                top: 9vw;
+                right: 9vw;
+            }
+            .left-column .cat-icon img {
+                width: 10vw;
+                height: auto;
             }
             .left-column h1{
                 margin-top: 2vh;
@@ -244,7 +249,7 @@
             }
 
             .project p {
-                font-size: 1.3vw;
+                font-size: 1.4vw;
             }
         }
 
@@ -257,11 +262,11 @@
             }
 
             .project h3 {
-                font-size: 3.2vw;
+                font-size: 3.5vw;
             }
 
             .project p {
-                font-size: 2.3vw;
+                font-size: 2.8vw;
             }
         }
 
@@ -330,7 +335,8 @@
             <p>
                 My cofounders and I are passionate indie game developers, naturally surrounded by gamers. A common request we hear is from people sharing their game ideas. Some are artists, some are writers, and some are just gamers with vivid imaginations. We've recommended tools like Godot, RPG Maker, or Roblox to help them, but none fully met their needs. While these tools aren’t the ultimate solution, they’ve inspired us in shaping our approach.</p>
             <img class="illustration" style="margin-bottom: 6vh;" accesskey=""src="assets/i3-1.png" alt="Game Engines Images">
-            <p>After researching all lightweight game engines on the market and collectively conducting nearly 100 hours of interviews with people sharing this need, we created our user persona storyboard.</p>
+            <p>
+                We then conduct in-depth interviews with a target audience comprising young creatives and existing content creators across various mediums. These interviews revealed 67% of participants lacked programming knowledge but had strong narrative and visual ideas, informing our focus on prompt-driven game design. After researching all lightweight game engines on the market and collectively conducting nearly 100 hours of interviews with people sharing this need, we created our user persona storyboard.</p>
             <img class="illustration" src="assets/i3-2.png" alt="User Persona Images">
         </div>
 
@@ -348,7 +354,7 @@
             </p>
             <img class="illustration" style="margin-bottom: 6vh;" src="assets/i3-3.png" alt="Community Images">
             <p>
-                The game experience and engine were built using Unity. Our core feature was a conversational interface, where an AI copilot guides the creator by asking questions and generating corresponding game assets based on their answers. We created a custom training dataset of around 30 images for characters and game maps, training separate image generation models. For dialogues and certain game mechanics, we utilized GPT-3.5. <br><br>To kickstart the project, we collaborated with two game dev-focused YouTubers, which proved successful.
+                The game experience and engine were built using Unity. Our core feature was a conversational interface, where an AI copilot guides the creator by asking questions and generating corresponding game assets based on their answers. We created a custom training dataset of around 300 images for characters and game maps, training separate image generation models. For dialogues and certain game mechanics, we utilized GPT-3.5. We also implemented reinforcement learning to optimize conversational prompts for diverse game genres.<br><br>To kickstart the project, we collaborated with two game dev-focused YouTubers, which proved successful.
             </p>
             <img class="illustration" src="assets/i3-5.png" alt="Dev Log Images">
         </div>

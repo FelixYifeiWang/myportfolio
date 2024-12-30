@@ -75,7 +75,7 @@
             list-style-type: none;
             font-family: 'Poppins', Arial, sans-serif;
             font-weight: 400;
-            font-size: 0.8325vw;
+            font-size: max(0.8325vw, 1.75vh);
             padding: 0;
             margin-left: 3vw;
             margin-top: 10vh;
@@ -159,13 +159,13 @@
         }
 
         .project h2 {
-            font-size: 1.665vw;
+            font-size: max(1.665vw, 3vh);
             font-weight: 400;
             text-align: right;
         }
 
         .project h3 {
-            font-size: 1.3vw;
+            font-size: max(1.3vw, 2.73vh);
             font-weight: 400;
             text-align: left;
             margin-left: 3vw;
@@ -173,7 +173,7 @@
         }
 
         .project p {
-            font-size: 0.8vw;
+            font-size: max(0.8vw, 1.7vh);
             color: black;
             text-align: left;
             margin-left: 3vw;
@@ -192,7 +192,12 @@
                 display: none;
             }
             .left-column .cat-icon{
-                display: none;
+                top: 9vw;
+                right: 9vw;
+            }
+            .left-column .cat-icon img {
+                width: 10vw;
+                height: auto;
             }
             .left-column h1{
                 margin-top: 2vh;
@@ -244,7 +249,7 @@
             }
 
             .project p {
-                font-size: 1.3vw;
+                font-size: 1.4vw;
             }
         }
 
@@ -257,11 +262,11 @@
             }
 
             .project h3 {
-                font-size: 3.2vw;
+                font-size: 3.5vw;
             }
 
             .project p {
-                font-size: 2.3vw;
+                font-size: 2.8vw;
             }
         }
 
@@ -320,14 +325,14 @@
         <div class="project">
             <hr class="custom-line">
             <h3>Initiative</h3>
-            <p>VR technology has revolutionized visual experiences. Despite its limitations, applications like Google Earth and medical tools have shown the immense value of immersive data visualization. Meanwhile, archaeological data remains largely inaccessible and unfriendly to the general public, presenting an ideal opportunity for innovation.<br><br>This project uses open-source datasets from Open Heritage to reconstruct ancient sites in an immersive virtual space, enabling users to explore and interact with history like never before.</p>
+            <p>VR technology has revolutionized visual experiences. Despite its existing limitations, applications like Google Earth and medical tools have shown the immense value of immersive data visualization. Meanwhile, archaeological data remains largely inaccessible and unfriendly to the general public, presenting an ideal opportunity for innovation.<br><br>This project uses open-source datasets from Open Heritage to reconstruct ancient sites in an immersive virtual space, enabling users to explore and interact with history like never before.</p>
         </div>
 
         <div class="project">
             <h3>Research & Ideation</h3>
             <p>Google Earth VR was a major inspiration during the ideation process. It provided an unprecedented experience, allowing me to fly over a realistic visualization of Earth and navigate to places like my college dorm or favorite art museum.</p>
             <img class="illustration" style="margin-bottom: 6vh;" src="assets/i4-1.png" alt="Google Earth Images">
-            <p>It felt natural to consider an archaeology application. As a player, I’ve seen many games based on historical settings, with VR emerging as a powerful new medium. Combining both to create a valuable experience was intuitive. I explored various related applications, many of which were academic and highly inspiring. Most importantly, I discovered OpenHeritage, which provided the data needed to bring this idea to life.</p>
+            <p>It felt natural to me to consider an archaeology application. As a player, I’ve seen many games based on historical settings, with VR emerging as a powerful new medium. Combining both to create a valuable experience was intuitive. I explored various related applications, many of which were academic and highly inspiring. Most importantly, I discovered OpenHeritage, which provided the data needed to bring this idea to life.</p>
             <img class="illustration" src="assets/i4-2.png" alt="Applications Images">
         </div>
 

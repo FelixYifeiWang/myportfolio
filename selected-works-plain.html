@@ -82,7 +82,7 @@
             list-style-type: none;
             font-family: 'Poppins', Arial, sans-serif;
             font-weight: 400;
-            font-size: 0.8325vw;
+            font-size: max(0.8325vw, 1.75vh);
             padding: 0;
             margin-left: 3vw;
             margin-top: 10vh;
@@ -104,16 +104,16 @@
             bottom: 6vh;
             text-align: left;
             font-family: 'Poppins', Arial, sans-serif;
-            font-size: 0.624vw;
+            font-size: max(0.624vw, 1.31vh);
         }
 
         .left-column .immersive-view button {
-            padding: 0.6vw 1.6vw;
+            padding: 0.6vw max(1.6vw, 3.36vh);
             border: 0.18vw solid #333;
             background: none;
             cursor: pointer;
             font-family: 'Poppins', Arial, sans-serif;
-            font-size: 1.04vw;
+            font-size: max(1.04vw, 2.18vh);
             transition: opacity 0.2s ease-in-out;
         }
 
@@ -160,13 +160,13 @@
         }
 
         .project h2 {
-            font-size: 1.665vw;
+            font-size: max(1.665vw, 3.5vh);
             font-weight: 400;
             text-align: right;
         }
 
         .project p {
-            font-size: 1.04vw;
+            font-size: max(1.04vw, 2.184vh);
             color: #949494;
             text-align: right;
         }
@@ -210,6 +210,10 @@
                 font-size: 1.04vw;
                 color: #949494;
                 text-align: right;
+            }
+
+            #ending {
+                margin-bottom: 30vh;
             }
         }
 
@@ -369,8 +373,7 @@
             <h2>Undeciber</h2>
             <p>A 2020-themed social impact driven fashion brand.</p>
         </section>
-        <div class="project">
-            <p style="opacity: 0;">To Be Continue...</p>
+        <div class="project" id="ending">
         </div>
         <!-- Add more projects as needed -->
     </div> 
