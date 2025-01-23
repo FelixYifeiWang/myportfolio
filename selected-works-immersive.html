@@ -61,6 +61,14 @@
             pointer-events: none;
         }
 
+        .cat {
+            z-index: 2;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            pointer-events: none;
+        }
+
         .door {
             z-index: 1;
             position: absolute;
@@ -416,6 +424,7 @@
     <img src="assets/label4.png" alt="Project 4" class="label label4">
     <img src="assets/label5.png" alt="Project 5" class="label label5">
     <img src="assets/exit.png" alt="Exit" class="exit">
+    <img src="assets/cat1.png" alt="Cat" class="cat">
     <a href="selected-works-plain.html?from=0"><img src="assets/doorlight.png" alt="Door" class="door"></a>
     <div class="desc1 desc">
         <img src="assets/x.png" alt="X" class="close">
@@ -456,6 +465,8 @@
         //#region start
         const urlParams = new URLSearchParams(window.location.search);
         var fromIndex = urlParams.get('from') === '0';
+        var visitedTrack = [0, 0, 0, 0, 0];
+        var catIndex = 0;
 
         fromIndex = true;
 
@@ -681,6 +692,7 @@
         const label5 = document.querySelector('.label5');
         const exit = document.querySelector('.exit');
         const door = document.querySelector('.door');
+        const cat = document.querySelector('.cat');
 
         cover1.addEventListener('mouseover', () => {
             if (!overlay && !shown){
@@ -742,6 +754,43 @@
                 shown = false;
             }
         });
+
+        var catWidth = [0.08, 0.08, 0.08, 0.08, 0.08];
+        var catLeft = [0.85, 0.85, 0.85, 0.85, 0.85];
+        var catTop = [0.72, 0.72, 0.72, 0.72, 0.72];
+        var catSrc = ["assets/cat1.png", "assets/cat2.png", "assets/cat3.png", "assets/cat4.png", "assets/cat5.png"];
+
+        function positionCat() {
+            if (overlay) {
+                return;
+            }
+            // Get the current viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Determine the scaling factor based on the larger dimension
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                // Viewport is wider than 1920:1080; scale by height
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                // Viewport is taller than 1920:1080; scale by width
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            // Calculate `.sw`'s position relative to the scaled background
+            const swX = (bgWidth * catLeft[catIndex]) + (viewportWidth - bgWidth) / 2; // 58% from left of the scaled background
+            const swY = (bgHeight * catTop[catIndex]) + (viewportHeight - bgHeight) / 2; // 75% from top of the scaled background
+            const swWidth = bgWidth * catWidth[catIndex]; // Maintain proportional scaling
+            cat.style.left = `${swX}px`;
+            cat.style.top = `${swY}px`;
+            cat.style.width = `${swWidth}px`;
+            cat.src = catSrc[catIndex];
+        }
+        window.addEventListener('resize', positionCat);
+        positionCat();
 
         function positionLabel1() {
             if (overlay) {
@@ -994,19 +1043,26 @@
                 positionLabel5();
                 if (desc1.style.display === 'block') {
                     cover1.classList.add('visited');
+                    visitedTrack[0] = 1;
                 }
                 if (desc2.style.display === 'block') {
                     cover2.classList.add('visited');
+                    visitedTrack[1] = 1;
                 }
                 if (desc3.style.display === 'block') {
                     cover3.classList.add('visited');
+                    visitedTrack[2] = 1;
                 }
                 if (desc4.style.display === 'block') {
                     cover4.classList.add('visited');
+                    visitedTrack[3] = 1;
                 }
                 if (desc5.style.display === 'block') {
                     cover5.classList.add('visited');
+                    visitedTrack[4] = 1;
                 }
+                catIndex = Math.min(visitedTrack.reduce((b, a) => b + a, 0), 4);
+                positionCat();
                 desc1.style.display = 'none';
                 desc2.style.display = 'none';
                 desc3.style.display = 'none';
