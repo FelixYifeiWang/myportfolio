@@ -35,7 +35,7 @@
         }
 
 
-        .left-hand, .right-hand {
+        .left-hand, .right-hand-front {
             position: absolute;
             width: 55vw; /* Adjust size as necessary */
             pointer-events: none;
@@ -51,23 +51,35 @@
         }
 
         .right-hand {
+            position: absolute;
+            width: 55vw; /* Adjust size as necessary */
+            pointer-events: none;
+            opacity: 0;
+            z-index: 1;
             top: 50%;
             right: 25vw;
             transform: translate(50%, -50%);
             animation: fadeInRightHand 1s ease-in forwards;
         }
 
+        .right-hand-front {
+            top: 50%;
+            right: 25vw;
+            transform: translate(50%, -50%);
+            animation: fadeInRightHandFront 1s ease-in forwards;
+        }
+
         .content {
             position: relative;
             text-align: center;
             color: #fff;
-            z-index: 10;
+            z-index: 1;
             opacity: 0;
             animation: fadeInText 1s ease-in 1s forwards;
         }
 
         .content h1 {
-            font-size: 15vw;
+            font-size: 14.6vw;
             margin: 0;
             text-shadow: 0 0 1.1vw #fff;
             line-height: 8vw;
@@ -78,7 +90,7 @@
         @keyframes fadeInText {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(0px);
             }
             to {
                 opacity: 1;
@@ -125,6 +137,20 @@
                 transform: translate(55%, -50%);
             }
             to {
+                opacity: 1;
+                transform: translate(50%, -50%);
+            }
+        }
+
+        @keyframes fadeInRightHandFront {
+            0% {
+                opacity: 0;
+                transform: translate(55%, -50%);
+            }
+            99.9% {
+                opacity: 0;
+            }
+            100% {
                 opacity: 1;
                 transform: translate(50%, -50%);
             }
@@ -299,6 +325,7 @@
     <!-- Left hand -->
     <img src="assets/left-hand.png" alt="Left Hand" class="left-hand">
     <!-- Right hand -->
+    <img src="assets/right-hand-front.png" alt="Right Hand" class="right-hand-front">
     <img src="assets/right-hand.png" alt="Right Hand" class="right-hand">
     <!-- Content -->
     <div class="content">
