@@ -1,0 +1,34 @@
+---
+interface Props {
+  title: string;
+  bodyFont?: 'zen-dots' | 'all';
+}
+
+const { title, bodyFont = 'all' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MTFBJ9W9EY"></script>
+    <script is:inline>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-MTFBJ9W9EY');
+    </script>
+    {bodyFont === 'all' && (
+        <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    )}
+    {bodyFont === 'zen-dots' && (
+        <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap" rel="stylesheet">
+    )}
+    <slot name="head" />
+</head>
+<body>
+    <slot />
+</body>
+</html>

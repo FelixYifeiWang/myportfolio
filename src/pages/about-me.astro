@@ -1,0 +1,341 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="About Me">
+    <div id="fade-overlay"></div>
+    <div class="left-column">
+        <h1>Yifei Felix<br><br>Wang</h1>
+        <ul>
+            <li><a id="chosen">About Me</a></li>
+            <li><a href="/selected-works-plain">Selected Works</a></li>
+            <li><a href="/other-works">Other Works</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="project">
+            <img src="/assets/profile.png" alt="Project 1">
+            <h2>Hi, I build cool tech stuff to make people happy.</h2>
+        </div>
+        <div class="project">
+            <h3>How I spend my time </h3>
+            <p>47% creating, 20% sleeping, 10% gaming, 4% eating, 2% making art, 2% doing sports, and 15% left for the unknown. </p>
+        </div>
+        <div class="project">
+            <h3>Things I like </h3>
+            <p>Baldur's Gate / Jacques and His Master / Elden Ring / Steve Jobs hosting an Apple keynote / Darkest Hour / EVA / 黑梦 / To Pimp a Butterfly / Pokémon / Heroes of Might and Magic / home-cooked meals / John Galliano's designs at Dior / 狂人日记 / The Lovers / real Chinese food / Gunpei Yokoi's product philosophy / Mme Kupka among Verticals / working from bed</p>
+        </div>
+        <div class="project">
+            <h3>Things I dislike </h3>
+            <p>alcohol and alcoholics / crowded places / Elon Musk when talking nonsense / commuting / hierarchies / Gucci / Japanese food that simply piles up ingredients / repetitive jobs / extreme weather / Monster Hunter / NFT art / pointless parties / Ready Player One (the movie) / shooter games / Supreme / Jujutsu Kaisen / vacations that are too long</p>
+        </div>
+        <div class="project">
+            <h3>Contact me </h3>
+            <p>+ 1 401 654 8567 | +86 187 0120 0848 | <a href="https://www.linkedin.com/in/felix-wang1" target="_blank">LinkedIn</a></p>
+            <p>Business: felix@dreamin.land</p>
+            <p>Personal: wangyifeifelix@gmail.com </p>
+        </div>
+    </div>
+    <script is:inline>
+        const urlParams = new URLSearchParams(window.location.search);
+        var fromIndex = urlParams.get('from') === '0';
+
+        const currentUrl = window.location.href;
+        const newUrl = currentUrl.split('?')[0];
+        window.history.replaceState({}, document.title, newUrl);
+
+        window.addEventListener('load', () => {
+            const fadeOverlay = document.getElementById('fade-overlay');
+            if (fromIndex) {
+                fadeOverlay.classList.add('hidden');
+                fadeOverlay.addEventListener('transitionend', () => {
+                    fadeOverlay.remove();
+                });
+            } else {
+                fadeOverlay.style.display="none";
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('fadein');
+            const internalLinks = document.querySelectorAll('a[href^="/other-works"], a[href^="/selected-works-plain"]');
+
+            internalLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    if (!this.getAttribute('href')) return;
+
+                    event.preventDefault();
+
+                    const destination = this.href;
+
+                    document.body.classList.add('fadeout');
+
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 300);
+                });
+            });
+        });
+    </script>
+</BaseLayout>
+
+<style is:global>
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            background-color: white;
+        }
+        to {
+            opacity: 0;
+            background-color: white;
+        }
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            background-color: white;
+        }
+        to {
+            opacity: 1;
+            background-color: white;
+        }
+    }
+    .fadein {
+        animation: fadeIn 0.3s ease-in forwards;
+    }
+    .fadeout {
+        animation: fadeOut 0.3s ease-out forwards;
+    }
+    body {
+        margin: 0;
+        overflow: hidden;
+
+        background-image: url('/assets/whitebg.png');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+    }
+
+    #fade-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 1s ease-in-out;
+    }
+
+    #fade-overlay.hidden {
+        opacity: 0;
+    }
+
+    .left-column {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 32vw;
+        height: 100%;
+        padding: 20px;
+    }
+
+    .left-column h1 {
+        font-size: 3.33vw;
+        line-height: 2.33vw;
+        font-family: 'Zen Dots', sans-serif;
+        font-weight: 300;
+        margin-top: 6vh;
+        margin-left: 3vw;
+    }
+
+    .left-column ul {
+        list-style-type: none;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-weight: 400;
+        font-size: max(0.8325vw, 1.75vh);
+        padding: 0;
+        margin-left: 3vw;
+        margin-top: 10vh;
+    }
+
+    .left-column ul li {
+        margin: 35px 0;
+    }
+
+    .left-column ul li a {
+        text-decoration: none;
+        color: #949494;
+    }
+
+    .left-column .immersive-view {
+        position: fixed;
+        margin-top: 0;
+        margin-left: 3vw;
+        bottom: 6vh;
+        text-align: left;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 0.624vw;
+    }
+
+    .left-column .immersive-view button {
+        padding: 0.6vw 1.6vw;
+        border: 0.18vw solid #333;
+        background: none;
+        cursor: pointer;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 1.04vw;
+    }
+
+    .left-column .cat-icon {
+        position: fixed;
+        text-align: left;
+        margin-left: 3vw;
+        bottom: 16vh;
+    }
+
+    .left-column .cat-icon img {
+        width: 6.04vw;
+        height: auto;
+    }
+
+    .content {
+        position: fixed;
+        margin-left: 31.6vw;
+        top: 27vh;
+        width: 67.4vw;
+        height: 73vh;
+        overflow-y: auto;
+        font-family: 'Poppins', Arial, sans-serif;
+        scrollbar-width: none;
+    }
+
+    .content::-webkit-scrollbar {
+        display: none;
+    }
+
+    .project {
+        margin-bottom: 5.94vw;
+        margin-right: 3vw;
+    }
+
+    .project img {
+        width: 100%;
+    }
+
+    .project h2 {
+        font-size: 1.665vw;
+        font-weight: 400;
+        text-align: right;
+        margin-right: 2%;
+    }
+
+    .project p {
+        font-size: 1.04vw;
+        color: #949494;
+        text-align: left;
+        margin-left: 2%;
+    }
+
+    .project h3 {
+        font-size: 1.2vw;
+        color: black;
+        text-align: left;
+        margin-left: 2%;
+        font-weight: 400;
+    }
+
+    .project a {
+        color: #949494;
+        transition: color 0.2s;
+    }
+
+    .project a:hover{
+        color: black;
+    }
+
+    #chosen {
+        color: black;
+    }
+
+    @media (orientation: portrait) {
+        .left-column ul{
+            display: none;
+        }
+        .left-column .immersive-view {
+            display: none;
+        }
+        .left-column .cat-icon{
+            display: none;
+        }
+        .left-column h1{
+            margin-top: 2vh;
+            font-size: 5vw;
+            line-height: 3vw;
+        }
+        .left-column {
+            width: 100vw;
+        }
+        .content {
+            width: 80vw;
+            margin-left: 10vw;
+            top: 17vh;
+            height: 83vh;
+        }
+        .project h2 {
+            font-size: 1.665vw;
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .project p {
+            font-size: 1.04vw;
+            color: #949494;
+            text-align: right;
+        }
+    }
+
+    @media (max-aspect-ratio: 1.45/1) {
+        .left-column .immersive-view {
+            display: none;
+        }
+        .left-column .cat-icon{
+            display: none;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .left-column ul {
+            font-size: 1.6vw;
+        }
+        .left-column {
+            width: 100vw;
+        }
+        .project h2 {
+            font-size: 2vw;
+        }
+
+        .project p {
+            font-size: 1.6vw;
+            color: #949494;
+            text-align: right;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .left-column {
+            width: 100vw;
+        }
+        .project h2 {
+            font-size: 4vw;
+        }
+
+        .project p {
+            font-size: 2.3vw;
+            color: #949494;
+            text-align: right;
+        }
+    }
+</style>

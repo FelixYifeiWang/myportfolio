@@ -1,0 +1,1183 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Selected Works" bodyFont="zen-dots">
+    <link slot="head" rel="preload" as="image" href="/assets/profile1.png">
+    <link slot="head" rel="preload" as="audio" href="/assets/click.aac">
+    <link slot="head" rel="preload" as="audio" href="/assets/windowopen.aac">
+    <link slot="head" rel="preload" as="audio" href="/assets/windowclose.aac">
+
+    <div class="background">
+        <img src="/assets/colorbg.png" alt="Background" class="background-img">
+        <img src="/assets/swlabel_on.png" alt="Selected Works" class="sw" id="swImage">
+    </div>
+
+    <div>
+        <img src="/assets/cover1.png" alt="Project 1" class="pj1 cover1">
+        <img src="/assets/pj1.png" alt="Project 1" class="pj1">
+    </div>
+
+    <div>
+        <img src="/assets/cover2.png" alt="Project 2" class="pj2 cover2">
+        <img src="/assets/pj2.png" alt="Project 2" class="pj2">
+    </div>
+
+    <div>
+        <img src="/assets/cover3.png" alt="Project 3" class="pj3 cover3">
+        <img src="/assets/pj3.png" alt="Project 3" class="pj3">
+    </div>
+
+    <div>
+        <img src="/assets/cover4.png" alt="Project 4" class="pj4 cover4">
+        <img src="/assets/pj4.png" alt="Project 4" class="pj4">
+    </div>
+
+    <div>
+        <img src="/assets/cover5.png" alt="Project 5" class="pj5 cover5">
+        <img src="/assets/pj5.png" alt="Project 5" class="pj5">
+    </div>
+    <img src="/assets/label1.png" alt="Project 1" class="label label1">
+    <img src="/assets/label2.png" alt="Project 2" class="label label2">
+    <img src="/assets/label3.png" alt="Project 3" class="label label3">
+    <img src="/assets/label4.png" alt="Project 4" class="label label4">
+    <img src="/assets/label5.png" alt="Project 5" class="label label5">
+    <img src="/assets/exit.png" alt="Exit" class="exit">
+    <img src="/assets/cat1.png" alt="Cat" class="cat">
+    <a href="/selected-works-plain?from=0"><img src="/assets/doorlight.png" alt="Door" class="door"></a>
+    <div class="desc1 desc">
+        <img src="/assets/x.png" alt="X" class="close">
+        <img src="/assets/profile1.png" alt="Project 1" class="profile">
+        <a href="https://www.echoofmobius.com" target="_blank">
+            <img src="/assets/weblink.png" class="weblink" alt="Web Link">
+        </a>
+        <iframe src="https://www.youtube.com/embed/izohRj-1sfM?si=lLVlqXmC7bcq8ca-" title="Echo of Mobius" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="video1"></iframe>
+    </div>
+    <div class="desc2 desc">
+        <img src="/assets/x.png" alt="X" class="close">
+        <img src="/assets/profile2.png" alt="Project 2" class="profile">
+        <iframe src="https://www.youtube.com/embed/XPgQ4WrfZw0?si=8QhAm7F-E3O5y0Aq" title="Orpheus" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="video2"></iframe>
+    </div>
+    <div class="desc3 desc">
+        <img src="/assets/x.png" alt="X" class="close">
+        <img src="/assets/profile3.png" alt="Project 3" class="profile">
+    </div>
+    <div class="desc4 desc">
+        <img src="/assets/x.png" alt="X" class="close">
+        <img src="/assets/profile4.png" alt="Project 4" class="profile">
+        <iframe src="https://www.youtube.com/embed/nVDoVkEmD04" title="VR Archaeology" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="video4"></iframe>
+    </div>
+    <div class="desc5 desc">
+        <img src="/assets/x.png" alt="X" class="close">
+        <img src="/assets/profile5.png" alt="Project 5" class="profile">
+        <iframe src="https://www.youtube.com/embed/b8Zba4JSr6g?si=eixWVM6ENfghChsS" title="DreamIn" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="video5"></iframe>
+    </div>
+
+    <audio id="clickSound" src="/assets/click.aac"></audio>
+    <audio id="openSound" src="/assets/windowopen.aac"></audio>
+    <audio id="closeSound" src="/assets/windowclose.aac"></audio>
+
+    <script is:inline>
+        var overlay = false;
+        var shown = false;
+        const urlParams = new URLSearchParams(window.location.search);
+        var fromIndex = urlParams.get('from') === '0';
+        var visitedTrack = [0, 0, 0, 0, 0];
+        var catIndex = 0;
+
+        fromIndex = true;
+
+        if (fromIndex) {
+            document.body.style.animation = 'fadeIn 1.5s ease-in forwards';
+
+            const currentUrl = window.location.href;
+            const newUrl = currentUrl.split('?')[0];
+            window.history.replaceState({}, document.title, newUrl);
+        }
+
+        const backgroundImg = document.querySelector('.background-img');
+        const swElement = document.querySelector('.sw');
+        const p1Elements = document.querySelectorAll('.pj1');
+        const p2Elements = document.querySelectorAll('.pj2');
+        const p3Elements = document.querySelectorAll('.pj3');
+        const p4Elements = document.querySelectorAll('.pj4');
+        const p5Elements = document.querySelectorAll('.pj5');
+
+        const fixedWidth = 1920;
+        const fixedHeight = 1080;
+        const aspectRatio = fixedWidth / fixedHeight;
+
+        function positionSW() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.57) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.75) + (viewportHeight - bgHeight) / 2;
+
+            swElement.style.left = `${swX}px`;
+            swElement.style.top = `${swY}px`;
+
+            const swWidth = bgWidth * 0.25;
+            swElement.style.width = `${swWidth}px`;
+        }
+
+        function positionProj1() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.162) + (viewportWidth - bgWidth) / 2;
+            const swWidth = bgWidth * 0.307;
+            p1Elements.forEach((element, index) => {
+                element.style.left = `${swX}px`;
+                element.style.width = `${swWidth}px`;
+            });
+        }
+
+        function positionProj2() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.38) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.29) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.075;
+            p2Elements.forEach((element, index) => {
+                element.style.left = `${swX}px`;
+                element.style.top = `${swY}px`;
+                element.style.width = `${swWidth}px`;
+            });
+        }
+
+        function positionProj3() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.476) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.36) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.069;
+            p3Elements.forEach((element, index) => {
+                element.style.left = `${swX}px`;
+                element.style.top = `${swY}px`;
+                element.style.width = `${swWidth}px`;
+            });
+        }
+
+        function positionProj4() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.543) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.174) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.051;
+            p4Elements.forEach((element, index) => {
+                element.style.left = `${swX}px`;
+                element.style.top = `${swY}px`;
+                element.style.width = `${swWidth}px`;
+            });
+        }
+
+        function positionProj5() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.594) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.445) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.122;
+            p5Elements.forEach((element, index) => {
+                element.style.left = `${swX}px`;
+                element.style.top = `${swY}px`;
+                element.style.width = `${swWidth}px`;
+            });
+        }
+
+        window.addEventListener('resize', positionSW);
+        window.addEventListener('resize', positionProj1);
+        window.addEventListener('resize', positionProj2);
+        window.addEventListener('resize', positionProj3);
+        window.addEventListener('resize', positionProj4);
+        window.addEventListener('resize', positionProj5);
+
+        positionSW();
+        positionProj1();
+        positionProj2();
+        positionProj3();
+        positionProj4();
+        positionProj5();
+
+        const cover1 = document.querySelector('.cover1');
+        const cover2 = document.querySelector('.cover2');
+        const cover3 = document.querySelector('.cover3');
+        const cover4 = document.querySelector('.cover4');
+        const cover5 = document.querySelector('.cover5');
+        const label1 = document.querySelector('.label1');
+        const label2 = document.querySelector('.label2');
+        const label3 = document.querySelector('.label3');
+        const label4 = document.querySelector('.label4');
+        const label5 = document.querySelector('.label5');
+        const exit = document.querySelector('.exit');
+        const door = document.querySelector('.door');
+        const cat = document.querySelector('.cat');
+
+        cover1.addEventListener('mouseover', () => {
+            if (!overlay && !shown){
+                label1.style.opacity = '1';
+                shown = true;
+            }
+        });
+        cover1.addEventListener('mouseout', () => {
+            if (!overlay){
+                label1.style.opacity = '0';
+                shown = false;
+            }
+        });
+        cover2.addEventListener('mouseover', () => {
+            if (!overlay && !shown){
+                label2.style.opacity = '1';
+                shown = true;
+            }
+        });
+        cover2.addEventListener('mouseout', () => {
+            if (!overlay){
+                label2.style.opacity = '0';
+                shown = false;
+            }
+        });
+        cover3.addEventListener('mouseover', () => {
+            if (!overlay && !shown){
+                label3.style.opacity = '1';
+                shown = true;
+            }
+        });
+        cover3.addEventListener('mouseout', () => {
+            if (!overlay){
+                label3.style.opacity = '0';
+                shown = false;
+            }
+        });
+        cover4.addEventListener('mouseover', () => {
+            if (!overlay && !shown){
+                label4.style.opacity = '1';
+                shown = true;
+            }
+        });
+        cover4.addEventListener('mouseout', () => {
+            if (!overlay){
+                label4.style.opacity = '0';
+                shown = false;
+            }
+        });
+        cover5.addEventListener('mouseover', () => {
+            if (!overlay && !shown){
+                label5.style.opacity = '1';
+                shown = true;
+            }
+        });
+        cover5.addEventListener('mouseout', () => {
+            if (!overlay){
+                label5.style.opacity = '0';
+                shown = false;
+            }
+        });
+
+        var catWidth = [0.08, 0.1, 0.06, 0.043, 0.12, 0.03];
+        var catLeft = [0.85, 0.83, 0.883, 0.83, 0.9, 0.81];
+        var catTop = [0.72, 0.82, 0.62, 0.56, 0.86, 0.5];
+        var catSrc = ["/assets/cat1.png", "/assets/cat2.png", "/assets/cat3.png", "/assets/cat4.png", "/assets/cat5.png", "/assets/cat6.png"];
+
+        function positionCat() {
+            if (overlay) {
+                return;
+            }
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * catLeft[catIndex]) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * catTop[catIndex]) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * catWidth[catIndex];
+            cat.style.left = `${swX}px`;
+            cat.style.top = `${swY}px`;
+            cat.style.width = `${swWidth}px`;
+            cat.src = catSrc[catIndex];
+        }
+        window.addEventListener('resize', positionCat);
+        positionCat();
+
+        function positionLabel1() {
+            if (overlay) {
+                return;
+            }
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.432) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.71) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.23;
+            label1.style.left = `${swX}px`;
+            label1.style.top = `${swY}px`;
+            label1.style.width = `${swWidth}px`;
+        }
+        window.addEventListener('resize', positionLabel1);
+        positionLabel1();
+
+        function positionLabel2() {
+            if (overlay) {
+                return;
+            }
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.531) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.505) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.23;
+            label2.style.left = `${swX}px`;
+            label2.style.top = `${swY}px`;
+            label2.style.width = `${swWidth}px`;
+        }
+        window.addEventListener('resize', positionLabel2);
+        positionLabel2();
+
+        function positionLabel3() {
+            if (overlay) {
+                return;
+            }
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.625) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.54) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.23;
+            label3.style.left = `${swX}px`;
+            label3.style.top = `${swY}px`;
+            label3.style.width = `${swWidth}px`;
+        }
+        window.addEventListener('resize', positionLabel3);
+        positionLabel3();
+
+        function positionLabel4() {
+            if (overlay) {
+                return;
+            }
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.683) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.36) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.23;
+            label4.style.left = `${swX}px`;
+            label4.style.top = `${swY}px`;
+            label4.style.width = `${swWidth}px`;
+        }
+        window.addEventListener('resize', positionLabel4);
+        positionLabel4();
+
+        function positionLabel5() {
+            if (overlay) {
+                return;
+            }
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.77) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.59) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.23;
+            label5.style.left = `${swX}px`;
+            label5.style.top = `${swY}px`;
+            label5.style.width = `${swWidth}px`;
+        }
+        window.addEventListener('resize', positionLabel5);
+        positionLabel5();
+
+        function positionExit() {
+            if (overlay) {
+                return;
+            }
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.833) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.313) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.0534;
+            exit.style.left = `${swX}px`;
+            exit.style.top = `${swY}px`;
+            exit.style.width = `${swWidth}px`;
+        }
+        window.addEventListener('resize', positionExit);
+        positionExit();
+
+        function positionDoor() {
+            if (overlay) {
+                return;
+            }
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.8) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.4023) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 0.1289;
+            door.style.left = `${swX}px`;
+            door.style.top = `${swY}px`;
+            door.style.width = `${swWidth}px`;
+        }
+        window.addEventListener('resize', positionDoor);
+        positionDoor();
+
+        const closex = document.querySelectorAll('.close');
+        const desc1 = document.querySelector('.desc1');
+        const desc2 = document.querySelector('.desc2');
+        const desc3 = document.querySelector('.desc3');
+        const desc4 = document.querySelector('.desc4');
+        const desc5 = document.querySelector('.desc5');
+
+        closex.forEach(child => {
+            child.addEventListener('click', () => {
+                overlay=false;
+                label1.style.filter = 'none';
+                desc1.style.opacity = '0';
+                label1.src = "/assets/label1.png";
+                label2.style.filter = 'none';
+                desc2.style.opacity = '0';
+                label2.src = "/assets/label2.png";
+                label3.style.filter = 'none';
+                desc3.style.opacity = '0';
+                label3.src = "/assets/label3.png";
+                label4.style.filter = 'none';
+                desc4.style.opacity = '0';
+                label4.src = "/assets/label4.png";
+                label5.style.filter = 'none';
+                desc5.style.opacity = '0';
+                label5.src = "/assets/label5.png";
+                positionLabel1();
+                positionLabel2();
+                positionLabel3();
+                positionLabel4();
+                positionLabel5();
+                if (desc1.style.display === 'block') {
+                    cover1.classList.add('visited');
+                    visitedTrack[0] = 1;
+                }
+                if (desc2.style.display === 'block') {
+                    cover2.classList.add('visited');
+                    visitedTrack[1] = 1;
+                }
+                if (desc3.style.display === 'block') {
+                    cover3.classList.add('visited');
+                    visitedTrack[2] = 1;
+                }
+                if (desc4.style.display === 'block') {
+                    cover4.classList.add('visited');
+                    visitedTrack[3] = 1;
+                }
+                if (desc5.style.display === 'block') {
+                    cover5.classList.add('visited');
+                    visitedTrack[4] = 1;
+                }
+                catIndex = Math.min(visitedTrack.reduce((b, a) => b + a, 0), 5);
+                positionCat();
+                desc1.style.display = 'none';
+                desc2.style.display = 'none';
+                desc3.style.display = 'none';
+                desc4.style.display = 'none';
+                desc5.style.display = 'none';
+                label1.style.opacity = '0';
+                label2.style.opacity = '0';
+                label3.style.opacity = '0';
+                label4.style.opacity = '0';
+                label5.style.opacity = '0';
+                desc1.classList.remove('bulb-on');
+                desc2.classList.remove('bulb-on');
+                desc3.classList.remove('bulb-on');
+                desc4.classList.remove('bulb-on');
+                desc5.classList.remove('bulb-on');
+            })
+        });
+
+        cover1.addEventListener('click', () => {
+            windowOpenSound();
+            label1.src = "/assets/pw.png";
+            label1.style.opacity = '1';
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.49) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.3) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 6;
+            overlay = true;
+            label1.style.left = `${swX}px`;
+            label1.style.top = `${swY}px`;
+            label1.style.width = `${swWidth}px`;
+            label1.style.filter = 'grayscale(100%)';
+            desc1.style.filter = 'grayscale(0%)';
+            desc1.style.display = 'block';
+            setTimeout(() => {
+                desc1.classList.add('bulb-on');
+            }, 300);
+        });
+
+        cover2.addEventListener('click', () => {
+            windowOpenSound();
+            label2.src = "/assets/pw.png";
+            label2.style.opacity = '1';
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.49) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.3) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 6;
+            overlay = true;
+            label2.style.left = `${swX}px`;
+            label2.style.top = `${swY}px`;
+            label2.style.width = `${swWidth}px`;
+            label2.style.filter = 'grayscale(100%)';
+            desc2.style.filter = 'grayscale(0%)';
+            desc2.style.display = 'block';
+            setTimeout(() => {
+                desc2.classList.add('bulb-on');
+            }, 300);
+        });
+        cover3.addEventListener('click', () => {
+            windowOpenSound();
+            label3.src = "/assets/pw.png";
+            label3.style.opacity = '1';
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.49) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.3) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 6;
+            overlay = true;
+            label3.style.left = `${swX}px`;
+            label3.style.top = `${swY}px`;
+            label3.style.width = `${swWidth}px`;
+            label3.style.filter = 'grayscale(100%)';
+            desc3.style.filter = 'grayscale(0%)';
+            desc3.style.display = 'block';
+            setTimeout(() => {
+                desc3.classList.add('bulb-on');
+            }, 300);
+        });
+        cover4.addEventListener('click', () => {
+            windowOpenSound();
+            label4.src = "/assets/pw.png";
+            label4.style.opacity = '1';
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.49) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.3) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 6;
+            overlay = true;
+            label4.style.left = `${swX}px`;
+            label4.style.top = `${swY}px`;
+            label4.style.width = `${swWidth}px`;
+            label4.style.filter = 'grayscale(100%)';
+            desc4.style.filter = 'grayscale(0%)';
+            desc4.style.display = 'block';
+            setTimeout(() => {
+                desc4.classList.add('bulb-on');
+            }, 300);
+        });
+        cover5.addEventListener('click', () => {
+            windowOpenSound();
+            label5.src = "/assets/pw.png";
+            label5.style.opacity = '1';
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let bgWidth, bgHeight;
+            if (viewportWidth / viewportHeight < aspectRatio) {
+                bgHeight = viewportHeight;
+                bgWidth = viewportHeight * aspectRatio;
+            } else {
+                bgWidth = viewportWidth;
+                bgHeight = viewportWidth / aspectRatio;
+            }
+
+            const swX = (bgWidth * 0.49) + (viewportWidth - bgWidth) / 2;
+            const swY = (bgHeight * 0.3) + (viewportHeight - bgHeight) / 2;
+            const swWidth = bgWidth * 6;
+            overlay = true;
+            label5.style.left = `${swX}px`;
+            label5.style.top = `${swY}px`;
+            label5.style.width = `${swWidth}px`;
+            label5.style.filter = 'grayscale(100%)';
+            desc5.style.filter = 'grayscale(0%)';
+            desc5.style.display = 'block';
+            setTimeout(() => {
+                desc5.classList.add('bulb-on');
+            }, 300);
+        });
+
+        const swImage = document.getElementById('swImage');
+
+        swImage.addEventListener('click', () => {
+            if (swImage.src.includes('swlabel_on.png')) {
+                swImage.src = '/assets/swlabel_off.png';
+            } else {
+                swImage.src = '/assets/swlabel_on.png';
+            }
+        });
+
+        const playSound = () => {
+            const clickSound = document.getElementById('clickSound');
+            clickSound.currentTime = 0;
+            clickSound.play();
+        };
+        document.addEventListener('click', () => {
+            playSound();
+        });
+
+        const windowOpenSound = () => {
+            const clickSound = document.getElementById('openSound');
+            clickSound.currentTime = 0;
+            clickSound.volume = 0.6;
+            clickSound.play();
+        };
+        const windowCloseSound = () => {
+            const clickSound = document.getElementById('closeSound');
+            clickSound.currentTime = 0;
+            clickSound.play();
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const internalLinks = document.querySelectorAll('a[href^="/selected-works-plain"]');
+
+            internalLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    if (!this.getAttribute('href')) return;
+
+                    event.preventDefault();
+
+                    const destination = this.href;
+
+                    document.body.style.animation = 'fadeOut 1s ease-out forwards';
+
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</BaseLayout>
+
+<style is:global>
+    body {
+        margin: 0;
+        font-family: 'Zen Dots', sans-serif;
+        background-color: gray;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+        transition: filter 1s ease;
+        opacity: 0;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            background-color: black;
+        }
+        to {
+            opacity: 1;
+            background-color: black;
+        }
+    }
+
+    .background {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .exit {
+        z-index: 2;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        pointer-events: none;
+    }
+
+    .cat {
+        z-index: 2;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        pointer-events: none;
+    }
+
+    .door {
+        z-index: 1;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .door:hover {
+        opacity: 1;
+    }
+
+    .background-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+    }
+
+    .sw {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        z-index: 1;
+        cursor: pointer;
+    }
+
+    .pj1 {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        z-index: 10;
+    }
+
+    .cover1 {
+        z-index: 20;
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+    }
+
+    .cover1:hover {
+        opacity: 0.35;
+    }
+
+    .pj2 {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        z-index: 10;
+    }
+
+    .cover2 {
+        z-index: 20;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+    }
+
+    .cover2:hover {
+        opacity: 0.1;
+    }
+
+    .pj3 {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        z-index: 10;
+    }
+
+    .cover3 {
+        z-index: 20;
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+    }
+
+    .cover3:hover {
+        opacity: 0.35;
+    }
+
+    .pj4 {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        z-index: 10;
+    }
+
+    .cover4 {
+        z-index: 20;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+    }
+
+    .cover4:hover {
+        opacity: 0.3;
+    }
+
+    .pj5 {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        z-index: 10;
+    }
+
+    .cover5 {
+        z-index: 20;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+    }
+
+    .cover5:hover {
+        opacity: 0;
+    }
+
+    .label {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 0.3s ease, width 1s ease, left 1s ease, top 1s ease, filter 1s ease;
+        z-index: 30;
+        pointer-events: none;
+    }
+
+    .desc {
+        opacity: 0;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+        z-index: 40;
+        animation: none;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        scrollbar-width: none;
+    }
+    @keyframes bulbConnect {
+        0% {
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.5;
+        }
+        20% {
+            opacity: 0.8;
+        }
+        30% {
+            opacity: 0.4;
+        }
+        40% {
+            opacity: 0.9;
+        }
+        50% {
+            opacity: 0.7;
+        }
+        60% {
+            opacity: 1;
+        }
+        70% {
+            opacity: 0.85;
+        }
+        80% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 0.95;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .desc.bulb-on {
+        animation: bulbConnect 2s ease-in-out;
+        animation-fill-mode: forwards;
+    }
+
+    .close {
+        position: sticky;
+        object-fit: cover;
+        z-index: 50;
+        width: 3vw;
+        top: 3vw;
+        left: 3vw;
+        cursor: pointer;
+    }
+
+    .profile {
+        position: absolute;
+        object-fit: cover;
+        z-index: 40;
+        width: 100vw;
+        top: 0;
+        left: 0;
+    }
+
+    .weblink {
+        width: 35.66%;
+        position: absolute;
+        object-fit: cover;
+        z-index: 50;
+        top: 359.4vw;
+        left: 32.18%;
+        transition: opacity 0.3s ease;
+    }
+
+    .weblink:hover {
+        opacity: 0.4;
+    }
+
+    .video1 {
+        position: absolute;
+        z-index: 50;
+        top: 370.65vw;
+        left: 21.7vw;
+        width: 57vw;
+        height: 31.71vw;
+        margin: 0;
+        padding: 0;
+    }
+    .video2 {
+        top: 347.99vw;
+        position: absolute;
+        z-index: 50;
+        left: 21.7vw;
+        width: 57vw;
+        height: 31.71vw;
+        margin: 0;
+        padding: 0;
+    }
+    .video4 {
+        top: 259.44vw;
+        position: absolute;
+        z-index: 50;
+        left: 21.7vw;
+        width: 57vw;
+        height: 31.71vw;
+        margin: 0;
+        padding: 0;
+    }
+    .video5 {
+        top: 361.85vw;
+        position: absolute;
+        z-index: 50;
+        left: 21.7vw;
+        width: 57vw;
+        height: 31.71vw;
+        margin: 0;
+        padding: 0;
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            background-color: black;
+        }
+        to {
+            opacity: 0;
+            background-color: black;
+        }
+    }
+
+    .fadeout {
+        animation: fadeOut 1.5s ease-out forwards;
+    }
+    .cover1.visited {
+        opacity: 0.25;
+    }
+    .cover1.visited:hover {
+        opacity: 0.5;
+    }
+
+    .cover2.visited {
+        opacity: 0;
+    }
+    .cover2.visited:hover {
+        opacity: 0.4;
+    }
+
+    .cover3.visited {
+        opacity: 0.05;
+    }
+    .cover3.visited:hover {
+        opacity: 0.5;
+    }
+
+    .cover4.visited {
+        opacity: 0.2;
+    }
+    .cover4.visited:hover {
+        opacity: 0.4;
+    }
+
+    .cover5.visited {
+        opacity: 0;
+    }
+    .cover5.visited:hover {
+        opacity: 0.3;
+    }
+</style>

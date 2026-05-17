@@ -1,0 +1,509 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Other Works">
+    <div id="fade-overlay"></div>
+    <div class="left-column">
+        <h1>Yifei Felix<br><br>Wang</h1>
+        <ul>
+            <li><a href="/about-me">About Me</a></li>
+            <li><a href="/selected-works-plain">Selected Works</a></li>
+            <li><a id="chosen">Other Works</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="project">
+            <img src="/assets/ow2.png" alt="Project 1">
+            <div class="overlay">
+                <p>Redesigned the conversational interface for an AI-powered documentation generation tool.<br><br>02/2024</p>
+            </div>
+            <div class="project-info">
+                <span class="date">01</span>
+                <h2 class="title">Conversational interface @ Driver AI</h2>
+            </div>
+            <p>Generative AI / Frontend Dev / Figma</p>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow1.png" alt="Project 1">
+            <div class="overlay">
+                <p>Designed and built an automated vision system integrating RFID, robotic arms, and PLCs.<br><br>05/2024</p>
+            </div>
+            <div class="project-info">
+                <span class="date">02</span>
+                <h2 class="title">Vision inspection system @ JJE</h2>
+            </div>
+            <p>Robotics / Computer Vision / RFID</p>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow7.png" alt="Project 1">
+            <div class="overlay">
+                <p>Designed and developed core features of the AI-driven manga platform for creating and sharing.<br><br>02/2022</p>
+            </div>
+            <div class="project-info">
+                <span class="date">03</span>
+                <h2 class="title">AI manga platform features @ PixAI</h2>
+            </div>
+            <p>Generative AI / Full-stack Dev / ML Engineering</p>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow9.png" alt="Project 1">
+            <div class="overlay">
+                <p>Designed and developed a data portal to streamline customs clearance processes.<br><br>07/2020</p>
+            </div>
+            <div class="project-info">
+                <span class="date">04</span>
+                <h2 class="title">Clearance Data portal @ Amazon</h2>
+            </div>
+            <p>Full-stack Dev / Database / Figma</p>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow3.png" alt="Project 1">
+            <div class="overlay">
+                <p>Designed and produced custom 3D printed toys using advanced CAD models.<br><br>09/2023</p>
+            </div>
+            <div class="project-info">
+                <span class="date">05</span>
+                <h2 class="title">3D-printed toys @ Inkheart</h2>
+            </div>
+            <p>3D Modeling / CAD / 3D Printing</p>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow10.png" alt="Project 1">
+            <div class="overlay">
+                <p>Designed a cement material derived from seawater, inspired by the carbon-capturing behaviors of seashells.<br><br>12/2023</p>
+            </div>
+            <div class="project-info">
+                <span class="date">06</span>
+                <h2 class="title">Seawater cement material @ Brown U.</h2>
+            </div>
+            <p>Material Science / Chemical Engineering</p>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow8.png" alt="Project 1">
+            <div class="overlay">
+                <p>Designed a non-electric refrigerator based on eco-friendly chemical reactions.<br><br>03/2021</p>
+            </div>
+            <div class="project-info">
+                <span class="date">07</span>
+                <h2 class="title">Non-Electric refrigerator @ Brown U.</h2>
+            </div>
+            <p>Mechanical Engineering / Sustainable Design</p>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow6.png" alt="Project 1">
+            <div class="overlay">
+                <p>Designed and developed a platform to provide resources and support for international students.<br><br>12/2019</p>
+            </div>
+            <div class="project-info">
+                <span class="date">08</span>
+                <h2 class="title">Intl. students support platform @ RPG</h2>
+            </div>
+            <p>Figma / Full-stack Dev / Database</p>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow04.png" alt="Project 1">
+            <div class="overlay">
+                <p>Since 08/2018</p>
+            </div>
+            <div class="project-info">
+                <span class="date">Ex 1</span>
+                <h2 class="title">Indie Games</h2>
+            </div>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow02.png" alt="Project 0.2">
+            <div class="overlay">
+                <p>Since 06/2017</p>
+            </div>
+            <div class="project-info">
+                <span class="date">Ex 2</span>
+                <h2 class="title">Fine Arts</h2>
+            </div>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow03.png" alt="Project 0.3">
+            <div class="overlay">
+                <p>Since 10/2015</p>
+            </div>
+            <div class="project-info">
+                <span class="date">Ex 3</span>
+                <h2 class="title">Theatre Acting</h2>
+            </div>
+        </div>
+
+        <div class="project">
+            <img src="/assets/ow01.png" alt="Project 0.4">
+            <div class="overlay">
+                <p>Since 05/2021</p>
+            </div>
+            <div class="project-info">
+                <span class="date">Ex 4</span>
+                <h2 class="title">Board Games</h2>
+            </div>
+        </div>
+
+        <div class="project">
+            <p></p>
+        </div>
+        <div class="project">
+            <p></p>
+        </div>
+    </div>
+    <script is:inline>
+        const urlParams = new URLSearchParams(window.location.search);
+        var fromIndex = urlParams.get('from') === '0';
+
+        const currentUrl = window.location.href;
+        const newUrl = currentUrl.split('?')[0];
+        window.history.replaceState({}, document.title, newUrl);
+
+        window.addEventListener('load', () => {
+            const fadeOverlay = document.getElementById('fade-overlay');
+            if (fromIndex) {
+                fadeOverlay.classList.add('hidden');
+                fadeOverlay.addEventListener('transitionend', () => {
+                    fadeOverlay.remove();
+                });
+            } else {
+                fadeOverlay.style.display="none";
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('fadein');
+            const internalLinks = document.querySelectorAll('a[href^="/about-me"], a[href^="/selected-works-plain"]');
+
+            internalLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    if (!this.getAttribute('href')) return;
+
+                    event.preventDefault();
+
+                    const destination = this.href;
+
+                    document.body.classList.add('fadeout');
+
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 300);
+                });
+            });
+        });
+    </script>
+</BaseLayout>
+
+<style is:global>
+    body {
+        margin: 0;
+        overflow: hidden;
+
+        background-image: url('/assets/whitebg.png');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+    }
+
+    #fade-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 1s ease-in-out;
+    }
+
+    #fade-overlay.hidden {
+        opacity: 0;
+    }
+
+    .left-column {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 32vw;
+        height: 100%;
+        padding: 20px;
+    }
+
+    .left-column h1 {
+        font-size: 3.33vw;
+        line-height: 2.33vw;
+        font-family: 'Zen Dots', sans-serif;
+        font-weight: 300;
+        margin-top: 6vh;
+        margin-left: 3vw;
+    }
+
+    .left-column ul {
+        list-style-type: none;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-weight: 400;
+        font-size: max(0.8325vw, 1.75vh);
+        padding: 0;
+        margin-left: 3vw;
+        margin-top: 10vh;
+    }
+
+    .left-column ul li {
+        margin: 35px 0;
+    }
+
+    .left-column ul li a {
+        text-decoration: none;
+        color: #949494;
+    }
+
+    .left-column .immersive-view {
+        position: fixed;
+        margin-top: 0;
+        margin-left: 3vw;
+        bottom: 6vh;
+        text-align: left;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 0.624vw;
+    }
+
+    .left-column .immersive-view button {
+        padding: 0.6vw 1.6vw;
+        border: 0.18vw solid #333;
+        background: none;
+        cursor: pointer;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: 1.04vw;
+    }
+
+    .left-column .cat-icon {
+        position: fixed;
+        text-align: left;
+        margin-left: 3vw;
+        bottom: 16vh;
+    }
+
+    .left-column .cat-icon img {
+        width: 6.04vw;
+        height: auto;
+    }
+
+    .content {
+        position: fixed;
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: 31.6vw;
+        top: 27vh;
+        width: 63vw;
+        height: 73vh;
+        overflow-y: auto;
+        font-family: 'Poppins', Arial, sans-serif;
+        scrollbar-width: none;
+    }
+
+    .content::-webkit-scrollbar {
+        display: none;
+    }
+
+    .project {
+        position: relative;
+        flex: 0 1 calc(48% - 2vw);
+        margin: 0;
+        margin-bottom: 5.94vw;
+        margin-right: 3vw;
+        overflow: hidden;
+    }
+
+    .project img {
+        width: 100%;
+    }
+
+    .project p {
+        font-size: 1vw;
+        color: #949494;
+        text-align: right;
+        margin-right: 3%;
+        margin-top: 0;
+        font-weight: 300;
+    }
+
+    #chosen {
+        color: black;
+    }
+
+    @media (orientation: portrait) {
+        .left-column ul{
+            display: none;
+        }
+        .left-column .immersive-view {
+            display: none;
+        }
+        .left-column .cat-icon{
+            display: none;
+        }
+        .left-column h1{
+            margin-top: 2vh;
+            font-size: 5vw;
+            line-height: 3vw;
+        }
+        .left-column {
+            width: 100vw;
+        }
+        .content {
+            width: 80vw;
+            margin-left: 10vw;
+            top: 17vh;
+            height: 83vh;
+        }
+        .project h2 {
+            font-size: 1.665vw;
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .project p {
+            font-size: 1.04vw;
+            color: #949494;
+            text-align: right;
+        }
+    }
+
+    @media (max-aspect-ratio: 1.45/1) {
+        .left-column .immersive-view {
+            display: none;
+        }
+        .left-column .cat-icon{
+            display: none;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .left-column ul {
+            font-size: 1.6vw;
+        }
+        .left-column {
+            width: 100vw;
+        }
+        .project h2 {
+            font-size: 2vw;
+        }
+
+        .project p {
+            font-size: 1.6vw;
+            color: #949494;
+            text-align: right;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .left-column {
+            width: 100vw;
+        }
+        .project h2 {
+            font-size: 4vw;
+        }
+
+        .project p {
+            font-size: 2.3vw;
+            color: #949494;
+            text-align: right;
+        }
+    }
+
+    .project-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1% 0;
+        text-align: center;
+    }
+
+    .project-info .date {
+        font-size: 0.9vw;
+        color: #949494;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 300;
+        margin-left: 3%;
+        margin-bottom: 0;
+        margin-top: 2%;
+    }
+
+    .project-info .title {
+        font-size: 1.2vw;
+        font-family: 'Poppins', sans-serif;
+        color: #000;
+        margin-right: 3%;
+        margin-top: 2%;
+        margin-bottom: 0;
+        font-weight: 400;
+    }
+
+    .project .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        color: #FFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        text-align: center;
+        padding: 0 10px;
+        font-size: 1.1vw;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 300;
+    }
+
+    .project .overlay p {
+        color: white;
+        margin: 20%;
+        text-align: left;
+        font-size: 1vw;
+    }
+
+    .project:hover .overlay {
+        opacity: 1;
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            background-color: white;
+        }
+        to {
+            opacity: 0;
+            background-color: white;
+        }
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            background-color: white;
+        }
+        to {
+            opacity: 1;
+            background-color: white;
+        }
+    }
+    .fadein {
+        animation: fadeIn 0.3s ease-in forwards;
+    }
+    .fadeout {
+        animation: fadeOut 0.3s ease-out forwards;
+    }
+</style>

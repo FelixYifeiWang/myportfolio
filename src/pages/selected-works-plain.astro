@@ -1,0 +1,433 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Selected Works">
+    <div id="fade-overlay"></div>
+    <div id="fade-overlay2"></div>
+    <div class="left-column">
+        <h1>Yifei Felix<br><br>Wang</h1>
+        <ul>
+            <li><a href="/about-me">About Me</a></li>
+            <li><a id="chosen">Selected Works</a></li>
+            <li><a href="/other-works">Other Works</a></li>
+        </ul>
+        <div class="cat-icon">
+            <img src="/assets/cat.png" alt="Cat Icon">
+        </div>
+        <div class="immersive-view">
+            <p>Try something fun and a little quirky ↓</p>
+            <a href="/selected-works-immersive?from=0"><button>Immersive View</button></a>
+        </div>
+    </div>
+
+    <div class="content">
+        <section class="project" id="project1">
+            <a href="/echo-of-mobius">
+                <video src="/assets/v1.mp4" muted loop playsinline poster="/assets/v1c.jpg"></video>
+            </a>
+            <h2>Echo of Mobius</h2>
+            <p>A role-playing video game with infinite AI characters.</p>
+        </section>
+
+        <section class="project" id="project2">
+            <a href="/orpheus">
+                <video src="/assets/v4.mp4" muted loop playsinline poster="/assets/v4c.jpg"></video>
+            </a>
+            <h2>Orpheus</h2>
+            <p>An AI mental well-being support chatbot with EEG monitoring.</p>
+        </section>
+
+        <section class="project" id="project3">
+            <a href="/dreamin-engine">
+                <video src="/assets/v2.mp4" muted loop playsinline poster="/assets/v2c.jpg"></video>
+            </a>
+            <h2>DreamIn Engine</h2>
+            <p>A prompt-based AI game engine with no technical barriers.</p>
+        </section>
+
+        <section class="project" id="project4">
+            <a href="/relicvr">
+                <video src="/assets/v3.mp4" muted loop playsinline poster="/assets/v3c.jpg"></video>
+            </a>
+            <h2>RelicVR</h2>
+            <p>An immersive VR application for visualizing archaeological sites.</p>
+        </section>
+
+        <section class="project" id="project5">
+            <a href="/undecimber">
+                <video src="/assets/v5.mp4" muted loop playsinline poster="/assets/v5c.jpg"></video>
+            </a>
+            <h2>Undeciber</h2>
+            <p>A 2020-themed social impact driven fashion brand.</p>
+        </section>
+        <div class="project" id="ending">
+        </div>
+    </div>
+    <script is:inline>
+        const urlParams = new URLSearchParams(window.location.search);
+        var fromIndex = urlParams.get('from') === '0';
+
+        const currentUrl = window.location.href;
+        const newUrl = currentUrl.split('?')[0];
+        window.history.replaceState({}, document.title, newUrl);
+
+        window.addEventListener('load', () => {
+            const fadeOverlay = document.getElementById('fade-overlay');
+            if (fromIndex) {
+                fadeOverlay.classList.add('hidden');
+                fadeOverlay.addEventListener('transitionend', () => {
+                    fadeOverlay.remove();
+                });
+            } else {
+                fadeOverlay.style.display="none";
+                document.body.classList.add('fadein');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const videos = document.querySelectorAll('.project video');
+
+            videos.forEach(video => {
+                video.addEventListener('mouseenter', () => {
+                    video.play();
+                });
+
+                video.addEventListener('mouseleave', () => {
+                    video.pause();
+                    video.currentTime = 0;
+                });
+            });
+
+            const internalLinks = document.querySelectorAll('a[href^="/about-me"], a[href^="/other-works"], a[href^="/echo-of-mobius"], a[href^="/orpheus"], a[href^="/dreamin-engine"], a[href^="/relicvr"], a[href^="/undecimber"]');
+
+            internalLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    if (!this.getAttribute('href')) return;
+
+                    event.preventDefault();
+
+                    const destination = this.href;
+
+                    document.body.classList.add('fadeout');
+
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 300);
+                });
+            });
+
+            const blacklink = document.querySelectorAll('a[href^="/selected-works-immersive"]');
+
+            blacklink.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    if (!this.getAttribute('href')) return;
+
+                    event.preventDefault();
+
+                    const destination = this.href;
+
+                    const fadeOverlay = document.getElementById('fade-overlay2');
+                    fadeOverlay.classList.add('appear');
+
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</BaseLayout>
+
+<style is:global>
+    body {
+        margin: 0;
+        overflow: hidden;
+
+        background-image: url('/assets/whitebg.png');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+    }
+
+    #fade-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 1s ease-in-out;
+    }
+
+    #fade-overlay2 {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
+    #fade-overlay.hidden {
+        opacity: 0;
+    }
+
+    #fade-overlay2.appear {
+        opacity: 1;
+    }
+
+    .left-column {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 32vw;
+        height: 100%;
+        padding: 20px;
+    }
+
+    .left-column h1 {
+        font-size: 3.33vw;
+        line-height: 2.33vw;
+        font-family: 'Zen Dots', sans-serif;
+        font-weight: 300;
+        margin-top: 6vh;
+        margin-left: 3vw;
+    }
+
+    .left-column ul {
+        list-style-type: none;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-weight: 400;
+        font-size: max(0.8325vw, 1.75vh);
+        padding: 0;
+        margin-left: 3vw;
+        margin-top: 10vh;
+    }
+
+    .left-column ul li {
+        margin: 35px 0;
+    }
+
+    .left-column ul li a {
+        text-decoration: none;
+        color: #949494;
+    }
+
+    .left-column .immersive-view {
+        position: fixed;
+        margin-top: 0;
+        margin-left: 3vw;
+        bottom: 6vh;
+        text-align: left;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: max(0.624vw, 1.31vh);
+    }
+
+    .left-column .immersive-view button {
+        padding: 0.6vw max(1.6vw, 3.36vh);
+        border: 0.18vw solid #333;
+        background: none;
+        cursor: pointer;
+        font-family: 'Poppins', Arial, sans-serif;
+        font-size: max(1.04vw, 2.18vh);
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .left-column .immersive-view button:hover{
+        opacity: 0.6;
+    }
+
+    .left-column .cat-icon {
+        position: fixed;
+        text-align: left;
+        margin-left: 3vw;
+        bottom: 16vh;
+    }
+
+    .left-column .cat-icon img {
+        width: 6.04vw;
+        height: auto;
+    }
+
+    .content {
+        position: fixed;
+        margin-left: 31.6vw;
+        top: 27vh;
+        width: 67.4vw;
+        height: 73vh;
+        overflow-y: auto;
+        font-family: 'Poppins', Arial, sans-serif;
+        scrollbar-width: none;
+        scroll-behavior: smooth;
+    }
+
+    .content::-webkit-scrollbar {
+        display: none;
+    }
+
+    .project {
+        margin-bottom: 5.94vw;
+        margin-right: 3vw;
+    }
+
+    .project img {
+        width: 100%;
+    }
+
+    .project h2 {
+        font-size: max(1.665vw, 3.5vh);
+        font-weight: 400;
+        text-align: right;
+    }
+
+    .project p {
+        font-size: max(1.04vw, 2.184vh);
+        color: #949494;
+        text-align: right;
+    }
+
+    #chosen {
+        color: black;
+    }
+
+    @media (orientation: portrait) {
+        .left-column ul{
+            display: none;
+        }
+        .left-column .immersive-view {
+            display: none;
+        }
+        .left-column .cat-icon{
+            display: none;
+        }
+        .left-column h1{
+            margin-top: 2vh;
+            font-size: 5vw;
+            line-height: 3vw;
+        }
+        .left-column {
+            width: 100vw;
+        }
+        .content {
+            width: 80vw;
+            margin-left: 10vw;
+            top: 17vh;
+            height: 83vh;
+        }
+        .project h2 {
+            font-size: 1.665vw;
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .project p {
+            font-size: 1.04vw;
+            color: #949494;
+            text-align: right;
+        }
+
+        #ending {
+            margin-bottom: 30vh;
+        }
+    }
+
+    @media (max-aspect-ratio: 1.5/1) {
+        .left-column .immersive-view {
+            display: none;
+        }
+        .left-column .cat-icon{
+            display: none;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .left-column ul {
+            font-size: 1.6vw;
+        }
+        .left-column {
+            width: 100vw;
+        }
+        .project h2 {
+            font-size: 2vw;
+        }
+
+        .project p {
+            font-size: 1.6vw;
+            color: #949494;
+            text-align: right;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .left-column {
+            width: 100vw;
+        }
+        .project h2 {
+            font-size: 4vw;
+        }
+
+        .project p {
+            font-size: 2.3vw;
+            color: #949494;
+            text-align: right;
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            background-color: white;
+        }
+        to {
+            opacity: 0;
+            background-color: white;
+        }
+    }
+    @keyframes fadeOutBlack {
+        from {
+            opacity: 1;
+            background-color: black;
+        }
+        to {
+            opacity: 0;
+            background-color: black;
+        }
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            background-color: white;
+        }
+        to {
+            opacity: 1;
+            background-color: white;
+        }
+    }
+    .fadein {
+        animation: fadeIn 0.3s ease-in forwards;
+    }
+    .fadeout {
+        animation: fadeOut 0.3s ease-out forwards;
+    }
+    .fadeoutBlack {
+        animation: fadeOutBlack 1s ease-out forwards;
+    }
+
+    .project video {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        display: block;
+    }
+
+    .project a {
+        pointer-events: all;
+    }
+</style>
