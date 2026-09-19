@@ -5,6 +5,14 @@ import { resolve, join } from 'node:path';
 
 const out = resolve('dist');
 const pages = ['/', '/work/echo-of-mobius/', '/work/dreamin-engine/', '/work/relicvr/', '/work/orpheus/', '/work/undecimber/'];
+if (process.env.SITE_PREVIEW_URL) {
+  for (const route of pages) {
+    test(`${route} responds successfully in the running preview`, async () => {
+      const response = await fetch(new URL(route, process.env.SITE_PREVIEW_URL));
+      assert.equal(response.status, 200);
+    });
+  }
+}
 for (const route of pages) {
   test(`${route} has readable content and an accessible document`, () => {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');

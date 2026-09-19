@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  trailingSlash: 'never',
+  trailingSlash: 'always',
   build: {
     format: 'directory',
   },
