@@ -12,7 +12,7 @@ const sources = {
   ramen: { task: 'ramen-v1', textureSize: 1024, normalScale: .5 },
   stool: { task: 'stool-v1', textureSize: 1024, normalScale: .35 },
   plant: { textureSize: 512, normalScale: .6 },
-  kettle: { textureSize: 1024, normalScale: .4 },
+  kettle: { textureSize: 512, normalScale: .4 },
 };
 const names = process.argv.slice(2);
 if (!names.length || names.some(name => !sources[name])) {
@@ -47,7 +47,7 @@ for (const name of names) {
     const low = document.createMesh(`${name} room detail`);
     for (const primitive of high.listPrimitives()) {
       const reduced = primitive.clone();
-      simplifyPrimitive(reduced, { simplifier: MeshoptSimplifier, ratio: .34, error: .005, lockBorder: false });
+      simplifyPrimitive(reduced, { simplifier: MeshoptSimplifier, ratio: name === 'plant' ? .22 : .34, error: name === 'plant' ? .015 : .005, lockBorder: false });
       low.addPrimitive(reduced);
       roomTriangles += triangleCount(reduced);
     }

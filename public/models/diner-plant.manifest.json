@@ -1,11 +1,11 @@
 {
   "source": "Poly Haven CC0",
   "reference": null,
-  "roomTriangles": 15918,
+  "roomTriangles": 5985,
   "triangles": 25128,
-  "vertices": 33288,
+  "vertices": 26659,
   "draws": 3,
   "textures": 6,
-  "bytes": 581760,
+  "bytes": 505288,
   "sourceBytes": 2695848
 }

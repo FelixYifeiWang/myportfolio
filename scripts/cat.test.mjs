@@ -12,8 +12,8 @@ const budgets = {
   espresso: [500_000, 13_000, 5_000],
   ramen: [500_000, 20_000, 7_000],
   stool: [500_000, 13_000, 5_000],
-  plant: [650_000, 26_000, 17_000],
-  kettle: [900_000, 16_000, 6_000],
+  plant: [600_000, 26_000, 10_000],
+  kettle: [400_000, 16_000, 6_000],
 };
 const triangles = mesh => mesh.listPrimitives().reduce((total, primitive) => total + primitive.getIndices().getCount() / 3, 0);
 for (const [name, [bytes, highLimit, lowLimit]] of Object.entries(budgets)) {
@@ -47,7 +47,7 @@ for (const [name, [bytes, highLimit, lowLimit]] of Object.entries(budgets)) {
   });
 }
 
-test('the full imported model set stays below four megabytes', () => {
+test('the full imported model set stays below three megabytes', () => {
   const bytes = Object.keys(budgets).reduce((total, name) => total + statSync(new URL(`../public/models/diner-${name}.glb`, import.meta.url)).size, 0);
-  assert.ok(bytes < 4_000_000, `${bytes} model bytes`);
+  assert.ok(bytes < 3_000_000, `${bytes} model bytes`);
 });

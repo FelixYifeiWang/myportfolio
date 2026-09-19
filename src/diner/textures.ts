@@ -176,3 +176,27 @@ export function bottleLabelTexture() {
         ctx.fillText('EST. 2024', 256, 197);
     });
 }
+
+/** Ribbed privacy glass, with a quiet hand-lettered welcome. */
+export function doorGlassTexture() {
+    return canvasTexture(384, 512, ctx => {
+        const sky = ctx.createLinearGradient(0, 0, 0, 512);
+        sky.addColorStop(0, '#263c3d');
+        sky.addColorStop(1, '#627267');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, 384, 512);
+        for (let x = 0; x < 384; x += 16) {
+            ctx.fillStyle = '#d4d6b815';
+            ctx.fillRect(x, 0, 3, 512);
+            ctx.fillStyle = '#0b25221a';
+            ctx.fillRect(x + 11, 0, 2, 512);
+        }
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#e1d5b5';
+        ctx.font = 'italic 92px "Instrument Serif", Georgia';
+        ctx.fillText('Open late', 192, 250);
+        ctx.fillRect(92, 284, 200, 1);
+        ctx.font = '15px "DM Mono", monospace';
+        ctx.fillText('COME AS YOU ARE', 192, 324);
+    });
+}

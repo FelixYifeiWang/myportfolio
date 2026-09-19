@@ -18,7 +18,7 @@ npm test
 SITE_PREVIEW_URL=http://127.0.0.1:4321 npm test
 ```
 
-The complete suite has 27 checks when a local preview is supplied. Integration checks cover seven routes, document landmarks, internal links, image alternatives and asset destinations. Geometry checks protect nested transforms, interactive objects, shared geometry, transparency, shadows, quantized attributes and independent distance detail levels. Asset checks decode all six actual GLBs and enforce geometry and delivery budgets. The production build retains Vite's large-chunk advisory for the separately loaded Three.js scene.
+The complete suite has 30 checks when a local preview is supplied. Integration checks cover seven routes, document landmarks, internal links, image alternatives and asset destinations. Geometry checks protect nested transforms, interactive objects, shared geometry, transparency, shadows, quantized attributes and independent distance detail levels. Environment checks enforce bounds, material/geometry budgets, single-batch contact shadows and a real opening in the sink worktop. Asset checks decode all six actual GLBs and enforce geometry and delivery budgets. The production build retains Vite's large-chunk advisory for the separately loaded Three.js scene.
 
 ## Exploring the diner
 
@@ -29,6 +29,7 @@ All important actions have keyboard-accessible controls. Dialogs trap focus, ret
 ## Source
 
 - `src/diner/models.ts`: room geometry, prop placement, lights and interactive targets.
+- `src/diner/furnishings.ts`: entrance, shelf ceramics, preparation area and contact shadows.
 - `src/diner/assets.ts`: parallel asset loading, shared textures and distance detail levels.
 - `src/diner/cat.ts`: white cat, still cushion and breathing group.
 - `src/diner/textures.ts`: original tiles, menu, signs and labels.
@@ -45,11 +46,11 @@ All important actions have keyboard-accessible controls. Dialogs trap focus, ret
 
 ## Art direction and assets
 
-Quality comes from consistent shapes, materials, scale and lighting. The white cat is the close-up character; other objects are designed to read at ordinary room distance. The compact espresso machine uses a single dial and handle, and background normal maps are softened to avoid competing with the cat or menu.
+Quality comes from consistent shapes, materials, scale and lighting. The white cat is the close-up character; other objects are designed to read at ordinary room distance. The compact espresso machine uses a single dial and handle, and background normal maps are softened to avoid competing with the cat or menu. The final environment pass adds a framed entrance with ribbed privacy glass, an opal sconce, a door mat, varied shelf ceramics, a recessed sink, cookbooks, folded linen and supported brass rails. Soft furniture contact shadows share one tiny geometry batch. The warm lighting is calibrated around the existing lights; the sconce glow adds no shadow map or dynamic light.
 
 Four selected Tripo models (cat, espresso machine, ramen and stool) share original visual references. The plant, kettle and walnut material use CC0 Poly Haven sources. Detailed credits, generation settings, reference prompts and local reproduction instructions are in [ASSET_CREDITS.md](ASSET_CREDITS.md). Reference images in `assets/references/` are production files and are not served to visitors. The API is used only during asset creation; the website requires no API key or external generation service.
 
-All six optimized GLBs total approximately 3.31 MB, including both detail levels and their embedded textures. Runtime draws one level per object, and cloned props share geometry and materials. The cat uses a 2K texture set; background props use 512–1K textures. Original full-size models remain locally in ignored `work/`. Regeneration of web delivery files uses `npm run build:assets`, or `npm run build:cat` for the cat only; these commands never submit paid generation tasks.
+All six optimized GLBs total approximately 2.79 MB, including both detail levels and their embedded textures. Runtime draws one level per object, and cloned props share geometry and materials. The cat uses a 2K texture set; background props use 512–1K textures, with 512 reserved for foliage and the distant kettle. Original full-size models remain locally in ignored `work/`. Regeneration of web delivery files uses `npm run build:assets`, or `npm run build:cat` for the cat only; these commands never submit paid generation tasks.
 
 The earlier AI-generated counter illustration is retained only as the WebGL-failure fallback and is not downloaded during normal startup. Existing artwork, portraits and project images come from the prior portfolio. Locally served fonts retain their licenses in `public/fonts`. Audio contains no sampled music.
 
@@ -61,12 +62,13 @@ Camera movement uses animation frames. Ambient animation is capped at 24 updates
 
 Measured in the local browser at the default 1440 × 900 room view:
 
-| Rendering measure | Original room | Previous procedural cat | Current coherent asset pass |
+| Rendering measure | Previous procedural cat | Coherent asset pass | Finished room |
 | --- | ---: | ---: | ---: |
-| Draw calls per frame | 471 | 85 | 82 |
-| GPU geometries | 449 | 76 | 67 |
-| Rendered triangles | 103,986 | 131,362 | 139,762 |
+| Draw calls per frame | 85 | 82 | 85 |
+| GPU geometries | 76 | 67 | 75 |
+| Rendered triangles | 131,362 | 139,762 | 125,284 |
+| Imported model download | — | 3.31 MB | 2.79 MB |
 
-The final browser walkthrough covered desktop (1440 × 900) and phone (390 × 844) layouts, all five project stories, notebook/about, cat focus, sound toggling and paused rendering while reading. Reduced-motion guards were reviewed in code.
+The final browser walkthrough covered desktop (1440 × 900) and phone (390 × 844) layouts, all five project stories, notebook/about, cat focus, seated view, side-angle orbit, sound toggling and paused rendering while reading. Reduced-motion guards were reviewed in code.
 
-Distance detail keeps the improved models close to the prior room's geometry budget. Close views selectively increase detail. These numbers measure rendering work, not guaranteed frame rates across devices. Development exposes a canvas frame counter for verifying paused rendering; production omits it. The scene engine loads separately from the small navigation script, and static portfolio pages do not load it.
+The finished room draws roughly 10% fewer triangles than the preceding asset pass, with three additional draw calls. Lower foliage detail at room distance and four steam sprites keep the extra architecture inexpensive. Close views selectively increase detail. These numbers measure rendering work, not guaranteed frame rates across devices. Development exposes a canvas frame counter for verifying paused rendering; production omits it. The scene engine loads separately from the small navigation script, and static portfolio pages do not load it.

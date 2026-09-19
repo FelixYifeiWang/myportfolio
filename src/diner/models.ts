@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { batchStaticMeshes } from './optimize';
+import { addFurnishings, addContactShadows, createBackCounter } from './furnishings';
 import type { DinerCat } from './cat';
 import { placeProp, type DinerProps } from './assets';
-import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture } from './textures';
+import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture } from './textures';
 export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about';
 export interface DinerWorld {
     group: THREE.Group;
@@ -176,8 +177,11 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     box(10.3, .16, .22, palette.darkwood, 0, 5.31, -4, group);
     box(.2, .15, 8.2, palette.darkwood, -5, 5.32, 0, group);
     // Back bar: cabinetry, tile backsplash, open shelves, and a working-looking coffee station.
-    box(9.15, 1.34, .95, palette.darkwood, 0, .70, -3.36, group, .025);
-    box(9.3, .12, 1.1, palette.wood, 0, 1.42, -3.28, group, .04);
+    box(9.15, 1.22, .95, palette.darkwood, 0, .64, -3.36, group, .025);
+    box(9.15, .15, .065, palette.darkwood, 0, 1.30, -2.854, group);
+    for (const x of [-4.54, 4.54])
+        box(.07, .15, .95, palette.darkwood, x, 1.30, -3.36, group);
+    group.add(createBackCounter(palette.wood));
     for (let i = 0; i < 8; i++) {
         box(1.07, 1.12, .06, palette.walnut, -3.96 + i * 1.13, .72, -2.854, group, .008);
         box(.23, .025, .075, palette.brass, -3.96 + i * 1.13, 1.09, -2.80, group, .006);
@@ -188,8 +192,8 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
             box(.035, .35, .035, palette.brass, x, y - .19, -3.85, group);
             box(.035, .035, .4, palette.brass, x, y - .35, -3.68, group);
         }
-        for (let i = 0; i < 7; i++)
-            bottle(2 + i * .35, y + .05, -3.66, .44 + (i % 3) * .11, ['#314c32', '#653b25', '#617060'][i % 3], group);
+        for (let i = 0; i < 3; i++)
+            bottle((y > 3 ? 3.24 : 2.02) + i * .39, y + .05, -3.66, .40 + (i % 3) * .09, ['#314c32', '#653b25', '#617060'][i % 3], group);
     }
     placeProp(props.espresso, .95, new THREE.Vector3(-3.25, 1.48, -3.25), -Math.PI / 2, group);
     // Milk pitcher: a hollow spun profile, pinched pouring lip and bent handle.
@@ -201,7 +205,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     line([[.088, .21, 0], [.16, .20, 0], [.17, .08, 0], [.102, .064, 0]], .009, palette.metal, pitcher);
     line([[-.03, .246, .089], [0, .253, .126], [.03, .246, .089]], .007, palette.metal, pitcher);
     for (let i = 0; i < 5; i++)
-        cylinder(.22, .21, .03, palette.cream, -1.9, 1.52 + i * .032, -3.15, group);
+        cylinder(.22, .21, .03, palette.cream, -2.02, 1.52 + i * .032, -3.15, group);
     const sign = texturePlane(signTexture(), 4.2, 1.4, -.45, 3.57, -3.96, group, true);
     sign.renderOrder = 2;
     // A framed print introduces the user's own art into the actual room.
@@ -224,7 +228,12 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         box(.07, 1.53, .06, palette.walnut, x, .82, .412, group, .014);
     box(8.95, .18, 1.75, palette.wood, 0, 1.75, -.12, group, .07);
     box(8.91, .018, 1.70, palette.brass, 0, 1.657, -.12, group, .009);
-    line([[-4.25, .32, .74], [-4.25, .32, .92], [4.25, .32, .92], [4.25, .32, .74]], .036, palette.brass, group);
+    line([[-4.25, .32, .42], [-4.25, .32, .92], [4.25, .32, .92], [4.25, .32, .42]], .036, palette.brass, group);
+    for (const x of [-3, 0, 3]) {
+        const mount = cylinder(.055, .055, .025, palette.brass, x, .27, .435, group, 16);
+        mount.rotation.x = Math.PI / 2;
+        line([[x, .27, .44], [x, .27, .75], [x, .32, .92]], .018, palette.brass, group);
+    }
     for (const x of [-3, -1, 1, 3])
         placeProp(props.stool, 1.16, new THREE.Vector3(x, .025, 1.75), x * .06, group);
     for (const x of [-2.8, 0, 2.8])
@@ -336,10 +345,15 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     mesh(new THREE.LatheGeometry(shadeProfile, 40), palette.leather, [0, .62, 0], lamp);
     cylinder(.30, .30, .015, palette.glow, 0, .62, 0, lamp);
     addCounterDetails(group, props);
+    addFurnishings(group, palette, doorGlassTexture());
     // Floating steam is rendered inside the room, not layered onto the page.
     const soft = softTexture();
+    addContactShadows(group, soft);
+    const sconceGlow = mesh(new THREE.PlaneGeometry(1.55, 1.6), new THREE.MeshBasicMaterial({ map: soft, color: '#ffbd78', transparent: true, opacity: .16, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [-5.005, 4.03, 2.65], group);
+    sconceGlow.rotation.y = Math.PI / 2;
+    sconceGlow.castShadow = false;
     const steam: THREE.Sprite[] = [];
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 4; i++) {
         const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: soft, color: '#d6c6b0', transparent: true, opacity: .12, depthWrite: false }));
         s.position.set(1.25, 2.15 + i * .085, .22);
         s.scale.set(.11 + i * .012, .19 + i * .015, 1);
@@ -356,10 +370,10 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     const rain = new THREE.LineSegments(rainGeometry, new THREE.LineBasicMaterial({ color: '#b6cfcb', transparent: true, opacity: .24 }));
     group.add(rain);
     const lights: THREE.Light[] = [];
-    const ambient = new THREE.HemisphereLight('#f0dcc0', '#4c3930', .78);
+    const ambient = new THREE.HemisphereLight('#f0dcc0', '#4c3930', .65);
     group.add(ambient);
     for (const x of [-2.8, 0, 2.8]) {
-        const light = new THREE.SpotLight('#ffd092', 13, 12, Math.PI * .34, .72, 1.5);
+        const light = new THREE.SpotLight('#ffd092', 15, 12, Math.PI * .34, .72, 1.5);
         light.position.set(x, 4.19, -.15);
         light.target.position.set(x, 1, .1);
         group.add(light, light.target);
@@ -378,11 +392,11 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     windowLight.position.set(-4.85, 3.1, -.7);
     windowLight.lookAt(0, 1.5, 0);
     group.add(windowLight);
-    const softFront = new THREE.RectAreaLight('#efdbbf', 1.25, 8, 5);
+    const softFront = new THREE.RectAreaLight('#efdbbf', 1.1, 8, 5);
     softFront.position.set(0, 4, 5);
     softFront.lookAt(0, 1, 0);
     group.add(softFront);
-    const signGlow = new THREE.PointLight('#f3a46c', .45, 5, 2);
+    const signGlow = new THREE.PointLight('#f3a46c', 1.1, 5, 2);
     signGlow.position.set(-.5, 3.45, -3.6);
     group.add(signGlow);
     // Batch the rigid pieces inside clickable props too. Only the record spins;

@@ -35,7 +35,7 @@ Source downloads and prepared GLBs remain in ignored `work/`. The plant source w
 
 `npm run build:assets` prepares the retained local source GLBs; it does not make paid API calls. `npm run build:cat` rebuilds only the cat. A fresh checkout can build and run the site directly from the committed optimized public assets. Re-running the offline conversion requires the local originals (`work/tripo/{cat-v1,espresso-v2,ramen-v1,stool-v1}.glb` and matching task records, plus `work/{plant,kettle}.glb`). Task IDs above identify the selected generations for recovering sources from the account.
 
-The conversion deduplicates and welds geometry, makes two mesh levels sharing one texture set, encodes Meshopt geometry and WebP textures, and writes measured manifests beside each public GLB. Texture dimensions are 2K for the cat, 512 for foliage, and 1K for the other props. Normal-map strength is deliberately reduced, particularly on the machine and stools. Runtime selects one level with hysteresis to avoid repeated switching near the threshold. All six GLBs together must remain under 4 MB; asset tests decode the actual files and enforce individual budgets.
+The conversion deduplicates and welds geometry, makes two mesh levels sharing one texture set, encodes Meshopt geometry and WebP textures, and writes measured manifests beside each public GLB. Texture dimensions are 2K for the cat, 512 for foliage and the distant kettle, and 1K for the other props. Normal-map strength is deliberately reduced, particularly on the machine and stools. Runtime selects one level with hysteresis to avoid repeated switching near the threshold. All six GLBs together must remain under 3 MB; asset tests decode the actual files and enforce individual budgets.
 
 ## Reference prompt for the simplified espresso machine
 
@@ -46,3 +46,9 @@ Built-in imagegen, saved as `assets/references/espresso.png`:
 ## Existing materials
 
 Room architecture, smaller props, signs, menu textures and synthesized lounge/rain audio are original project work. Artwork, portraits and project screenshots come from the archived portfolio. Instrument Serif, DM Sans and DM Mono are served locally with licenses in `public/fonts`. The earlier AI-generated counter illustration remains only as the WebGL-failure fallback and is not fetched during normal 3D startup.
+
+## Final room finishing pass
+
+The entrance, ribbed-glass lettering, sconce, shelf ceramics, books, linen, recessed sink and rail supports are original procedural geometry. These use the existing room palette and static material batching. Furniture contact shadows are a single merged transparent batch with no depth writes; the sconce halo reuses the same radial texture. No additional Tripo generations were used. Total spending remains 300 credits ($3.00), leaving 700 credits ($7.00) at the last account check.
+
+The plant's distant mesh was reduced from 15,918 to 5,985 triangles; its detailed mesh is unchanged for close views. Kettle textures were reduced to 512 pixels. Those two changes cut the model payload by 524,844 bytes. Four steam sprites replace nine, avoiding five draw calls without adding a particle engine or postprocessing.

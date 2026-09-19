@@ -33,7 +33,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     renderer.shadowMap.autoUpdate = false;
     renderer.shadowMap.needsUpdate = true;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.08;
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#1b211e');
     scene.fog = new THREE.Fog('#1b211e', 23, 49);
@@ -310,7 +310,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             if (playing)
                 world.vinyl.rotation.y -= delta * .9;
             world.steam.forEach((sprite, i) => {
-                const phase = (elapsed * .16 + i / 9) % 1;
+                const phase = (elapsed * .16 + i / world.steam.length) % 1;
                 sprite.position.set(1.25 + Math.sin(phase * 7 + i) * .036, 2.12 + phase * .65, .22 + Math.cos(phase * 6) * .025);
                 sprite.material.opacity = Math.sin(phase * Math.PI) * .07;
                 sprite.scale.set(.1 + phase * .14, .17 + phase * .12, 1);
