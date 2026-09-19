@@ -1,6 +1,11 @@
 {
-  "triangles": 40636,
-  "vertices": 21278,
-  "draws": 9,
-  "bytes": 851632
+  "source": "Tripo image-to-3D v3.1",
+  "reference": "assets/references/cat.png",
+  "roomTriangles": 13479,
+  "triangles": 39757,
+  "vertices": 34778,
+  "draws": 1,
+  "textures": 3,
+  "bytes": 841740,
+  "sourceBytes": 2932392
 }

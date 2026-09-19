@@ -1,14 +1,15 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { batchStaticMeshes } from './optimize';
-import { woodTexture, tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, pressureGaugeTexture, leafTexture } from './textures';
+import type { DinerCat } from './cat';
+import { placeProp, type DinerProps } from './assets';
+import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture } from './textures';
 export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about';
 export interface DinerWorld {
     group: THREE.Group;
     targets: Record<ObjectName, THREE.Vector3>;
     interactives: THREE.Object3D[];
     cat: THREE.Group;
-    catHead: THREE.Group;
     vinyl: THREE.Group;
     steam: THREE.Sprite[];
     rain: THREE.LineSegments;
@@ -24,7 +25,7 @@ function surface(color: string, roughness = .7, metalness = 0) {
 }
 const cityMaterials = ['#15232b', '#20303a', '#a88e62', '#698590'].map(color => new THREE.MeshBasicMaterial({ color }));
 const palette = {
-    wood: new THREE.MeshStandardMaterial({ map: woodTexture(), color: '#d1a87c', roughness: .43 }),
+    wood: new THREE.MeshStandardMaterial({ color: '#d4a87b', roughness: .43 }),
     darkwood: new THREE.MeshStandardMaterial({ color: '#38291f', roughness: .7 }),
     walnut: new THREE.MeshStandardMaterial({ color: '#705039', roughness: .6 }),
     brass: new THREE.MeshStandardMaterial({ color: '#b4935b', roughness: .32, metalness: .78 }),
@@ -38,14 +39,6 @@ const palette = {
 const bottlePaper = new THREE.MeshStandardMaterial({ map: bottleLabelTexture(), roughness: .92 });
 const coffeeMaterial = new THREE.MeshStandardMaterial({ map: coffeeTexture(), roughness: .32 });
 const pendantMaterial = new THREE.MeshStandardMaterial({ color: '#b8763c', roughness: .32, metalness: .35, side: THREE.DoubleSide });
-const leafMaterial = new THREE.MeshStandardMaterial({ map: leafTexture(), roughness: .76, side: THREE.DoubleSide });
-const leafGeometry = new THREE.PlaneGeometry(1, 1, 2, 8);
-const leafVertices = leafGeometry.attributes.position;
-for (let i = 0; i < leafVertices.count; i++) {
-    const y = leafVertices.getY(i), x = leafVertices.getX(i);
-    leafVertices.setXYZ(i, x * Math.sin((y + .5) * Math.PI), y, .2 * Math.sin((y + .5) * Math.PI) - Math.abs(x) * .13);
-}
-leafGeometry.computeVertexNormals();
 function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, position = [0, 0, 0], parent?: THREE.Object3D) {
     const object = new THREE.Mesh(geometry, material);
     object.position.set(position[0], position[1], position[2]);
@@ -111,21 +104,6 @@ function coffee(x: number, y: number, z: number, parent: THREE.Object3D) {
     spoonRim.rotation.x = Math.PI / 2;
     spoonRim.scale.set(.03, .044, .03);
 }
-function stool(x: number, z: number, parent: THREE.Object3D) {
-    const cushion = [new THREE.Vector2(0, .12), new THREE.Vector2(.18, .12), new THREE.Vector2(.31, .10), new THREE.Vector2(.36, .065), new THREE.Vector2(.37, 0), new THREE.Vector2(.35, -.07), new THREE.Vector2(0, -.07)];
-    mesh(new THREE.LatheGeometry(cushion.reverse(), 40), palette.leather, [x, 1.04, z], parent);
-    const piping = mesh(new THREE.TorusGeometry(.363, .009, 8, 40), surface('#a26748', .8), [x, 1.055, z], parent);
-    piping.rotation.x = Math.PI / 2;
-    cylinder(.37, .36, .04, palette.brass, x, .95, z, parent);
-    for (const dx of [-.20, .20])
-        for (const dz of [-.20, .20]) {
-            const leg = cylinder(.025, .036, .93, palette.black, x + dx, .475, z + dz, parent, 12);
-            leg.rotation.z = -dx * .12;
-            leg.rotation.x = dz * .12;
-        }
-    const ring = mesh(new THREE.TorusGeometry(.275, .018, 8, 48), palette.brass, [x, .37, z], parent);
-    ring.rotation.x = Math.PI / 2;
-}
 function pendant(x: number, y: number, z: number, parent: THREE.Object3D) {
     cylinder(.012, .012, 5.3 - y, palette.black, x, (5.3 + y) / 2, z, parent, 8);
     const shade = pendantMaterial;
@@ -134,34 +112,16 @@ function pendant(x: number, y: number, z: number, parent: THREE.Object3D) {
     cylinder(.455, .455, .016, palette.glow, x, y - .12, z, parent, 48);
     cylinder(.07, .06, .10, palette.brass, x, y + .3, z, parent, 20);
 }
-function plant(x: number, y: number, z: number, parent: THREE.Object3D) {
-    const pot = surface('#95674b', .91);
-    cylinder(.24, .16, .35, pot, x, y + .175, z, parent);
-    cylinder(.213, .213, .014, palette.darkwood, x, y + .35, z, parent);
-    const lip = mesh(new THREE.TorusGeometry(.232, .018, 8, 32), pot, [x, y + .351, z], parent);
-    lip.rotation.x = Math.PI / 2;
-    cylinder(.22, .20, .025, pot, x, y + .012, z, parent);
-    for (let i = 0; i < 14; i++) {
-        const a = i * 2.4, r = .045 + (i % 4) * .042;
-        const pebble = mesh(new THREE.IcosahedronGeometry(.015, 0), palette.walnut, [x + Math.sin(a) * r, y + .363, z + Math.cos(a) * r], parent);
-        pebble.scale.y = .5;
-    }
-    const leaf = leafMaterial;
-    for (let i = 0; i < 10; i++) {
-        const a = i * 2.4, length = .45 + (i % 3) * .16;
-        const stem = line([[x, y + .3, z], [x + Math.sin(a) * .08, y + .65, z + Math.cos(a) * .08], [x + Math.sin(a) * .25, y + .3 + length, z + Math.cos(a) * .25]], .009, leaf, parent);
-        const l = mesh(leafGeometry, leaf, [x + Math.sin(a) * .23, y + .3 + length, z + Math.cos(a) * .23], parent);
-        l.scale.set(.18, .54 + (i % 3) * .06, .18);
-        l.rotation.set(Math.cos(a) * .55, a, Math.sin(a) * .7);
-        stem.castShadow = false;
-    }
-}
-export function buildDiner(catModel: {
-    root: THREE.Group;
-    body: THREE.Group;
-    head: THREE.Group;
-}): DinerWorld {
+export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     const group = new THREE.Group();
+    for (const material of [palette.wood, palette.walnut]) {
+        material.map = props.wood.color;
+        material.normalMap = props.wood.normal;
+        material.normalScale.set(.22, .22);
+        material.roughnessMap = props.wood.roughness;
+        material.needsUpdate = true;
+    }
+    palette.walnut.color.set('#a88260');
     const interactives: THREE.Object3D[] = [];
     const targets = {} as Record<ObjectName, THREE.Vector3>;
     function interactive(name: ObjectName, object: THREE.Object3D, point: THREE.Vector3) {
@@ -197,7 +157,7 @@ export function buildDiner(catModel: {
         box(.22, .12, 3.86, palette.darkwood, -5, y, -.7, group);
     box(.24, .08, 3.8, palette.darkwood, -4.98, 3.1, -.7, group);
     box(.24, 2.8, .08, palette.darkwood, -4.98, 3.05, -.7, group);
-    box(.5, .1, 4.02, palette.wood, -4.84, 1.63, -.7, group);
+    box(.72, .1, 4.02, palette.wood, -4.76, 1.63, -.7, group);
     const glass = new THREE.MeshStandardMaterial({ color: '#24434c', emissive: '#1a3444', emissiveIntensity: .4, roughness: .18, transparent: true, opacity: .68, side: THREE.DoubleSide });
     const window = mesh(new THREE.PlaneGeometry(3.72, 2.77), glass, [-5.04, 3.07, -.7], group);
     window.rotation.y = Math.PI / 2;
@@ -231,50 +191,7 @@ export function buildDiner(catModel: {
         for (let i = 0; i < 7; i++)
             bottle(2 + i * .35, y + .05, -3.66, .44 + (i % 3) * .11, ['#314c32', '#653b25', '#617060'][i % 3], group);
     }
-    const machine = new THREE.Group();
-    machine.position.set(-3.3, 1.48, -3.26);
-    group.add(machine);
-    // Enamel housing, inset fascia and a raised cup rail, modeled as assembled parts.
-    box(1.3, .73, .65, palette.green, 0, .43, 0, machine, .07);
-    box(1.14, .49, .035, palette.black, 0, .44, .337, machine, .028);
-    box(1.18, .21, .055, palette.metal, 0, .37, .365, machine, .018);
-    box(1.34, .07, .82, palette.metal, 0, .045, .07, machine, .015);
-    box(1.18, .024, .31, palette.black, 0, .083, .28, machine, .015);
-    box(1.15, .021, .51, palette.metal, 0, .807, -.005, machine, .012);
-    line([[-.56, .86, .24], [-.59, .86, -.24], [.59, .86, -.24], [.56, .86, .24]], .012, palette.brass, machine);
-    for (const x of [-.50, .50])
-        for (const z of [-.22, .24])
-            cylinder(.045, .05, .038, palette.black, x, -.008, z, machine, 12);
-    for (const x of [-.30, .3]) {
-        cylinder(.10, .085, .12, palette.metal, x, .28, .415, machine);
-        cylinder(.078, .085, .025, palette.brass, x, .216, .415, machine);
-        const handle = cylinder(.026, .035, .24, palette.black, x, .264, .573, machine, 16);
-        handle.rotation.x = Math.PI / 2;
-        line([[x, .204, .415], [x, .174, .43], [x + .038, .164, .45]], .009, palette.metal, machine);
-        const dial = cylinder(.051, .051, .029, palette.brass, x, .615, .354, machine, 24);
-        dial.rotation.x = Math.PI / 2;
-        const button = cylinder(.038, .038, .034, palette.cream, x, .615, .375, machine, 24);
-        button.rotation.x = Math.PI / 2;
-        coffee(x, .822, 0, machine);
-    }
-    for (let i = 0; i < 17; i++)
-        box(.015, .009, .25, palette.metal, -.54 + i * .0675, .103, .28, machine, 0);
-    // A recessed analog pressure gauge with calibrated ticks and a red needle.
-    mesh(new THREE.TorusGeometry(.087, .01, 8, 40), palette.brass, [0, .622, .367], machine);
-    const gauge = mesh(new THREE.CircleGeometry(.081, 40), new THREE.MeshStandardMaterial({ map: pressureGaugeTexture(), roughness: .45 }), [0, .622, .368], machine);
-    gauge.castShadow = false;
-    for (const x of [-.53, .53])
-        for (const y of [.29, .44]) {
-            const screw = cylinder(.014, .014, .008, palette.metal, x, y, .397, machine, 12);
-            screw.rotation.x = Math.PI / 2;
-            box(.015, .0025, .002, palette.black, x, y, .403, machine, 0);
-        }
-    const steamKnob = cylinder(.046, .046, .06, palette.black, .595, .53, .35, machine, 16);
-    steamKnob.rotation.x = Math.PI / 2;
-    line([[.56, .48, .34], [.65, .45, .43], [.67, .21, .48], [.61, .15, .5]], .016, palette.metal, machine);
-    cylinder(.022, .018, .034, palette.metal, .61, .145, .5, machine, 12);
-    for (let i = 0; i < 7; i++)
-        box(.09, .012, .003, palette.black, .57, .15 + i * .031, -.328, machine, 0);
+    placeProp(props.espresso, .95, new THREE.Vector3(-3.25, 1.48, -3.25), -Math.PI / 2, group);
     // Milk pitcher: a hollow spun profile, pinched pouring lip and bent handle.
     const pitcher = new THREE.Group();
     pitcher.position.set(-2.33, 1.48, -2.98);
@@ -309,7 +226,7 @@ export function buildDiner(catModel: {
     box(8.91, .018, 1.70, palette.brass, 0, 1.657, -.12, group, .009);
     line([[-4.25, .32, .74], [-4.25, .32, .92], [4.25, .32, .92], [4.25, .32, .74]], .036, palette.brass, group);
     for (const x of [-3, -1, 1, 3])
-        stool(x, 1.75, group);
+        placeProp(props.stool, 1.16, new THREE.Vector3(x, .025, 1.75), x * .06, group);
     for (const x of [-2.8, 0, 2.8])
         pendant(x, 4.38, -.15, group);
     // A real menu on the counter. Both raycasting and keyboard controls can pick it up.
@@ -390,7 +307,6 @@ export function buildDiner(catModel: {
     cat.position.set(-3.28, 1.94, .02);
     cat.rotation.y = -.1;
     group.add(cat);
-    const catHead = catModel.head;
     interactive('cat', cat, new THREE.Vector3(-3.25, 2.51, .12));
     // Personal postcard, utensils, condiments, flowers, and a small warm lamp.
     const about = new THREE.Group();
@@ -408,8 +324,9 @@ export function buildDiner(catModel: {
         stick.rotation.z = (i - 3) * .04;
     }
     bottle(1.65, 1.84, -.56, .30, '#4c3925', group);
-    plant(-4.62, 1.7, .37, group);
-    plant(4.28, 1.48, -3.1, group);
+    placeProp(props.plant, .98, new THREE.Vector3(-4.83, 1.68, -.2), .25, group);
+    placeProp(props.plant, .96, new THREE.Vector3(4.28, 1.48, -3.1), 2.2, group);
+    placeProp(props.kettle, .65, new THREE.Vector3(.42, 1.48, -3.15), -.45, group);
     const lamp = new THREE.Group();
     lamp.position.set(-4.04, 1.5, -3.2);
     group.add(lamp);
@@ -418,7 +335,7 @@ export function buildDiner(catModel: {
     const shadeProfile = [new THREE.Vector2(0, .20), new THREE.Vector2(.1, .19), new THREE.Vector2(.26, .1), new THREE.Vector2(.33, 0)];
     mesh(new THREE.LatheGeometry(shadeProfile, 40), palette.leather, [0, .62, 0], lamp);
     cylinder(.30, .30, .015, palette.glow, 0, .62, 0, lamp);
-    addCounterDetails(group);
+    addCounterDetails(group, props);
     // Floating steam is rendered inside the room, not layered onto the page.
     const soft = softTexture();
     const steam: THREE.Sprite[] = [];
@@ -439,7 +356,7 @@ export function buildDiner(catModel: {
     const rain = new THREE.LineSegments(rainGeometry, new THREE.LineBasicMaterial({ color: '#b6cfcb', transparent: true, opacity: .24 }));
     group.add(rain);
     const lights: THREE.Light[] = [];
-    const ambient = new THREE.HemisphereLight('#ebd5a7', '#5c4633', .9);
+    const ambient = new THREE.HemisphereLight('#f0dcc0', '#4c3930', .78);
     group.add(ambient);
     for (const x of [-2.8, 0, 2.8]) {
         const light = new THREE.SpotLight('#ffd092', 13, 12, Math.PI * .34, .72, 1.5);
@@ -461,7 +378,7 @@ export function buildDiner(catModel: {
     windowLight.position.set(-4.85, 3.1, -.7);
     windowLight.lookAt(0, 1.5, 0);
     group.add(windowLight);
-    const softFront = new THREE.RectAreaLight('#dfb683', 1.4, 8, 5);
+    const softFront = new THREE.RectAreaLight('#efdbbf', 1.25, 8, 5);
     softFront.position.set(0, 4, 5);
     softFront.lookAt(0, 1, 0);
     group.add(softFront);
@@ -477,28 +394,12 @@ export function buildDiner(catModel: {
         batchStaticMeshes(object as THREE.Group, [vinyl]);
         object.traverse(child => { child.userData.action = object.userData.action; });
     }
-    return { group, targets, interactives, cat: catModel.body, catHead, vinyl, steam, rain, rainPositions, lights };
+    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, rainPositions, lights };
 }
-function addCounterDetails(parent: THREE.Object3D) {
-    // A little supper, set just behind the notebook: handmade ceramic and chopsticks.
-    const bowl = new THREE.Group();
-    bowl.position.set(-1.66, 1.85, -.62);
-    parent.add(bowl);
-    const ceramic = surface('#88917c', .4);
-    const profile = [new THREE.Vector2(.08, 0), new THREE.Vector2(.18, .035), new THREE.Vector2(.25, .14), new THREE.Vector2(.27, .22), new THREE.Vector2(.25, .22), new THREE.Vector2(.21, .09), new THREE.Vector2(.08, .035)];
-    mesh(new THREE.LatheGeometry(profile, 32), ceramic, [0, 0, 0], bowl);
-    cylinder(.238, .23, .015, surface('#53311c', .32), 0, .175, 0, bowl, 32);
-    const noodle = surface('#d1b47c', .8);
-    for (let i = 0; i < 5; i++)
-        line([[-.15, .19, -.12 + i * .048], [-.05, .195, -.1 + i * .048], [.08, .192, -.14 + i * .048], [.16, .19, -.1 + i * .048]], .009, noodle, bowl);
-    const egg = ball(.09, .197, .015, .082, .017, .102, palette.cream, bowl);
-    ball(.10, .213, .018, .036, .008, .045, surface('#cf9135', .7), bowl);
-    for (let i = 0; i < 5; i++) {
-        const scallion = cylinder(.014, .01, .008, surface('#54713b', .9), -.07 + i * .026, .208, .05 + (i % 2) * .03, bowl, 8);
-        scallion.rotation.z = .15;
-    }
+function addCounterDetails(parent: THREE.Object3D, props: DinerProps) {
+    const bowl = placeProp(props.ramen, .34, new THREE.Vector3(-1.63, 1.85, -.59), .3, parent);
     for (const offset of [-.035, .035]) {
-        const stick = cylinder(.007, .01, .79, palette.walnut, offset, .27, 0, bowl, 6);
+        const stick = cylinder(.007, .01, .79, palette.walnut, offset, .32, 0, bowl, 6);
         stick.rotation.set(Math.PI / 2, 0, .7);
     }
     // Folded linen under the cup; deliberately tiny geometry instead of simulated cloth.
@@ -511,9 +412,4 @@ function addCounterDetails(parent: THREE.Object3D) {
     parent.add(receipt);
     const paper = texturePlane(labelTexture('Good\ncompany.', 'NO RESERVATION NEEDED', '#ddcfb2', '#826c4e'), .31, .45, 0, .014, 0, receipt);
     paper.rotation.x = -Math.PI / 2;
-    // Small feet and mounting details make furniture feel assembled rather than extruded.
-    for (const x of [-3, -1, 1, 3])
-        for (const dx of [-.2, .2])
-            for (const dz of [-.2, .2])
-                cylinder(.038, .04, .06, palette.brass, x + dx, .045, 1.75 + dz, parent, 10);
 }

@@ -4,6 +4,7 @@ import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUnifo
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { batchStaticMeshes } from './optimize';
 import { loadDinerCat } from './cat';
+import { loadDinerProps } from './assets';
 import { buildDiner, type ObjectName } from './models';
 type View = ObjectName | 'room' | 'seat';
 export interface DinerScene {
@@ -57,10 +58,11 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     const roomEnvironment = new RoomEnvironment();
     const environment = pmrem.fromScene(roomEnvironment, .04);
     scene.environment = environment.texture;
-    scene.environmentIntensity = .16;
+    scene.environmentIntensity = .24;
     roomEnvironment.dispose();
     pmrem.dispose();
-    const world = buildDiner(await loadDinerCat());
+    const [catModel, props] = await Promise.all([loadDinerCat(), loadDinerProps()]);
+    const world = buildDiner(catModel, props);
     const batches = batchStaticMeshes(world.group, world.interactives);
     scene.add(world.group);
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: '#1b211e', roughness: 1 }));
@@ -304,8 +306,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         }
         const cameraChanged = controls.update();
         if (!paused && !reduced.matches) {
-            world.cat.scale.y = 1 + Math.sin(elapsed * 1.5) * .014;
-            world.catHead.rotation.x = THREE.MathUtils.lerp(world.catHead.rotation.x, now < petUntil ? .02 : .11, Math.min(delta * 4, 1));
+            world.cat.scale.y = 1 + Math.sin(elapsed * (now < petUntil ? 2.1 : 1.4)) * .009;
             if (playing)
                 world.vinyl.rotation.y -= delta * .9;
             world.steam.forEach((sprite, i) => {

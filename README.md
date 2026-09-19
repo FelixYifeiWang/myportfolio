@@ -18,7 +18,7 @@ npm test
 SITE_PREVIEW_URL=http://127.0.0.1:4321 npm test
 ```
 
-The integration tests check seven routes, document landmarks, internal links, image alternatives, and asset destinations. Geometry tests verify that batching preserves nested transforms, interactive objects, shared geometry, transparency, and shadow behavior. Cat asset tests decode the actual GLB, validate geometry and animation groups, and enforce a 45,000-triangle, 10-draw-call, 1.1 MB total download budget. Browser verification covers all five project dialogs, menu navigation, Escape, the notebook, about, cat close-up, seated camera, sound toggle, and phone layout. Menu closure restores the prior camera position.
+The complete suite has 27 checks when a local preview is supplied. Integration checks cover seven routes, document landmarks, internal links, image alternatives and asset destinations. Geometry checks protect nested transforms, interactive objects, shared geometry, transparency, shadows, quantized attributes and independent distance detail levels. Asset checks decode all six actual GLBs and enforce geometry and delivery budgets. The production build retains Vite's large-chunk advisory for the separately loaded Three.js scene.
 
 ## Exploring the diner
 
@@ -28,39 +28,45 @@ All important actions have keyboard-accessible controls. Dialogs trap focus, ret
 
 ## Source
 
-- `src/diner/models.ts`: original room geometry, props, lights, and interactive targets.
-- `src/diner/textures.ts`: procedural wood, tiles, menu, signs, analog gauge, foliage and labels.
-- `src/diner/cat.ts`: parallel loading and material setup for the original white cat.
-- `scripts/build-cat.mjs`: offline cat sculpt, texture baking, batching and GLB export.
-- `src/diner/scene.ts`: rendering, orbit controls, raycasting, camera transitions, motion.
+- `src/diner/models.ts`: room geometry, prop placement, lights and interactive targets.
+- `src/diner/assets.ts`: parallel asset loading, shared textures and distance detail levels.
+- `src/diner/cat.ts`: white cat, still cushion and breathing group.
+- `src/diner/textures.ts`: original tiles, menu, signs and labels.
+- `scripts/prepare-assets.mjs`: offline model optimization, texture compression and measured manifests.
+- `src/diner/optimize.ts`: static geometry batching with transform and quantization handling.
+- `src/diner/scene.ts`: rendering, orbit controls, raycasting, camera transitions and motion.
 - `src/diner/ui.ts`: accessible dialogs and room controls.
-- `src/diner/audio.ts`: opt-in original synthesized ambience.
+- `src/diner/audio.ts`: opt-in synthesized ambience.
 - `src/data/projects.ts`: project content adapted from the original portfolio.
 - `src/pages/index.astro`: diner interface and project dialogs.
 - `src/pages/work/`: complete static portfolio and project pages.
 - `src/styles/diner.css`: responsive interface and paper menu styling.
 - `archive/previous-site`: the previous site, preserved unchanged.
 
-## Assets
+## Art direction and assets
 
-The room uses original geometry and procedural textures; no downloaded third-party models or external rendering services. The white cat is an original continuous-surface sculpt, generated offline and committed as a quantized GLB with compact WebP coat and fur textures. Its body, head and ears remain independent for animation; the cushion stays still. Regenerate it with `npm run build:cat`. The complete cat and its textures total approximately 1 MB, with 40,636 triangles and nine material batches. No sculpting or texture baking runs in the browser. Existing artwork, portraits, and project images come from the prior portfolio. Instrument Serif, DM Sans, and DM Mono are served locally with their licenses in `public/fonts`.
+Quality comes from consistent shapes, materials, scale and lighting. The white cat is the close-up character; other objects are designed to read at ordinary room distance. The compact espresso machine uses a single dial and handle, and background normal maps are softened to avoid competing with the cat or menu.
 
-The earlier AI-generated counter image is retained only as the WebGL failure fallback; it is not downloaded during normal startup. It is a conceptual scene, not a photograph of Felix’s home or pet. It was generated with OpenAI’s image generation tool and encoded as WebP. Audio is generated locally using Web Audio and contains no sampled music.
+Four selected Tripo models (cat, espresso machine, ramen and stool) share original visual references. The plant, kettle and walnut material use CC0 Poly Haven sources. Detailed credits, generation settings, reference prompts and local reproduction instructions are in [ASSET_CREDITS.md](ASSET_CREDITS.md). Reference images in `assets/references/` are production files and are not served to visitors. The API is used only during asset creation; the website requires no API key or external generation service.
+
+All six optimized GLBs total approximately 3.31 MB, including both detail levels and their embedded textures. Runtime draws one level per object, and cloned props share geometry and materials. The cat uses a 2K texture set; background props use 512–1K textures. Original full-size models remain locally in ignored `work/`. Regeneration of web delivery files uses `npm run build:assets`, or `npm run build:cat` for the cat only; these commands never submit paid generation tasks.
+
+The earlier AI-generated counter illustration is retained only as the WebGL-failure fallback and is not downloaded during normal startup. Existing artwork, portraits and project images come from the prior portfolio. Locally served fonts retain their licenses in `public/fonts`. Audio contains no sampled music.
 
 ## Rendering and performance
 
-The room batches static geometry by shared material while keeping interactive and animated objects separate. Native antialiasing replaces full-screen postprocessing, shadow maps are reused, and the renderer limits total pixel count and adapts resolution when camera movement remains slow.
+The room batches static geometry by shared material while preserving interactive objects and adaptive model levels. Native antialiasing replaces full-screen postprocessing, shadow maps are reused, and rendering limits total pixel count and adapts resolution during slow camera movement.
 
-Camera movement uses animation frames. Ambient animation is capped at 24 updates per second, and rendering stops when the page is hidden or a reading dialog has finished opening. Reduced-motion mode renders only on changes. Audio suspends when hidden or muted, and its temporary nodes are disconnected after playback.
+Camera movement uses animation frames. Ambient animation is capped at 24 updates per second; rendering stops when the page is hidden or a reading dialog has finished opening. Reduced-motion mode renders only on changes. Audio suspends when hidden or muted, and temporary audio nodes are disconnected after playback.
 
-Measured in the same local browser room view during the September 2026 polish passes:
+Measured in the local browser at the default 1440 × 900 room view:
 
-| Rendering measure | Initial room | First optimization | White cat and detailed props |
+| Rendering measure | Original room | Previous procedural cat | Current coherent asset pass |
 | --- | ---: | ---: | ---: |
-| Draw calls per frame | 471 | 121 | 85 |
-| GPU geometries | 449 | 112 | 76 |
-| Rendered triangles | 103,986 | 88,064 | 131,362 |
+| Draw calls per frame | 471 | 85 | 82 |
+| GPU geometries | 449 | 76 | 67 |
+| Rendered triangles | 103,986 | 131,362 | 139,762 |
 
-The new sculpt deliberately spends more triangles on curved surfaces, while batching rigid parts within the interactive props reduces draw calls by another 30%. The latest browser walkthrough covered 1440 × 900 and 390 × 844 layouts, cat orbit views, all five project dialogs, notebook/about, sound, and paused rendering during reading. The complete automated suite has 22 passing checks when run with the local preview.
+The final browser walkthrough covered desktop (1440 × 900) and phone (390 × 844) layouts, all five project stories, notebook/about, cat focus, sound toggling and paused rendering while reading. Reduced-motion guards were reviewed in code.
 
-These measure rendering work, not a promised frame-rate improvement on every device. In development, the canvas exposes a frame counter for verifying that dialogs stop rendering; production builds omit it. The 3D engine is loaded separately from the small navigation script, and the static portfolio does not load it.
+Distance detail keeps the improved models close to the prior room's geometry budget. Close views selectively increase detail. These numbers measure rendering work, not guaranteed frame rates across devices. Development exposes a canvas frame counter for verifying paused rendering; production omits it. The scene engine loads separately from the small navigation script, and static portfolio pages do not load it.

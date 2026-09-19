@@ -1,0 +1,11 @@
+{
+  "source": "Tripo image-to-3D v3.1",
+  "reference": "assets/references/ramen.png",
+  "roomTriangles": 5950,
+  "triangles": 17500,
+  "vertices": 15676,
+  "draws": 1,
+  "textures": 3,
+  "bytes": 399776,
+  "sourceBytes": 2396292
+}

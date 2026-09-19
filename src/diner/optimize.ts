@@ -10,7 +10,7 @@ export function batchStaticMeshes(root: THREE.Group, excluded: THREE.Object3D[])
     root.updateWorldMatrix(true, true);
     const inverseRoot = root.matrixWorld.clone().invert();
     function collect(object: THREE.Object3D) {
-        if (excludedSet.has(object) || !object.visible)
+        if (excludedSet.has(object) || object instanceof THREE.LOD || !object.visible)
             return;
         if (object instanceof THREE.Mesh && !(object instanceof THREE.SkinnedMesh) &&
             !Array.isArray(object.material) && !object.material.transparent &&
@@ -29,6 +29,19 @@ export function batchStaticMeshes(root: THREE.Group, excluded: THREE.Object3D[])
             continue;
         const pieces = objects.map(object => {
             const geometry = object.geometry.index ? object.geometry.toNonIndexed() : object.geometry.clone();
+            // Quantized attributes cannot store baked world coordinates beyond [-1, 1].
+            // Expand before transforming, otherwise repeated GLB props wrap or disappear.
+            for (const name of ['position', 'normal']) {
+                const attribute = geometry.getAttribute(name);
+                if (!attribute || attribute.array instanceof Float32Array) continue;
+                const values = new Float32Array(attribute.count * attribute.itemSize);
+                for (let i = 0; i < attribute.count; i++) {
+                    values[i * 3] = attribute.getX(i);
+                    values[i * 3 + 1] = attribute.getY(i);
+                    values[i * 3 + 2] = attribute.getZ(i);
+                }
+                geometry.setAttribute(name, new THREE.BufferAttribute(values, attribute.itemSize));
+            }
             return geometry.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inverseRoot, object.matrixWorld));
         });
         const merged = mergeGeometries(pieces, false);

@@ -55,3 +55,36 @@ test('transparent surfaces and different shadow settings are not merged together
   assert.equal(result.after,3);
   assert.equal(root.children.filter(item=>item.castShadow).length,1);
 });
+
+test('compressed model instances keep their positions outside the quantization range', () => {
+  const root = new THREE.Group();
+  const material = new THREE.MeshStandardMaterial();
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const positions = geometry.attributes.position;
+  geometry.setAttribute('position', new THREE.BufferAttribute(Int16Array.from(positions.array, value => Math.round(value * 32767)), 3, true));
+  for (const x of [-3, -1, 1, 3]) {
+    const object = new THREE.Mesh(geometry, material);
+    object.position.set(x, 1, 1.75);
+    root.add(object);
+  }
+  const before = new THREE.Box3().setFromObject(root);
+  batchStaticMeshes(root, []);
+  const after = new THREE.Box3().setFromObject(root);
+  assert.ok(before.min.distanceTo(after.min) < 1e-5 && before.max.distanceTo(after.max) < 1e-5);
+});
+
+test('distance detail levels stay separate so only the selected level renders', () => {
+  const root = new THREE.Group();
+  const material = new THREE.MeshStandardMaterial();
+  const lod = new THREE.LOD();
+  const high = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), material);
+  const low = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 6), material);
+  lod.addLevel(high, 0); lod.addLevel(low, 7);
+  root.add(lod, new THREE.Mesh(new THREE.BoxGeometry(), material));
+  batchStaticMeshes(root, []);
+  const camera = new THREE.PerspectiveCamera();
+  camera.position.z = 12; camera.updateMatrixWorld(); lod.update(camera);
+  assert.ok(high.parent === lod && low.parent === lod && !high.visible && low.visible);
+  camera.position.z = 3; camera.updateMatrixWorld(); lod.update(camera);
+  assert.ok(high.visible && !low.visible);
+});

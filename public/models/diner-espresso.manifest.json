@@ -1,0 +1,11 @@
+{
+  "source": "Tripo image-to-3D v3.1",
+  "reference": "assets/references/espresso.png",
+  "roomTriangles": 3848,
+  "triangles": 11319,
+  "vertices": 11170,
+  "draws": 1,
+  "textures": 3,
+  "bytes": 271056,
+  "sourceBytes": 1756716
+}

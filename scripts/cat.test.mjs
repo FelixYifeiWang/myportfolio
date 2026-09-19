@@ -1,55 +1,53 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { NodeIO, getBounds } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 
-const asset = readFileSync(new URL('../public/models/diner-cat.glb', import.meta.url));
-const { scene } = await new GLTFLoader().parseAsync(asset.buffer.slice(asset.byteOffset, asset.byteOffset + asset.byteLength), '');
-const meshes = [];
-scene.traverse(object => { if (object.isMesh) meshes.push(object); });
+await MeshoptDecoder.ready;
+const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder});
+const budgets = {
+  cat: [1_000_000, 41_000, 15_000],
+  espresso: [500_000, 13_000, 5_000],
+  ramen: [500_000, 20_000, 7_000],
+  stool: [500_000, 13_000, 5_000],
+  plant: [650_000, 26_000, 17_000],
+  kettle: [900_000, 16_000, 6_000],
+};
+const triangles = mesh => mesh.listPrimitives().reduce((total, primitive) => total + primitive.getIndices().getCount() / 3, 0);
+for (const [name, [bytes, highLimit, lowLimit]] of Object.entries(budgets)) {
+  test(`${name}: web model decodes, preserves detail levels, and fits delivery budgets`, async () => {
+    const path = new URL(`../public/models/diner-${name}.glb`, import.meta.url);
+    const doc = await io.read(path.pathname);
+    const root = doc.getRoot();
+    const lods = root.listNodes().filter(node => node.getExtras().webLOD);
+    assert.ok(lods.length > 0, 'Missing distance detail levels');
+    let high = 0, low = 0;
+    for (const node of lods) {
+      const levels = node.listChildren();
+      assert.equal(levels.length, 2);
+      high += triangles(levels[0].getMesh());
+      low += triangles(levels[1].getMesh());
+      for (const level of levels) for (const primitive of level.getMesh().listPrimitives()) {
+        const positions = primitive.getAttribute('POSITION');
+        assert.ok([...primitive.getIndices().getArray()].every(index => index < positions.getCount()));
+        assert.ok(primitive.getAttribute('NORMAL') && primitive.getAttribute('TEXCOORD_0'));
+        assert.ok(primitive.getMaterial().getBaseColorTexture());
+      }
+    }
+    for (const accessor of root.listAccessors()) assert.ok([...accessor.getArray()].every(Number.isFinite));
+    assert.ok(high <= highLimit && low <= lowLimit && low < high);
+    assert.ok(statSync(path).size < bytes);
+    const bounds = getBounds(root.listScenes()[0]);
+    assert.ok(bounds.min.every(Number.isFinite) && bounds.max.every((value, i) => value > bounds.min[i]));
+    const manifest = JSON.parse(readFileSync(new URL(`../public/models/diner-${name}.manifest.json`, import.meta.url)));
+    assert.equal(high, manifest.triangles);
+    assert.equal(low, manifest.roomTriangles);
+  });
+}
 
-test('the complete cat stays within its download and rendering budgets', () => {
-  const textures = ['cat-coat.webp', 'cat-face.webp', 'cat-fur.webp'];
-  const bytes = textures.reduce((total, name) => total + statSync(new URL(`../public/models/${name}`, import.meta.url)).size, asset.length);
-  const triangles = meshes.reduce((total, mesh) => total + mesh.geometry.index.count / 3, 0);
-  assert.ok(bytes < 1_100_000, `Cat and textures use ${bytes} bytes`);
-  assert.ok(triangles < 45_000, `Cat uses ${triangles} triangles`);
-  assert.ok(meshes.length <= 10, `Cat needs ${meshes.length} draw calls`);
-});
-
-test('the cat decodes into finite, shaded geometry with a correctly sized silhouette', () => {
-  for (const mesh of meshes) {
-    const geometry = mesh.geometry;
-    for (const attribute of Object.values(geometry.attributes))
-      assert.ok([...attribute.array].every(Number.isFinite), `${mesh.name} contains invalid attributes`);
-    const positions = geometry.attributes.position;
-    assert.ok([...geometry.index.array].every(index => index < positions.count));
-    geometry.computeBoundingSphere();
-    assert.ok(geometry.boundingSphere.radius > 0 && geometry.boundingSphere.radius < 2);
-  }
-  const size = new THREE.Box3().setFromObject(scene).getSize(new THREE.Vector3());
-  assert.ok(size.x > 1.3 && size.x < 1.6 && size.y > .5 && size.y < .8 && size.z > .8 && size.z < 1.1);
-});
-
-test('breathing and greeting animate separately without moving the cushion', () => {
-  const body = scene.getObjectByName('CatBreathingBody');
-  const head = scene.getObjectByName('CatHead');
-  const cushion = scene.getObjectByName('Cushion');
-  assert.ok(body && head && cushion);
-  assert.ok(head.getObjectByName('EarLeft') && head.getObjectByName('EarRight'));
-  const before = new THREE.Box3().setFromObject(cushion);
-  body.scale.y = 1.02; head.rotation.x += .1;
-  const after = new THREE.Box3().setFromObject(cushion);
-  assert.ok(before.equals(after));
-  body.scale.y = 1; head.rotation.x -= .1;
-});
-
-test('the coat and face have independent white materials and usable texture coordinates', () => {
-  for (const name of ['White coat', 'White face']) {
-    const mesh = meshes.find(object => object.material.name === name);
-    assert.ok(mesh, `${name} is missing`);
-    const uv = mesh.geometry.attributes.uv;
-    assert.ok(uv && Math.max(...uv.array) - Math.min(...uv.array) > .5);
-  }
+test('the full imported model set stays below four megabytes', () => {
+  const bytes = Object.keys(budgets).reduce((total, name) => total + statSync(new URL(`../public/models/diner-${name}.glb`, import.meta.url)).size, 0);
+  assert.ok(bytes < 4_000_000, `${bytes} model bytes`);
 });

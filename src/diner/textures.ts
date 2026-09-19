@@ -10,93 +10,6 @@ function canvasTexture(width: number, height: number, paint: (ctx: CanvasRenderi
     texture.anisotropy = 4;
     return texture;
 }
-export function pressureGaugeTexture() {
-    return canvasTexture(256, 256, ctx => {
-        ctx.fillStyle = '#e9e0c9';
-        ctx.fillRect(0, 0, 256, 256);
-        ctx.translate(128, 128);
-        ctx.strokeStyle = '#52483d';
-        for (let i = 0; i <= 30; i++) {
-            const a = Math.PI * (.75 + i / 30 * 1.5);
-            ctx.lineWidth = i % 5 === 0 ? 3 : 1.3;
-            ctx.beginPath();
-            ctx.moveTo(Math.cos(a) * 98, Math.sin(a) * 98);
-            ctx.lineTo(Math.cos(a) * (i % 5 === 0 ? 78 : 88), Math.sin(a) * (i % 5 === 0 ? 78 : 88));
-            ctx.stroke();
-            if (i % 5 === 0) {
-                ctx.fillStyle = '#52483d';
-                ctx.font = '18px Georgia';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(String(i / 2.5), Math.cos(a) * 63, Math.sin(a) * 63);
-            }
-        }
-        ctx.fillStyle = '#82745d';
-        ctx.font = '12px Georgia';
-        ctx.fillText('BAR', 0, 45);
-        ctx.strokeStyle = '#994b3a';
-        ctx.lineWidth = 4;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(-9, 12);
-        ctx.lineTo(47, -62);
-        ctx.stroke();
-        ctx.fillStyle = '#554a3b';
-        ctx.beginPath();
-        ctx.arc(0, 0, 7, 0, Math.PI * 2);
-        ctx.fill();
-    });
-}
-export function leafTexture() {
-    return canvasTexture(128, 256, ctx => {
-        const shade = ctx.createLinearGradient(0, 0, 128, 0);
-        shade.addColorStop(0, '#334c2e');
-        shade.addColorStop(.47, '#6b824c');
-        shade.addColorStop(.51, '#536d3b');
-        shade.addColorStop(1, '#344e30');
-        ctx.fillStyle = shade;
-        ctx.fillRect(0, 0, 128, 256);
-        ctx.strokeStyle = '#9baa6660';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 12; i++)
-            for (const side of [-1, 1]) {
-                ctx.beginPath();
-                ctx.moveTo(64, i * 22 + 23);
-                ctx.quadraticCurveTo(64 + side * 22, i * 22 + 13, 64 + side * 60, i * 22 - 18);
-                ctx.stroke();
-            }
-        ctx.strokeStyle = '#a1ad72';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(64, 0);
-        ctx.lineTo(64, 256);
-        ctx.stroke();
-    });
-}
-export function woodTexture() {
-    return canvasTexture(1024, 1024, ctx => {
-        ctx.fillStyle = '#805337';
-        ctx.fillRect(0, 0, 1024, 1024);
-        let seed = 72;
-        const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-        for (let y = 0; y < 1024; y += 1) {
-            const shade = random();
-            ctx.strokeStyle = `rgba(${shade > .5 ? '198,147,92' : '43,22,12'},${.02 + random() * .14})`;
-            ctx.lineWidth = .5 + random() * 1.6;
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            for (let x = 0; x <= 1024; x += 32)
-                ctx.lineTo(x, y + Math.sin(x * .01 + y * .03) * 3 + Math.sin(x * .004) * 5);
-            ctx.stroke();
-        }
-        for (let y = 0; y < 1024; y += 256) {
-            ctx.fillStyle = '#2a160c55';
-            ctx.fillRect(0, y, 1024, 2);
-            ctx.fillStyle = '#e3aa7050';
-            ctx.fillRect(0, y + 2, 1024, 1);
-        }
-    });
-}
 export function tileTexture() {
     const texture = canvasTexture(512, 512, ctx => {
         ctx.fillStyle = '#172d2b';
@@ -123,7 +36,7 @@ export function floorTexture() {
         ctx.fillRect(0, 0, 512, 512);
         for (let y = 0; y < 4; y++)
             for (let x = 0; x < 4; x++) {
-                ctx.fillStyle = (x + y) % 2 ? '#62594a' : '#b3a58b';
+                ctx.fillStyle = (x + y) % 2 ? '#716858' : '#a39882';
                 ctx.fillRect(x * 128 + 2, y * 128 + 2, 124, 124);
             }
         for (let i = 0; i < 16000; i++) {

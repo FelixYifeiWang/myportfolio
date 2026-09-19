@@ -1,0 +1,11 @@
+{
+  "source": "Tripo image-to-3D v3.1",
+  "reference": "assets/references/stool.png",
+  "roomTriangles": 4028,
+  "triangles": 11850,
+  "vertices": 11007,
+  "draws": 1,
+  "textures": 3,
+  "bytes": 409280,
+  "sourceBytes": 3141396
+}
