@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { batchStaticMeshes } from './optimize';
+import { loadDinerCat } from './cat';
 import { buildDiner, type ObjectName } from './models';
 type View = ObjectName | 'room' | 'seat';
 export interface DinerScene {
@@ -59,7 +60,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     scene.environmentIntensity = .16;
     roomEnvironment.dispose();
     pmrem.dispose();
-    const world = buildDiner();
+    const world = buildDiner(await loadDinerCat());
     const batches = batchStaticMeshes(world.group, world.interactives);
     scene.add(world.group);
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: '#1b211e', roughness: 1 }));
@@ -104,7 +105,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         seat: { position: new THREE.Vector3(.4, 2.85, 5.1), target: new THREE.Vector3(-.15, 2.6, -2.7) },
         menu: { position: new THREE.Vector3(1.8, 4.5, 4.7), target: new THREE.Vector3(.05, 1.6, 0) },
         notebook: { position: new THREE.Vector3(-.2, 4.3, 4.8), target: new THREE.Vector3(-1.5, 1.65, 0) },
-        cat: { position: new THREE.Vector3(-1.6, 3, 3.5), target: new THREE.Vector3(-3.05, 2.05, 0) },
+        cat: { position: new THREE.Vector3(-1.6, 3, 3.5), target: new THREE.Vector3(-3.32, 2.19, .08) },
         record: { position: new THREE.Vector3(4.7, 3.5, 3.4), target: new THREE.Vector3(2.7, 1.9, -.25) },
         about: { position: new THREE.Vector3(2.2, 3.5, 4), target: new THREE.Vector3(-.6, 2.4, -2.9) },
     };
@@ -125,8 +126,19 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         manualView = false;
         shell.classList.toggle('is-exploring', name !== 'room');
         const target = name === 'room' ? roomTarget : views[name].target;
-        const to = name === 'room' ? roomPosition : views[name].position;
+        const to = viewPosition(name);
         moveCamera(to, target);
+    }
+    function viewPosition(name: View) {
+        if (name === 'room') return roomPosition;
+        const view = views[name];
+        if (name !== 'cat') return view.position;
+        // Fit a sphere enclosing the cat, including its cushion and whiskers,
+        // into the narrower field of view. Portrait screens need more distance.
+        const halfFov = THREE.MathUtils.degToRad(camera.fov / 2);
+        const limitingAngle = Math.min(halfFov, Math.atan(Math.tan(halfFov) * camera.aspect));
+        const offset = view.position.clone().sub(view.target);
+        return offset.setLength(Math.max(offset.length(), 1.02 / Math.sin(limitingAngle))).add(view.target);
     }
     function moveCamera(to: THREE.Vector3, target: THREE.Vector3) {
         controls.enabled = false;
@@ -168,6 +180,12 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         if (currentView === 'room' && !manualView) {
             camera.position.copy(roomPosition);
             controls.target.copy(roomTarget);
+            transition = null;
+            controls.enabled = !paused;
+        }
+        else if (currentView === 'cat' && !manualView) {
+            camera.position.copy(viewPosition('cat'));
+            controls.target.copy(views.cat.target);
             transition = null;
             controls.enabled = !paused;
         }
@@ -287,7 +305,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         const cameraChanged = controls.update();
         if (!paused && !reduced.matches) {
             world.cat.scale.y = 1 + Math.sin(elapsed * 1.5) * .014;
-            world.catHead.rotation.x = THREE.MathUtils.lerp(world.catHead.rotation.x, now < petUntil ? -.09 : 0, Math.min(delta * 4, 1));
+            world.catHead.rotation.x = THREE.MathUtils.lerp(world.catHead.rotation.x, now < petUntil ? .02 : .11, Math.min(delta * 4, 1));
             if (playing)
                 world.vinyl.rotation.y -= delta * .9;
             world.steam.forEach((sprite, i) => {

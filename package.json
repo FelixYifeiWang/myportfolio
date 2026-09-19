@@ -10,7 +10,8 @@
     "test": "node --test scripts/*.test.mjs",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "build:cat": "node scripts/build-cat.mjs"
   },
   "dependencies": {
     "astro": "^4.16.0",

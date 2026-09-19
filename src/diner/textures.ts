@@ -10,6 +10,69 @@ function canvasTexture(width: number, height: number, paint: (ctx: CanvasRenderi
     texture.anisotropy = 4;
     return texture;
 }
+export function pressureGaugeTexture() {
+    return canvasTexture(256, 256, ctx => {
+        ctx.fillStyle = '#e9e0c9';
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.translate(128, 128);
+        ctx.strokeStyle = '#52483d';
+        for (let i = 0; i <= 30; i++) {
+            const a = Math.PI * (.75 + i / 30 * 1.5);
+            ctx.lineWidth = i % 5 === 0 ? 3 : 1.3;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(a) * 98, Math.sin(a) * 98);
+            ctx.lineTo(Math.cos(a) * (i % 5 === 0 ? 78 : 88), Math.sin(a) * (i % 5 === 0 ? 78 : 88));
+            ctx.stroke();
+            if (i % 5 === 0) {
+                ctx.fillStyle = '#52483d';
+                ctx.font = '18px Georgia';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(String(i / 2.5), Math.cos(a) * 63, Math.sin(a) * 63);
+            }
+        }
+        ctx.fillStyle = '#82745d';
+        ctx.font = '12px Georgia';
+        ctx.fillText('BAR', 0, 45);
+        ctx.strokeStyle = '#994b3a';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-9, 12);
+        ctx.lineTo(47, -62);
+        ctx.stroke();
+        ctx.fillStyle = '#554a3b';
+        ctx.beginPath();
+        ctx.arc(0, 0, 7, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+export function leafTexture() {
+    return canvasTexture(128, 256, ctx => {
+        const shade = ctx.createLinearGradient(0, 0, 128, 0);
+        shade.addColorStop(0, '#334c2e');
+        shade.addColorStop(.47, '#6b824c');
+        shade.addColorStop(.51, '#536d3b');
+        shade.addColorStop(1, '#344e30');
+        ctx.fillStyle = shade;
+        ctx.fillRect(0, 0, 128, 256);
+        ctx.strokeStyle = '#9baa6660';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 12; i++)
+            for (const side of [-1, 1]) {
+                ctx.beginPath();
+                ctx.moveTo(64, i * 22 + 23);
+                ctx.quadraticCurveTo(64 + side * 22, i * 22 + 13, 64 + side * 60, i * 22 - 18);
+                ctx.stroke();
+            }
+        ctx.strokeStyle = '#a1ad72';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(64, 0);
+        ctx.lineTo(64, 256);
+        ctx.stroke();
+    });
+}
 export function woodTexture() {
     return canvasTexture(1024, 1024, ctx => {
         ctx.fillStyle = '#805337';
@@ -153,30 +216,6 @@ export function surfaceTexture() {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(5, 3);
     return texture;
-}
-export function furTexture() {
-    return canvasTexture(512, 256, ctx => {
-        ctx.fillStyle = '#b87a48';
-        ctx.fillRect(0, 0, 512, 256);
-        for (let i = 0; i < 9; i++) {
-            ctx.fillStyle = '#855231';
-            ctx.beginPath();
-            const x = i * 64;
-            ctx.moveTo(x - 9, 0);
-            ctx.bezierCurveTo(x + 20, 70, x - 20, 100, x + 3, 165);
-            ctx.bezierCurveTo(x - 4, 115, x - 7, 60, x - 20, 0);
-            ctx.fill();
-        }
-        for (let i = 0; i < 5000; i++) {
-            ctx.strokeStyle = i % 2 ? '#f3cb9630' : '#643b2414';
-            ctx.lineWidth = .6;
-            const x = (i * 97.33) % 512, y = (i * 23.61) % 256;
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(x + 2, y + 5);
-            ctx.stroke();
-        }
-    });
 }
 export function coffeeTexture() {
     return canvasTexture(256, 256, ctx => {
