@@ -3,8 +3,9 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { batchStaticMeshes } from './optimize';
 import { addFurnishings, addContactShadows, createBackCounter } from './furnishings';
 import type { DinerCat } from './cat';
+import { createWindowRain, type WindowRain } from './rain';
 import { placeProp, type DinerProps } from './assets';
-import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture } from './textures';
+import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, windowBeadsTexture } from './textures';
 export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about';
 export interface DinerWorld {
     group: THREE.Group;
@@ -13,8 +14,7 @@ export interface DinerWorld {
     cat: THREE.Group;
     vinyl: THREE.Group;
     steam: THREE.Sprite[];
-    rain: THREE.LineSegments;
-    rainPositions: Float32Array;
+    rain: WindowRain;
     lights: THREE.Light[];
 }
 const materialCache = new Map<string, THREE.MeshStandardMaterial>();
@@ -159,10 +159,13 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     box(.24, .08, 3.8, palette.darkwood, -4.98, 3.1, -.7, group);
     box(.24, 2.8, .08, palette.darkwood, -4.98, 3.05, -.7, group);
     box(.72, .1, 4.02, palette.wood, -4.76, 1.63, -.7, group);
-    const glass = new THREE.MeshStandardMaterial({ color: '#24434c', emissive: '#1a3444', emissiveIntensity: .4, roughness: .18, transparent: true, opacity: .68, side: THREE.DoubleSide });
+    const glass = new THREE.MeshStandardMaterial({ color: '#24434c', emissive: '#1a3444', emissiveIntensity: .4, roughness: .22, transparent: true, opacity: .43, side: THREE.DoubleSide });
     const window = mesh(new THREE.PlaneGeometry(3.72, 2.77), glass, [-5.04, 3.07, -.7], group);
     window.rotation.y = Math.PI / 2;
     window.castShadow = false;
+    const beads = mesh(new THREE.PlaneGeometry(3.72, 2.77), new THREE.MeshBasicMaterial({ map: windowBeadsTexture(), transparent: true, opacity: .30, depthWrite: false }), [-5.028, 3.07, -.7], group);
+    beads.rotation.y = Math.PI / 2;
+    beads.castShadow = false;
     const sky = new THREE.MeshBasicMaterial({ color: '#14232c' });
     box(.03, 4.1, 5, sky, -5.9, 3, -.7, group, 0);
     for (let i = 0; i < 8; i++) {
@@ -214,13 +217,21 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     art.colorSpace = THREE.SRGBColorSpace;
     box(1.36, 1.16, .07, palette.darkwood, -3.4, 3.5, -3.92, group);
     texturePlane(art, 1.18, .98, -3.4, 3.5, -3.873, group);
-    const chalk = labelTexture('Stay\ncurious.', 'GOOD THINGS TAKE TIME', '#263c35', '#d7cbae');
-    const chalkGroup = new THREE.Group();
-    chalkGroup.position.set(1, 1.49, -3.2);
-    chalkGroup.rotation.x = -.08;
-    group.add(chalkGroup);
-    box(.74, .86, .055, palette.darkwood, 0, .43, 0, chalkGroup);
-    texturePlane(chalk, .65, .77, 0, .43, .034, chalkGroup);
+    // A quiet ceramic vase replaces another text sign on the back counter.
+    const vase = surface('#b89b79', .85);
+    const vaseProfile = [[0, 0], [.12, 0], [.17, .05], [.185, .23], [.14, .37], [.072, .44], [.07, .49], [.055, .49], [.057, .43], [.125, .36], [.16, .22], [.14, .065], [0, .03]];
+    mesh(new THREE.LatheGeometry(vaseProfile.map(([r, h]) => new THREE.Vector2(r, h)), 28), vase, [1.08, 1.48, -3.30], group);
+    const stemMaterial = surface('#687057', .95);
+    for (const [index, offset] of [-.17, .04, .21].entries()) {
+        const top = 2.40 + index * .09;
+        line([[1.08, 1.73, -3.30], [1.10 + offset * .3, 2.04, -3.30], [1.08 + offset, top, -3.32]], .006, stemMaterial, group);
+        for (let j = 0; j < 3; j++) {
+            const y = 2.09 + j * .09 + index * .035;
+            const leaf = mesh(new THREE.SphereGeometry(1, 10, 6), stemMaterial, [1.10 + offset * .55 + (j % 2 ? .045 : -.045), y, -3.30], group);
+            leaf.scale.set(.065, .025, .034);
+            leaf.rotation.z = j % 2 ? .5 : -.5;
+        }
+    }
     // The counter is a thick oak slab over a fluted, moss-green base.
     const baseMaterial = new THREE.MeshStandardMaterial({ color: '#354238', roughness: .72 });
     box(8.6, 1.65, 1.08, baseMaterial, 0, .82, -.15, group, .025);
@@ -236,7 +247,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     }
     for (const x of [-3, -1, 1, 3])
         placeProp(props.stool, 1.16, new THREE.Vector3(x, .025, 1.75), x * .06, group);
-    for (const x of [-2.8, 0, 2.8])
+    for (const x of [-2.8, 0, 3.35])
         pendant(x, 4.38, -.15, group);
     // A real menu on the counter. Both raycasting and keyboard controls can pick it up.
     const menu = new THREE.Group();
@@ -360,19 +371,12 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         group.add(s);
         steam.push(s);
     }
-    const rainPositions = new Float32Array(100 * 6);
-    for (let i = 0; i < 100; i++) {
-        const y = 1.78 + (i * .173) % 2.6, z = -2.5 + (i * .719) % 3.6;
-        rainPositions.set([-4.97, y, z, -4.97, y - .09, z + .009], i * 6);
-    }
-    const rainGeometry = new THREE.BufferGeometry();
-    rainGeometry.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
-    const rain = new THREE.LineSegments(rainGeometry, new THREE.LineBasicMaterial({ color: '#b6cfcb', transparent: true, opacity: .24 }));
-    group.add(rain);
+    const rain = createWindowRain();
+    group.add(rain.mesh);
     const lights: THREE.Light[] = [];
     const ambient = new THREE.HemisphereLight('#f0dcc0', '#4c3930', .65);
     group.add(ambient);
-    for (const x of [-2.8, 0, 2.8]) {
+    for (const x of [-2.8, 0, 3.35]) {
         const light = new THREE.SpotLight('#ffd092', 15, 12, Math.PI * .34, .72, 1.5);
         light.position.set(x, 4.19, -.15);
         light.target.position.set(x, 1, .1);
@@ -408,7 +412,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         batchStaticMeshes(object as THREE.Group, [vinyl]);
         object.traverse(child => { child.userData.action = object.userData.action; });
     }
-    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, rainPositions, lights };
+    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, lights };
 }
 function addCounterDetails(parent: THREE.Object3D, props: DinerProps) {
     const bowl = placeProp(props.ramen, .34, new THREE.Vector3(-1.63, 1.85, -.59), .3, parent);

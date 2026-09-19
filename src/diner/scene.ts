@@ -315,12 +315,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
                 sprite.material.opacity = Math.sin(phase * Math.PI) * .07;
                 sprite.scale.set(.1 + phase * .14, .17 + phase * .12, 1);
             });
-            for (let i = 0; i < 100; i++) {
-                const index = i * 6, y = world.rainPositions[index + 1] - delta * (.24 + (i % 4) * .09), next = y < 1.79 ? 4.43 : y;
-                world.rainPositions[index + 1] = next;
-                world.rainPositions[index + 4] = next - .09;
-            }
-            world.rain.geometry.attributes.position.needsUpdate = true;
+            world.rain.update(delta);
         }
         if (cameraChanged || dirty || moving)
             updateHotspots();

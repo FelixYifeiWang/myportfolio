@@ -84,9 +84,9 @@ export function signTexture() {
         ctx.fillStyle = '#ffd0a0';
         ctx.fillText('after hours', 768, 238);
         ctx.shadowBlur = 0;
-        ctx.font = '24px "DM Mono", monospace';
-        ctx.fillStyle = '#d3b494';
-        ctx.fillText('A LITTLE PLACE BY FELIX WANG', 768, 418);
+        ctx.font = '500 52px "DM Mono", monospace';
+        ctx.fillStyle = '#594331';
+        ctx.fillText('BY FELIX WANG', 768, 413);
     });
 }
 export function labelTexture(title: string, subtitle: string, color = '#dbcba8', ink = '#604735') {
@@ -177,7 +177,7 @@ export function bottleLabelTexture() {
     });
 }
 
-/** Ribbed privacy glass, with a quiet hand-lettered welcome. */
+/** Unlettered ribbed privacy glass. */
 export function doorGlassTexture() {
     return canvasTexture(384, 512, ctx => {
         const sky = ctx.createLinearGradient(0, 0, 0, 512);
@@ -191,12 +191,38 @@ export function doorGlassTexture() {
             ctx.fillStyle = '#0b25221a';
             ctx.fillRect(x + 11, 0, 2, 512);
         }
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#e1d5b5';
-        ctx.font = 'italic 92px "Instrument Serif", Georgia';
-        ctx.fillText('Open late', 192, 250);
-        ctx.fillRect(92, 284, 200, 1);
-        ctx.font = '15px "DM Mono", monospace';
-        ctx.fillText('COME AS YOU ARE', 192, 324);
+    });
+}
+
+/** Sparse, static water beads catch the room light without screen-space effects. */
+export function windowBeadsTexture() {
+    return canvasTexture(768, 576, ctx => {
+        let seed = 93;
+        const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+        for (let i = 0; i < 190; i++) {
+            const x = 8 + random() * 752, y = 8 + random() * 560;
+            const radius = .6 + random() * 1.5;
+            ctx.fillStyle = '#09242b45';
+            ctx.beginPath();
+            ctx.ellipse(x, y, radius, radius * 1.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#d3e6dc9a';
+            ctx.lineWidth = .65;
+            ctx.beginPath();
+            ctx.ellipse(x - .3, y + .4, radius * .75, radius * 1.15, 0, .1, 2.0);
+            ctx.stroke();
+            if (i % 14 === 0) {
+                const length = 9 + random() * 27;
+                const trail = ctx.createLinearGradient(0, y - length, 0, y);
+                trail.addColorStop(0, '#aac7cf00');
+                trail.addColorStop(1, '#aac7cf60');
+                ctx.strokeStyle = trail;
+                ctx.lineWidth = .8;
+                ctx.beginPath();
+                ctx.moveTo(x + 1, y - length);
+                ctx.bezierCurveTo(x - 1, y - length * .7, x + 1.5, y - 5, x, y);
+                ctx.stroke();
+            }
+        }
     });
 }

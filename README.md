@@ -18,7 +18,7 @@ npm test
 SITE_PREVIEW_URL=http://127.0.0.1:4321 npm test
 ```
 
-The complete suite has 30 checks when a local preview is supplied. Integration checks cover seven routes, document landmarks, internal links, image alternatives and asset destinations. Geometry checks protect nested transforms, interactive objects, shared geometry, transparency, shadows, quantized attributes and independent distance detail levels. Environment checks enforce bounds, material/geometry budgets, single-batch contact shadows and a real opening in the sink worktop. Asset checks decode all six actual GLBs and enforce geometry and delivery budgets. The production build retains Vite's large-chunk advisory for the separately loaded Three.js scene.
+The complete suite has 32 checks when a local preview is supplied. Integration checks cover seven routes, document landmarks, internal links, image alternatives and asset destinations. Geometry checks protect nested transforms, interactive objects, shared geometry, transparency, shadows, quantized attributes and independent distance detail levels. Environment checks enforce bounds, material/geometry budgets, single-batch contact shadows and a real opening in the sink worktop. Rain checks cover deterministic motion, varied streaks, reusable buffers and window bounds. Asset checks decode all six actual GLBs and enforce geometry and delivery budgets. The production build retains Vite's large-chunk advisory for the separately loaded Three.js scene.
 
 ## Exploring the diner
 
@@ -46,7 +46,7 @@ All important actions have keyboard-accessible controls. Dialogs trap focus, ret
 
 ## Art direction and assets
 
-Quality comes from consistent shapes, materials, scale and lighting. The white cat is the close-up character; other objects are designed to read at ordinary room distance. The compact espresso machine uses a single dial and handle, and background normal maps are softened to avoid competing with the cat or menu. The final environment pass adds a framed entrance with ribbed privacy glass, an opal sconce, a door mat, varied shelf ceramics, a recessed sink, cookbooks, folded linen and supported brass rails. Soft furniture contact shadows share one tiny geometry batch. The warm lighting is calibrated around the existing lights; the sconce glow adds no shadow map or dynamic light.
+Quality comes from consistent shapes, materials, scale and lighting. The white cat is the close-up character; other objects are designed to read at ordinary room distance. The compact espresso machine uses a single dial and handle, and background normal maps are softened to avoid competing with the cat or menu. The final environment pass adds an unlettered entrance with ribbed privacy glass, an opal sconce, a door mat, varied shelf ceramics, a recessed sink, cookbooks, folded linen and supported brass rails. A ceramic vase replaces the extra slogan frame, and the wall sign uses a larger, high-contrast “BY FELIX WANG” byline. Soft furniture contact shadows share one tiny geometry batch. The warm lighting is calibrated around the existing lights; the sconce glow adds no shadow map or dynamic light.
 
 Four selected Tripo models (cat, espresso machine, ramen and stool) share original visual references. The plant, kettle and walnut material use CC0 Poly Haven sources. Detailed credits, generation settings, reference prompts and local reproduction instructions are in [ASSET_CREDITS.md](ASSET_CREDITS.md). Reference images in `assets/references/` are production files and are not served to visitors. The API is used only during asset creation; the website requires no API key or external generation service.
 
@@ -58,17 +58,19 @@ The earlier AI-generated counter illustration is retained only as the WebGL-fail
 
 The room batches static geometry by shared material while preserving interactive objects and adaptive model levels. Native antialiasing replaces full-screen postprocessing, shadow maps are reused, and rendering limits total pixel count and adapts resolution during slow camera movement.
 
+Rain occupies real space behind the window, with varied streak lengths, falling speeds, depth and wind drift. Sparse static beads sit on the pane. The effect uses one line batch and one textured plane, without postprocessing or additional model downloads.
+
 Camera movement uses animation frames. Ambient animation is capped at 24 updates per second; rendering stops when the page is hidden or a reading dialog has finished opening. Reduced-motion mode renders only on changes. Audio suspends when hidden or muted, and temporary audio nodes are disconnected after playback.
 
 Measured in the local browser at the default 1440 × 900 room view:
 
 | Rendering measure | Previous procedural cat | Coherent asset pass | Finished room |
 | --- | ---: | ---: | ---: |
-| Draw calls per frame | 85 | 82 | 85 |
-| GPU geometries | 76 | 67 | 75 |
-| Rendered triangles | 131,362 | 139,762 | 125,284 |
+| Draw calls per frame | 85 | 82 | 87 |
+| GPU geometries | 76 | 67 | 77 |
+| Rendered triangles | 131,362 | 139,762 | 126,916 |
 | Imported model download | — | 3.31 MB | 2.79 MB |
 
 The final browser walkthrough covered desktop (1440 × 900) and phone (390 × 844) layouts, all five project stories, notebook/about, cat focus, seated view, side-angle orbit, sound toggling and paused rendering while reading. Reduced-motion guards were reviewed in code.
 
-The finished room draws roughly 10% fewer triangles than the preceding asset pass, with three additional draw calls. Lower foliage detail at room distance and four steam sprites keep the extra architecture inexpensive. Close views selectively increase detail. These numbers measure rendering work, not guaranteed frame rates across devices. Development exposes a canvas frame counter for verifying paused rendering; production omits it. The scene engine loads separately from the small navigation script, and static portfolio pages do not load it.
+The finished room draws roughly 9% fewer triangles than the preceding asset pass, with five additional draw calls. Lower foliage detail at room distance and four steam sprites keep the extra architecture inexpensive. Close views selectively increase detail. These numbers measure rendering work, not guaranteed frame rates across devices. Development exposes a canvas frame counter for verifying paused rendering; production omits it. The scene engine loads separately from the small navigation script, and static portfolio pages do not load it.

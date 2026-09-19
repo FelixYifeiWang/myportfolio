@@ -49,6 +49,8 @@ Room architecture, smaller props, signs, menu textures and synthesized lounge/ra
 
 ## Final room finishing pass
 
-The entrance, ribbed-glass lettering, sconce, shelf ceramics, books, linen, recessed sink and rail supports are original procedural geometry. These use the existing room palette and static material batching. Furniture contact shadows are a single merged transparent batch with no depth writes; the sconce halo reuses the same radial texture. No additional Tripo generations were used. Total spending remains 300 credits ($3.00), leaving 700 credits ($7.00) at the last account check.
+The entrance, unlettered ribbed glass, sconce, shelf ceramics, books, linen, recessed sink and rail supports are original procedural geometry. These use the existing room palette and static material batching. Furniture contact shadows are a single merged transparent batch with no depth writes; the sconce halo reuses the same radial texture. No additional Tripo generations were used. Total spending remains 300 credits ($3.00), leaving 700 credits ($7.00) at the last account check.
 
 The plant's distant mesh was reduced from 15,918 to 5,985 triangles; its detailed mesh is unchanged for close views. Kettle textures were reduced to 512 pixels. Those two changes cut the model payload by 524,844 bytes. Four steam sprites replace nine, avoiding five draw calls without adding a particle engine or postprocessing.
+
+The final visual cleanup replaces the slogan frame with original low-detail vase/stem geometry, simplifies the wall-sign byline and removes door lettering. Rain is original procedural geometry and a generated-in-code water-bead texture; no new external assets or paid generations were used.
