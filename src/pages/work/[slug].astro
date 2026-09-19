@@ -1,0 +1,25 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { projects } from '../../data/projects';
+export function getStaticPaths() {
+  return projects.map((project, index) => ({ params: { slug: project.slug }, props: { project, next: projects[(index + 1) % projects.length] } }));
+}
+const { project, next } = Astro.props;
+---
+<Layout title={`${project.name} — After Hours / Felix Wang`} description={project.description}>
+  <main id="main" class="project-page wrap">
+    <a class="back-link" href="/#work">← Back to the menu</a>
+    <div class="project-heading">
+      <p class="eyebrow">HOUSE SPECIAL {project.number} / {project.type.toUpperCase()}</p>
+      <h1>{project.name}</h1>
+      <p class="project-deck">{project.intro}</p>
+    </div>
+    <dl class="project-meta"><div><dt>Year</dt><dd>{project.year}</dd></div><div><dt>My role</dt><dd>{project.role}</dd></div><div><dt>Ingredients</dt><dd>{project.tools}</dd></div></dl>
+    <img class="project-cover" src={`/images/${project.cover}.webp`} alt={`${project.name} project presentation`} width="1600" height="900" fetchpriority="high" />
+    <section class="project-story" aria-labelledby="idea-title"><h2 id="idea-title">The idea.</h2><div><p>{project.story}</p></div></section>
+    <section class="project-story" aria-labelledby="process-title"><h2 id="process-title">In the making.</h2><div><p>{project.approach}</p><p>{project.detail}</p></div></section>
+    <img class="project-gallery" src={`/images/${project.gallery}.webp`} alt={`A closer look at the ${project.name} project`} width="1600" height="900" loading="lazy" />
+    <a class="next-project" href={`/work/${next.slug}/`}><div><p>UP NEXT / ANOTHER HOUSE SPECIAL</p><h2>{next.name}</h2></div><span aria-hidden="true">↗</span></a>
+    <p class="source-note">Selected work from {project.year}. <a href="mailto:wangyifeifelix@gmail.com">Get in touch to talk about the process.</a></p>
+  </main>
+</Layout>

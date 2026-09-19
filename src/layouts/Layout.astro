@@ -1,0 +1,36 @@
+---
+import '../styles/fonts.css';
+import '../styles/global.css';
+interface Props { title?: string; description?: string; }
+const { title = 'After Hours — Yifei Felix Wang', description = 'The personal corner of Yifei Felix Wang. A selection of technology, games, art, and things made with curiosity.' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#211a16" />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/font-6.ttf" as="font" type="font/ttf" crossorigin />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header wrap">
+      <a class="wordmark" href="/" aria-label="After Hours, home">after hours<span class="wordmark-star" aria-hidden="true">✳</span><span class="wordmark-by">BY FELIX WANG</span></a>
+      <nav aria-label="Main navigation">
+        <a href="/#work">Work</a><a href="/#on-the-side">On the side</a><a href="/#about">About</a>
+      </nav>
+      <a class="header-contact" href="mailto:wangyifeifelix@gmail.com">Say hello <span aria-hidden="true">↗</span></a>
+    </header>
+    <slot />
+    <footer class="site-footer wrap">
+      <a class="footer-wordmark" href="/">after hours<span aria-hidden="true">✳</span></a>
+      <span>A little corner of the internet, made with care.</span>
+      <a href="https://github.com/FelixYifeiWang" target="_blank" rel="noreferrer">GitHub ↗</a>
+      <a href="https://www.linkedin.com/in/felix-wang1" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+      <span class="copyright">© {new Date().getFullYear()} Felix Wang</span>
+    </footer>
+  </body>
+</html>
