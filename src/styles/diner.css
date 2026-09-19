@@ -60,7 +60,7 @@ img {
 .scene-fallback {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg,#18211fe8,transparent 75%),url('/images/after-hours-counter.webp') center/cover;
+  background: radial-gradient(ellipse at 52% 48%, #604b2c35, #18211f 68%);
   opacity: .45;
   transition: opacity .9s;
 }
@@ -1231,4 +1231,41 @@ img {
 }
 .is-exploring .take-seat {
   visibility: hidden;
+}
+/* Physical-object hover and a reliable touch target, even for small props. */
+.hotspot {
+  min-width: 44px;
+  min-height: 44px;
+}
+.hotspot.object-hovered .hotspot-label {
+  max-width: 160px;
+  opacity: 1;
+  padding: 7px 11px;
+}
+.hotspot.object-hovered .hotspot-dot {
+  background: #dbc9a6;
+  color: #34281d;
+  transform: scale(1.1);
+}
+@media(max-width:700px) {
+  .diner-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 18px 12px;
+  }
+  .diner-header nav {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: 0;
+  }
+  .sound-button {
+    align-self: start;
+  }
+  .arrival-label {
+    display: none;
+  }
+}
+
+.scene-unavailable .scene-fallback {
+  background: linear-gradient(90deg,#18211fe8,transparent 75%),url('/images/after-hours-counter.webp') center/cover;
 }

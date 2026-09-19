@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { woodTexture, tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture } from './textures';
+import { woodTexture, tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, furTexture, coffeeTexture, bottleLabelTexture } from './textures';
 export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about';
 export interface DinerWorld {
     group: THREE.Group;
@@ -14,6 +14,14 @@ export interface DinerWorld {
     rainPositions: Float32Array;
     lights: THREE.Light[];
 }
+const materialCache = new Map<string, THREE.MeshStandardMaterial>();
+function surface(color: string, roughness = .7, metalness = 0) {
+    const key = `${color}:${roughness}:${metalness}`;
+    if (!materialCache.has(key))
+        materialCache.set(key, new THREE.MeshStandardMaterial({ color, roughness, metalness }));
+    return materialCache.get(key)!;
+}
+const cityMaterials = ['#15232b', '#20303a', '#a88e62', '#698590'].map(color => new THREE.MeshBasicMaterial({ color }));
 const palette = {
     wood: new THREE.MeshStandardMaterial({ map: woodTexture(), color: '#d1a87c', roughness: .43 }),
     darkwood: new THREE.MeshStandardMaterial({ color: '#38291f', roughness: .7 }),
@@ -26,6 +34,17 @@ const palette = {
     metal: new THREE.MeshStandardMaterial({ color: '#adaba0', roughness: .23, metalness: .9 }),
     glow: new THREE.MeshStandardMaterial({ color: '#ffdfa0', emissive: '#ffbe70', emissiveIntensity: 2.4, roughness: .3 }),
 };
+const bottlePaper = new THREE.MeshStandardMaterial({ map: bottleLabelTexture(), roughness: .92 });
+const coffeeMaterial = new THREE.MeshStandardMaterial({ map: coffeeTexture(), roughness: .32 });
+const pendantMaterial = new THREE.MeshStandardMaterial({ color: '#b8763c', roughness: .32, metalness: .35, side: THREE.DoubleSide });
+const leafMaterial = new THREE.MeshStandardMaterial({ color: '#48613b', roughness: .76, side: THREE.DoubleSide });
+const leafGeometry = new THREE.PlaneGeometry(1, 1, 2, 8);
+const leafVertices = leafGeometry.attributes.position;
+for (let i = 0; i < leafVertices.count; i++) {
+    const y = leafVertices.getY(i), x = leafVertices.getX(i);
+    leafVertices.setXYZ(i, x * Math.sin((y + .5) * Math.PI), y, .2 * Math.sin((y + .5) * Math.PI) - Math.abs(x) * .13);
+}
+leafGeometry.computeVertexNormals();
 function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, position = [0, 0, 0], parent?: THREE.Object3D) {
     const object = new THREE.Mesh(geometry, material);
     object.position.set(position[0], position[1], position[2]);
@@ -51,7 +70,7 @@ function line(points: number[][], radius: number, material: THREE.Material, pare
         number,
         number
     ])));
-    return mesh(new THREE.TubeGeometry(path, 28, radius, 8, false), material, [0, 0, 0], parent);
+    return mesh(new THREE.TubeGeometry(path, radius < .01 ? 12 : 24, radius, radius < .01 ? 5 : 8, false), material, [0, 0, 0], parent);
 }
 function texturePlane(texture: THREE.Texture, w: number, h: number, x: number, y: number, z: number, parent: THREE.Object3D, unlit = false) {
     const material = unlit ? new THREE.MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false }) : new THREE.MeshStandardMaterial({ map: texture, roughness: .84, side: THREE.DoubleSide });
@@ -60,12 +79,12 @@ function texturePlane(texture: THREE.Texture, w: number, h: number, x: number, y
     return plane;
 }
 function bottle(x: number, y: number, z: number, height: number, color: string, parent: THREE.Object3D) {
-    const glass = new THREE.MeshStandardMaterial({ color, roughness: .22, metalness: .08 });
+    const glass = surface(color, .18, .15);
     cylinder(.08, .09, height * .65, glass, x, y + height * .325, z, parent, 16);
     const shoulder = mesh(new THREE.CylinderGeometry(.035, .08, height * .15, 16), glass, [x, y + height * .725, z], parent);
     cylinder(.035, .035, height * .2, glass, x, y + height * .9, z, parent, 16);
     cylinder(.038, .038, .045, palette.brass, x, y + height, z, parent, 16);
-    const paper = new THREE.MeshStandardMaterial({ color: '#dbc9a7', roughness: 1 });
+    const paper = bottlePaper;
     cylinder(.091, .091, height * .25, paper, x, y + height * .35, z, parent, 16);
     return shoulder;
 }
@@ -73,14 +92,21 @@ function coffee(x: number, y: number, z: number, parent: THREE.Object3D) {
     cylinder(.25, .21, .045, palette.cream, x, y + .022, z, parent);
     const shape = [new THREE.Vector2(.10, 0), new THREE.Vector2(.115, .025), new THREE.Vector2(.145, .20), new THREE.Vector2(.147, .22), new THREE.Vector2(.129, .22), new THREE.Vector2(.12, .04)];
     mesh(new THREE.LatheGeometry(shape, 40), palette.cream, [x, y + .04, z], parent);
-    cylinder(.126, .126, .012, new THREE.MeshStandardMaterial({ color: '#2d140a', roughness: .22 }), x, y + .242, z, parent);
+    cylinder(.126, .126, .012, surface('#3c2110', .25), x, y + .242, z, parent);
+    const crema = mesh(new THREE.CircleGeometry(.124, 32), coffeeMaterial, [x, y + .249, z], parent);
+    crema.rotation.x = -Math.PI / 2;
+    const lip = mesh(new THREE.TorusGeometry(.139, .009, 8, 40), palette.cream, [x, y + .26, z], parent);
+    lip.rotation.x = Math.PI / 2;
     const handle = mesh(new THREE.TorusGeometry(.082, .022, 10, 24), palette.cream, [x + .16, y + .16, z], parent);
-    handle.rotation.y = Math.PI / 2;
+    handle.scale.set(.85, 1.05, 1);
     const spoon = box(.028, .012, .33, palette.metal, x + .15, y + .07, z + .12, parent, .006);
     spoon.rotation.y = .6;
 }
 function stool(x: number, z: number, parent: THREE.Object3D) {
-    cylinder(.36, .37, .16, palette.leather, x, 1.05, z, parent);
+    const cushion = [new THREE.Vector2(0, .12), new THREE.Vector2(.18, .12), new THREE.Vector2(.31, .10), new THREE.Vector2(.36, .065), new THREE.Vector2(.37, 0), new THREE.Vector2(.35, -.07), new THREE.Vector2(0, -.07)];
+    mesh(new THREE.LatheGeometry(cushion.reverse(), 40), palette.leather, [x, 1.04, z], parent);
+    const piping = mesh(new THREE.TorusGeometry(.363, .009, 8, 40), surface('#a26748', .8), [x, 1.055, z], parent);
+    piping.rotation.x = Math.PI / 2;
     cylinder(.37, .36, .04, palette.brass, x, .95, z, parent);
     for (const dx of [-.20, .20])
         for (const dz of [-.20, .20]) {
@@ -93,21 +119,22 @@ function stool(x: number, z: number, parent: THREE.Object3D) {
 }
 function pendant(x: number, y: number, z: number, parent: THREE.Object3D) {
     cylinder(.012, .012, 5.3 - y, palette.black, x, (5.3 + y) / 2, z, parent, 8);
-    const shade = new THREE.MeshStandardMaterial({ color: '#b8763c', roughness: .32, metalness: .35, side: THREE.DoubleSide });
+    const shade = pendantMaterial;
     const profile = [new THREE.Vector2(.03, .27), new THREE.Vector2(.10, .25), new THREE.Vector2(.26, .13), new THREE.Vector2(.47, -.09), new THREE.Vector2(.49, -.13)];
     mesh(new THREE.LatheGeometry(profile, 48), shade, [x, y, z], parent);
     cylinder(.455, .455, .016, palette.glow, x, y - .12, z, parent, 48);
     cylinder(.07, .06, .10, palette.brass, x, y + .3, z, parent, 20);
 }
 function plant(x: number, y: number, z: number, parent: THREE.Object3D) {
-    const pot = new THREE.MeshStandardMaterial({ color: '#95674b', roughness: .91 });
+    const pot = surface('#95674b', .91);
     cylinder(.24, .16, .35, pot, x, y + .175, z, parent);
     cylinder(.213, .213, .014, palette.darkwood, x, y + .35, z, parent);
-    const leaf = new THREE.MeshStandardMaterial({ color: '#345540', roughness: .8, side: THREE.DoubleSide });
+    const leaf = leafMaterial;
     for (let i = 0; i < 10; i++) {
         const a = i * 2.4, length = .45 + (i % 3) * .16;
         const stem = line([[x, y + .3, z], [x + Math.sin(a) * .08, y + .65, z + Math.cos(a) * .08], [x + Math.sin(a) * .25, y + .3 + length, z + Math.cos(a) * .25]], .009, leaf, parent);
-        const l = ball(x + Math.sin(a) * .23, y + .3 + length, z + Math.cos(a) * .23, .09, .28, .018, leaf, parent);
+        const l = mesh(leafGeometry, leaf, [x + Math.sin(a) * .23, y + .3 + length, z + Math.cos(a) * .23], parent);
+        l.scale.set(.18, .54 + (i % 3) * .06, .18);
         l.rotation.set(Math.cos(a) * .55, a, Math.sin(a) * .7);
         stem.castShadow = false;
     }
@@ -122,7 +149,8 @@ export function buildDiner(): DinerWorld {
         interactives.push(object);
         targets[name] = point;
     }
-    const plaster = new THREE.MeshStandardMaterial({ color: '#bba582', roughness: 1 });
+    const plasterGrain = surfaceTexture();
+    const plaster = new THREE.MeshStandardMaterial({ color: '#bba582', roughness: 1, bumpMap: plasterGrain, bumpScale: .035 });
     const tileMap = tileTexture();
     const tiles = new THREE.MeshStandardMaterial({ map: tileMap, roughness: .25, metalness: .05, bumpMap: tileMap, bumpScale: .025 });
     const floor = new THREE.MeshStandardMaterial({ map: floorTexture(), roughness: .6 });
@@ -155,11 +183,11 @@ export function buildDiner(): DinerWorld {
     box(.03, 4.1, 5, sky, -5.9, 3, -.7, group, 0);
     for (let i = 0; i < 8; i++) {
         const z = -2.6 + i * .54, height = 1.2 + (i % 3) * .5;
-        box(.1, height, .42, new THREE.MeshBasicMaterial({ color: i % 2 ? '#15232b' : '#20303a' }), -5.7, 2 + height / 2, z, group, 0);
+        box(.1, height, .42, cityMaterials[i % 2], -5.7, 2 + height / 2, z, group, 0);
         for (let j = 0; j < 4; j++)
             for (let k = 0; k < 2; k++)
                 if ((i + j + k) % 3 !== 0)
-                    box(.015, .10, .07, new THREE.MeshBasicMaterial({ color: (i + j) % 2 ? '#a88e62' : '#698590' }), -5.63, 2.3 + j * .3, z - .1 + k * .2, group, 0);
+                    box(.015, .10, .07, cityMaterials[2 + (i + j) % 2], -5.63, 2.3 + j * .3, z - .1 + k * .2, group, 0);
     }
     box(.13, 5.4, .15, palette.darkwood, 5, 2.7, -4, group);
     box(10.3, .16, .22, palette.darkwood, 0, 5.31, -4, group);
@@ -191,7 +219,10 @@ export function buildDiner(): DinerWorld {
         box(.06, .06, .28, palette.black, x, .29, .56, machine);
         coffee(x, .81, 0, machine);
     }
-    for (const x of [-.35, 0, .35]) {
+    for (let i = 0; i < 12; i++)
+        box(.018, .012, .24, palette.black, -.52 + i * .09, .086, .26, machine, 0);
+    const pressure = texturePlane(labelTexture('9', 'BAR', '#e3d5b6', '#40392d'), .13, .13, 0, .60, .373, machine);
+    for (const x of [-.35, .35]) {
         const dial = cylinder(.055, .055, .035, palette.cream, x, .6, .35, machine);
         dial.rotation.x = Math.PI / 2;
     }
@@ -233,6 +264,8 @@ export function buildDiner(): DinerWorld {
     box(1.12, .055, 1.43, palette.leather, 0, 0, 0, menu, .025);
     const paper = texturePlane(menuTexture(), 1.05, 1.36, 0, .032, 0, menu);
     paper.rotation.x = -Math.PI / 2;
+    for (const z of [-.58, .58])
+        box(.10, .012, .038, palette.brass, -.49, .038, z, menu, .004);
     interactive('menu', menu, new THREE.Vector3(.1, 1.93, .15));
     const notebook = new THREE.Group();
     notebook.position.set(-1.5, 1.86, .16);
@@ -240,6 +273,9 @@ export function buildDiner(): DinerWorld {
     group.add(notebook);
     box(.76, .07, 1.02, new THREE.MeshStandardMaterial({ color: '#314944', roughness: .92 }), 0, 0, 0, notebook, .015);
     box(.71, .025, .95, palette.cream, 0, .036, 0, notebook, .006);
+    for (let i = 0; i < 4; i++)
+        box(.70, .002, .94, surface('#bdad8e', 1), 0, .025 + i * .005, 0, notebook, 0);
+    box(.022, .003, .96, palette.brass, .25, .055, 0, notebook, .001);
     const notebookLabel = labelTexture('Little\nideas', 'SKETCHES & SIDE QUESTS', '#314944', '#cbb893');
     const noteCover = texturePlane(notebookLabel, .72, .99, 0, .052, 0, notebook);
     noteCover.rotation.x = -Math.PI / 2;
@@ -281,10 +317,15 @@ export function buildDiner(): DinerWorld {
     const pale = new THREE.MeshStandardMaterial({ color: '#dbc9a9', roughness: 1 });
     const stripe = new THREE.MeshStandardMaterial({ color: '#895332', roughness: 1 });
     ball(0, -.03, 0, .65, .10, .45, new THREE.MeshStandardMaterial({ color: '#8a533c', roughness: 1 }), cat);
-    ball(.10, .2, 0, .48, .27, .34, fur, cat);
-    ball(-.03, .21, .06, .37, .21, .25, pale, cat);
+    const tabby = new THREE.MeshStandardMaterial({ map: furTexture(), roughness: 1 });
+    ball(.10, .19, 0, .48, .245, .32, tabby, cat);
+    ball(-.19, .13, .21, .21, .11, .15, pale, cat);
+    const cushionSeam = mesh(new THREE.TorusGeometry(1, .012, 6, 64), surface('#b97955', .9), [0, -.02, 0], cat);
+    cushionSeam.rotation.x = Math.PI / 2;
+    cushionSeam.scale.set(.62, .42, 1);
     const catHead = new THREE.Group();
-    catHead.position.set(-.34, .23, .19);
+    catHead.position.set(-.34, .24, .21);
+    catHead.rotation.y = .26;
     cat.add(catHead);
     ball(0, 0, 0, .22, .19, .19, fur, catHead);
     ball(-.018, -.07, .125, .15, .095, .08, pale, catHead);
@@ -300,9 +341,15 @@ export function buildDiner(): DinerWorld {
         line([[x - .032, .015, .169], [x, .002, .183], [x + .032, .015, .175]], .008, stripe, catHead);
     ball(-.33, .025, .34, .16, .07, .095, pale, cat);
     ball(-.06, .025, .34, .15, .07, .08, fur, cat);
-    line([[.44, .15, -.17], [.57, .1, .06], [.48, .045, .34], [.13, .035, .43], [-.05, .035, .35]], .071, fur, cat);
-    for (let i = 0; i < 3; i++)
-        line([[.04 + i * .12, .44, -.05], [.06 + i * .12, .41, .11], [.09 + i * .12, .35, .19]], .018, stripe, cat);
+    line([[.44, .15, -.17], [.57, .1, .06], [.48, .045, .34], [.13, .035, .43], [-.05, .035, .35]], .048, fur, cat);
+    for (const side of [-1, 1]) {
+        for (let i = 0; i < 3; i++) {
+            line([[side * .085, -.065, .19], [side * .18, -.06 + i * .018, .22], [side * .29, -.085 + i * .039, .23]], .0025, pale, catHead);
+        }
+        line([[0, -.057, .196], [side * .025, -.082, .19], [side * .049, -.076, .177]], .004, stripe, catHead);
+        for (let i = 0; i < 2; i++)
+            line([[side * .033, -.006, .18], [side * .033 + .009, .008, .175]], .003, stripe, catHead);
+    }
     interactive('cat', cat, new THREE.Vector3(-3.25, 2.35, .12));
     // Personal postcard, utensils, condiments, flowers, and a small warm lamp.
     const about = new THREE.Group();
@@ -330,6 +377,7 @@ export function buildDiner(): DinerWorld {
     const shadeProfile = [new THREE.Vector2(0, .20), new THREE.Vector2(.1, .19), new THREE.Vector2(.26, .1), new THREE.Vector2(.33, 0)];
     mesh(new THREE.LatheGeometry(shadeProfile, 40), palette.leather, [0, .62, 0], lamp);
     cylinder(.30, .30, .015, palette.glow, 0, .62, 0, lamp);
+    addCounterDetails(group);
     // Floating steam is rendered inside the room, not layered onto the page.
     const soft = softTexture();
     const steam: THREE.Sprite[] = [];
@@ -380,4 +428,42 @@ export function buildDiner(): DinerWorld {
     signGlow.position.set(-.5, 3.45, -3.6);
     group.add(signGlow);
     return { group, targets, interactives, cat, catHead, vinyl, steam, rain, rainPositions, lights };
+}
+function addCounterDetails(parent: THREE.Object3D) {
+    // A little supper, set just behind the notebook: handmade ceramic and chopsticks.
+    const bowl = new THREE.Group();
+    bowl.position.set(-1.66, 1.85, -.62);
+    parent.add(bowl);
+    const ceramic = surface('#88917c', .4);
+    const profile = [new THREE.Vector2(.08, 0), new THREE.Vector2(.18, .035), new THREE.Vector2(.25, .14), new THREE.Vector2(.27, .22), new THREE.Vector2(.25, .22), new THREE.Vector2(.21, .09), new THREE.Vector2(.08, .035)];
+    mesh(new THREE.LatheGeometry(profile, 32), ceramic, [0, 0, 0], bowl);
+    cylinder(.238, .23, .015, surface('#53311c', .32), 0, .175, 0, bowl, 32);
+    const noodle = surface('#d1b47c', .8);
+    for (let i = 0; i < 5; i++)
+        line([[-.15, .19, -.12 + i * .048], [-.05, .195, -.1 + i * .048], [.08, .192, -.14 + i * .048], [.16, .19, -.1 + i * .048]], .009, noodle, bowl);
+    const egg = ball(.09, .197, .015, .082, .017, .102, palette.cream, bowl);
+    ball(.10, .213, .018, .036, .008, .045, surface('#cf9135', .7), bowl);
+    for (let i = 0; i < 5; i++) {
+        const scallion = cylinder(.014, .01, .008, surface('#54713b', .9), -.07 + i * .026, .208, .05 + (i % 2) * .03, bowl, 8);
+        scallion.rotation.z = .15;
+    }
+    for (const offset of [-.035, .035]) {
+        const stick = cylinder(.007, .01, .79, palette.walnut, offset, .27, 0, bowl, 6);
+        stick.rotation.set(Math.PI / 2, 0, .7);
+    }
+    // Folded linen under the cup; deliberately tiny geometry instead of simulated cloth.
+    const cloth = surface('#b5a58a', .96);
+    const napkin = box(.51, .015, .43, cloth, 1.28, 1.85, .20, parent, .009);
+    napkin.rotation.y = .2;
+    const receipt = new THREE.Group();
+    receipt.position.set(2.14, 1.85, .29);
+    receipt.rotation.y = -.24;
+    parent.add(receipt);
+    const paper = texturePlane(labelTexture('Good\ncompany.', 'NO RESERVATION NEEDED', '#ddcfb2', '#826c4e'), .31, .45, 0, .014, 0, receipt);
+    paper.rotation.x = -Math.PI / 2;
+    // Small feet and mounting details make furniture feel assembled rather than extruded.
+    for (const x of [-3, -1, 1, 3])
+        for (const dx of [-.2, .2])
+            for (const dz of [-.2, .2])
+                cylinder(.038, .04, .06, palette.brass, x + dx, .045, 1.75 + dz, parent, 10);
 }

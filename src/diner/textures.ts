@@ -138,3 +138,89 @@ export function softTexture() {
         ctx.fillRect(0, 0, 128, 128);
     });
 }
+export function surfaceTexture() {
+    const texture = canvasTexture(256, 256, ctx => {
+        ctx.fillStyle = '#808080';
+        ctx.fillRect(0, 0, 256, 256);
+        let seed = 17;
+        for (let i = 0; i < 20000; i++) {
+            seed = (seed * 16807) % 2147483647;
+            const shade = 100 + seed % 55;
+            ctx.fillStyle = `rgb(${shade},${shade},${shade})`;
+            ctx.fillRect(seed % 256, Math.floor(seed / 256) % 256, 1, 1);
+        }
+    });
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(5, 3);
+    return texture;
+}
+export function furTexture() {
+    return canvasTexture(512, 256, ctx => {
+        ctx.fillStyle = '#b87a48';
+        ctx.fillRect(0, 0, 512, 256);
+        for (let i = 0; i < 9; i++) {
+            ctx.fillStyle = '#855231';
+            ctx.beginPath();
+            const x = i * 64;
+            ctx.moveTo(x - 9, 0);
+            ctx.bezierCurveTo(x + 20, 70, x - 20, 100, x + 3, 165);
+            ctx.bezierCurveTo(x - 4, 115, x - 7, 60, x - 20, 0);
+            ctx.fill();
+        }
+        for (let i = 0; i < 5000; i++) {
+            ctx.strokeStyle = i % 2 ? '#f3cb9630' : '#643b2414';
+            ctx.lineWidth = .6;
+            const x = (i * 97.33) % 512, y = (i * 23.61) % 256;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + 2, y + 5);
+            ctx.stroke();
+        }
+    });
+}
+export function coffeeTexture() {
+    return canvasTexture(256, 256, ctx => {
+        const base = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+        base.addColorStop(0, '#9a5e31');
+        base.addColorStop(.86, '#b98248');
+        base.addColorStop(1, '#61331c');
+        ctx.fillStyle = base;
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.strokeStyle = '#edcf97';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(128, 128, 117, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = '#f2dfb9';
+        for (let i = 0; i < 7; i++) {
+            const y = 75 + i * 16, w = 43 - i * 4;
+            ctx.beginPath();
+            ctx.ellipse(128 - w * .4, y, w, 9, .3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(128 + w * .4, y, w, 9, -.3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = '#f2dfb9';
+        ctx.beginPath();
+        ctx.moveTo(128, 60);
+        ctx.quadraticCurveTo(120, 130, 130, 202);
+        ctx.stroke();
+    });
+}
+export function bottleLabelTexture() {
+    return canvasTexture(512, 256, ctx => {
+        ctx.fillStyle = '#d7c5a2';
+        ctx.fillRect(0, 0, 512, 256);
+        ctx.fillStyle = '#786343';
+        ctx.fillRect(0, 18, 512, 3);
+        ctx.fillRect(0, 232, 512, 3);
+        ctx.textAlign = 'center';
+        ctx.font = '54px "Instrument Serif",Georgia';
+        ctx.fillText('AFTER HOURS', 256, 108);
+        ctx.font = '19px "DM Mono",monospace';
+        ctx.fillText('HOUSE RESERVE', 256, 162);
+        ctx.fillText('EST. 2024', 256, 197);
+    });
+}

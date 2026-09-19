@@ -5,9 +5,10 @@ export class DinerAudio {
     private timer: ReturnType<typeof setInterval> | null = null;
     private noise: AudioBufferSourceNode | null = null;
     private bar = 0;
+    private muteTimer: ReturnType<typeof setTimeout> | null = null;
     playing = false;
     private playChord() {
-        if (!this.context || !this.volume)
+        if (!this.context || !this.volume || this.context.state !== 'running')
             return;
         const ctx = this.context;
         const chords = [[130.81, 164.81, 196, 246.94], [110, 130.81, 164.81, 196], [146.83, 174.61, 220, 261.63], [98, 146.83, 174.61, 220]];
@@ -29,6 +30,12 @@ export class DinerAudio {
                 gain.connect(envelope);
                 oscillator.start(time);
                 oscillator.stop(time + 4);
+                oscillator.onended = () => {
+                    oscillator.disconnect();
+                    gain.disconnect();
+                    if (harmonic === 3)
+                        envelope.disconnect();
+                };
             }
         });
     }
@@ -53,6 +60,10 @@ export class DinerAudio {
             filter.connect(this.volume);
             this.noise.start();
         }
+        if (this.muteTimer) {
+            clearTimeout(this.muteTimer);
+            this.muteTimer = null;
+        }
         await this.context.resume();
         this.playing = !this.playing;
         this.volume!.gain.setTargetAtTime(this.playing ? .42 : 0, this.context.currentTime, .25);
@@ -64,10 +75,22 @@ export class DinerAudio {
             clearInterval(this.timer);
             this.timer = null;
         }
+        if (!this.playing)
+            this.muteTimer = setTimeout(() => { void this.context?.suspend(); }, 1000);
         return this.playing;
     }
+    setHidden(hidden: boolean) {
+        if (hidden)
+            void this.context?.suspend();
+        else if (this.playing)
+            void this.context?.resume();
+    }
     dispose() {
-        if (this.timer) clearInterval(this.timer);
+        if (this.muteTimer)
+            clearTimeout(this.muteTimer);
+        this.muteTimer = null;
+        if (this.timer)
+            clearInterval(this.timer);
         this.noise?.stop();
         void this.context?.close();
         this.timer = null;

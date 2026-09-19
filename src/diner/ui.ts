@@ -56,7 +56,7 @@ export function initDiner() {
             return;
         }
         const destination = (panel.startsWith('project-') ? 'menu' : panel) as ObjectName;
-        scene?.focus(destination);
+        scene?.focus(destination, true);
         // Give the visitor a brief sense of picking the object up before showing its content.
         openTimer = setTimeout(() => showPanel(panel), scene && !reduceMotion.matches ? 480 : 0);
     }
@@ -65,7 +65,7 @@ export function initDiner() {
         dialog.close();
         shell.classList.remove('panel-open');
         scene?.setPaused(false);
-        scene?.focus('room');
+        scene?.restoreView();
         lastFocus?.focus({ preventScroll: true });
     }
     async function toggleSound() {
@@ -94,41 +94,66 @@ export function initDiner() {
         openPanel(name);
     }
     document.querySelectorAll<HTMLElement>('[data-action]').forEach(button => button.addEventListener('click', () => action(button.dataset.action as ObjectName)));
-    document.querySelectorAll<HTMLAnchorElement>('[data-open]').forEach(link => link.addEventListener('click', event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
-        return; event.preventDefault(); openPanel(link.dataset.open!); }));
-    document.querySelectorAll<HTMLAnchorElement>('[data-project]').forEach(link => link.addEventListener('click', event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
-        return; event.preventDefault(); openPanel(`project-${link.dataset.project}`); }));
+    document.querySelectorAll<HTMLAnchorElement>('[data-open]').forEach(link => link.addEventListener('click', event => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+            return;
+        event.preventDefault();
+        openPanel(link.dataset.open!);
+    }));
+    document.querySelectorAll<HTMLAnchorElement>('[data-project]').forEach(link => link.addEventListener('click', event => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+            return;
+        event.preventDefault();
+        openPanel(`project-${link.dataset.project}`);
+    }));
     sound.addEventListener('click', () => void toggleSound());
     close.addEventListener('click', closePanel);
     back.addEventListener('click', () => showPanel('menu'));
-    dialog.addEventListener('cancel', event => { event.preventDefault(); if (currentPanel.startsWith('project-'))
-        showPanel('menu');
-    else
-        closePanel(); });
-    dialog.addEventListener('click', event => { if (event.target === dialog) {
-        const rect = dialog.getBoundingClientRect();
-        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)
+    dialog.addEventListener('cancel', event => {
+        event.preventDefault();
+        if (currentPanel.startsWith('project-'))
+            showPanel('menu');
+        else
             closePanel();
-    } });
+    });
+    dialog.addEventListener('click', event => {
+        if (event.target === dialog) {
+            const rect = dialog.getBoundingClientRect();
+            if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)
+                closePanel();
+        }
+    });
     document.querySelector('#take-seat')!.addEventListener('click', () => { scene?.focus('seat'); announce('Make yourself at home. The menu is right in front of you.'); });
     document.querySelector('#reset-view')!.addEventListener('click', () => { clearTimeout(openTimer); scene?.focus('room'); });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !dialog.open) {
-        clearTimeout(openTimer);
-        scene?.focus('room');
-    } });
-    function fromHash() { const hashes: Record<string, string> = { '#work': 'menu', '#on-the-side': 'notebook', '#about': 'about' }; if (hashes[window.location.hash])
-        openPanel(hashes[window.location.hash]); }
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && !dialog.open) {
+            clearTimeout(openTimer);
+            scene?.focus('room');
+        }
+    });
+    function fromHash() {
+        const hashes: Record<string, string> = { '#work': 'menu', '#on-the-side': 'notebook', '#about': 'about' };
+        if (hashes[window.location.hash])
+            openPanel(hashes[window.location.hash]);
+    }
     window.addEventListener('hashchange', fromHash);
     fromHash();
     if (window.matchMedia('(pointer: coarse)').matches)
         document.querySelector('#gesture-hint')!.textContent = 'Drag to look around · Pinch to move closer';
     function fallback() { shell.classList.add('scene-unavailable'); shell.classList.remove('scene-ready'); document.querySelector('#scene-loading')!.textContent = 'The room couldn’t load here. The whole menu is still available.'; document.querySelector('#gesture-hint')!.textContent = 'All projects are available from the menu.'; }
     document.addEventListener('diner-context-lost', () => { scene?.dispose(); scene = undefined; fallback(); });
-    import('./scene').then(module => module.createDiner(canvas, action)).then(result => { scene = result; shell.classList.add('scene-ready'); document.querySelector('#scene-loading')!.setAttribute('aria-hidden', 'true'); if (dialog.open)
-        scene.setPaused(true); }).catch(error => { console.error('Unable to create the diner:', error); fallback(); });
+    import('./scene').then(module => module.createDiner(canvas, action)).then(result => {
+        scene = result;
+        shell.classList.add('scene-ready');
+        document.querySelector('#scene-loading')!.setAttribute('aria-hidden', 'true');
+        if (dialog.open)
+            scene.setPaused(true);
+    }).catch(error => { console.error('Unable to create the diner:', error); fallback(); });
+    document.addEventListener('visibilitychange', () => audio.setHidden(document.hidden));
     window.addEventListener('pagehide', event => {
         // Preserve the room if the browser keeps this page for Back navigation.
-        if (!event.persisted) scene?.dispose();
+        if (!event.persisted)
+            scene?.dispose();
         audio.dispose();
         scene?.setPlaying(false);
         sound.setAttribute('aria-pressed', 'false');
