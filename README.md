@@ -1,6 +1,6 @@
 # After Hours
 
-Yifei Felix Wang's personal portfolio. A first exploration of a late-night chef's counter: an atmospheric introduction, a menu of selected projects, side interests, and readable project pages.
+Felix Wang’s personal portfolio, built as an interactive midnight diner with Astro and Three.js.
 
 ## Local development
 
@@ -12,27 +12,35 @@ npm run dev -- --host 127.0.0.1
 ## Validation
 
 ```sh
+npm run check
 npm run build
 npm test
+SITE_PREVIEW_URL=http://127.0.0.1:4321 npm test
 ```
 
-The integration tests check all project routes, document landmarks, internal links, image alternatives, and asset destinations in the production output.
+The integration tests check seven routes, document landmarks, internal links, image alternatives, and asset destinations. Browser verification covers all five project dialogs, menu navigation, Escape, the notebook, about, cat close-up, seated camera, sound toggle, and phone layout.
 
-## Content
+## Exploring the diner
 
-- `src/data/projects.ts`: project descriptions and metadata, adapted from the prior portfolio.
-- `src/pages/index.astro`: homepage, side projects, and personal details.
-- `src/pages/work/[slug].astro`: project pages.
-- `src/styles/global.css`: visual system and responsive layouts.
-- `public/images`: optimized project images and original atmosphere artwork.
+Drag to orbit; scroll or pinch to zoom. “Take a seat” moves inside the counter. Click the physical menu or its labeled hotspot to browse projects. The notebook holds side projects, the portrait opens the introduction, the record player toggles an original synthesized lounge-and-rain soundscape, and the cat responds to a greeting. Sound starts muted.
+
+All important actions have keyboard-accessible controls. Dialogs trap focus, return focus when closed, and support Escape. Reduced-motion preferences disable decorative animation and camera transitions. `/work/` and individual project pages provide the complete portfolio without JavaScript or WebGL.
+
+## Source
+
+- `src/diner/models.ts`: original room geometry, props, lights, and interactive targets.
+- `src/diner/textures.ts`: procedural wood, tiles, menu, signs, and labels.
+- `src/diner/scene.ts`: rendering, orbit controls, raycasting, camera transitions, motion.
+- `src/diner/ui.ts`: accessible dialogs and room controls.
+- `src/diner/audio.ts`: opt-in original synthesized ambience.
+- `src/data/projects.ts`: project content adapted from the original portfolio.
+- `src/pages/index.astro`: diner interface and project dialogs.
+- `src/pages/work/`: complete static portfolio and project pages.
+- `src/styles/diner.css`: responsive interface and paper menu styling.
 - `archive/previous-site`: the previous site, preserved unchanged.
 
-The website uses local fonts and static pages. The cat greeting and subtle scene tilt are optional enhancements. Reduced-motion preferences disable motion; the work remains accessible without JavaScript.
+## Assets
 
-## Artwork
+The room is real-time geometry with procedural textures; no downloaded 3D models or external rendering services. Existing artwork, portraits, and project images come from the prior portfolio. Instrument Serif, DM Sans, and DM Mono are served locally with their licenses in `public/fonts`.
 
-The counter scene at `public/images/after-hours-counter.webp` was generated with OpenAI's built-in image generation tool, then resized and encoded as WebP. It is a conceptual scene, not a photograph of Felix's home or pet.
-
-Art brief: a wide 3:2 scene for an After Hours chef's counter / creative studio, dark espresso backdrop, warm amber light from a burgundy mushroom lamp, sleeping cream-and-orange cat, espresso, burgundy notebook, and a handheld game device. Slightly elevated three-quarter view, tactile wood and physical shadows, dark edges, no text or logos.
-
-Existing project images belong to the prior portfolio. Google Fonts: Instrument Serif, DM Sans, and DM Mono, served locally under their Open Font Licenses in `public/fonts`.
+The earlier AI-generated counter image is retained only as the loading/WebGL fallback. It is a conceptual scene, not a photograph of Felix’s home or pet. It was generated with OpenAI’s image generation tool and encoded as WebP. Audio is generated locally using Web Audio and contains no sampled music.
