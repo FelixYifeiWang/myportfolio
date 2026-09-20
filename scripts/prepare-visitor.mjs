@@ -119,6 +119,6 @@ root.setDefaultScene(bakedScene);
 for (const animation of root.listAnimations()) animation.dispose();
 // Retain float positions: this source's closely layered clothing flickers when quantized.
 await document.transform(prune(), dedup(), weld(), join(), textureCompress({ encoder: sharp, targetFormat: 'webp', resize: ['chamber', 'ranni', 'esquie', 'wolf', 'mime'].includes(id) ? [768, 768] : [1024, 1024], quality: ['chamber', 'ranni', 'esquie', 'wolf', 'mime'].includes(id) ? 82 : 88 }));
-if (['ranni', 'jackie', 'esquie', 'shadowheart', 'wolf', 'astarion', 'jinx', 'mime', 'murloc', 'jar'].includes(id)) await document.transform(meshopt({ encoder: MeshoptEncoder, level: 'high', quantizePosition: 16, quantizeNormal: 10, quantizeTexcoord: 14 }));
+if (['ranni', 'jackie', 'esquie', 'shadowheart', 'wolf', 'astarion', 'jinx', 'mime', 'murloc', 'jar', 'malenia', 'lune'].includes(id)) await document.transform(meshopt({ encoder: MeshoptEncoder, level: 'high', quantizePosition: 16, quantizeNormal: 10, quantizeTexcoord: 14 }));
 await io.write(destination, document);
 console.log(`${id}: ${(await fs.stat(destination)).size} bytes; ${root.listMeshes().reduce((n,m) => n + m.listPrimitives().length, 0)} material batches; ${root.listSkins().length} skins`);

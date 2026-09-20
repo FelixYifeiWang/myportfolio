@@ -16,6 +16,8 @@ export const visitors: readonly VisitorSpec[] = [
     { id: 'link', name: 'Link', url: '/models/visitors/link.glb', height: 2.75, rotation: Math.PI * .37 },
     { id: 'pikachu', name: 'Pikachu', url: '/models/visitors/pikachu.glb', height: 1.4, rotation: Math.PI / 2 },
     { id: 'jinx', name: 'Jinx', url: '/models/visitors/jinx.glb', height: 2.65, rotation: Math.PI * .37 },
+    { id: 'malenia', name: 'Malenia', url: '/models/visitors/malenia.glb', height: 2.8, rotation: -Math.PI * .20, peekOffset: .14 },
+    { id: 'lune', name: 'Lune', url: '/models/visitors/lune.glb', height: 2.65, rotation: -Math.PI * .13 },
     { id: 'chamber', name: 'Chamber', url: '/models/visitors/chamber.glb', height: 2.8, rotation: -Math.PI * .13 },
     { id: 'joker', name: 'Joker', url: '/models/visitors/joker.glb', height: 2.8, rotation: Math.PI * .37 },
     { id: 'byleth', name: 'Byleth', url: '/models/visitors/byleth.glb', height: 2.8, rotation: Math.PI * .37 },

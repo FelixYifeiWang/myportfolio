@@ -77,3 +77,15 @@ test('the leaf clears the hinge jamb, threshold, and mat throughout its swing', 
     });
   }
 });
+
+test('exposed plaster and walnut end faces never overlap beside the door', () => {
+  const wall = createEntranceWall(palette.cream, palette.walnut, palette.darkwood);
+  wall.updateMatrixWorld(true);
+  const boundsFor = material => wall.children.filter(mesh => mesh.material === material).map(mesh => new THREE.Box3().setFromObject(mesh));
+  const plaster = boundsFor(palette.cream), panels = boundsFor(palette.walnut);
+  for (const panel of panels) {
+    const backing = plaster.find(wall => Math.abs(wall.max.z - panel.max.z) < 1e-5 && wall.min.y < .1);
+    assert.ok(backing, 'Every lower panel has a plaster backing');
+    assert.ok(panel.min.x >= backing.max.x - 1e-6, 'Overlapping coplanar end caps cause flicker at oblique angles');
+  }
+});

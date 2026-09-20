@@ -13,7 +13,8 @@ export function createEntranceWall(plaster: THREE.Material, walnut: THREE.Materi
     const doorMin = 1.79, doorMax = 3.51;
     for (const [min, max] of [[-4.1, doorMin], [doorMax, 4.1]]) {
         box(.2, 1.7, max - min, plaster, -5.12, .82, (max + min) / 2);
-        box(.15, 1.7, max - min, walnut, -4.99, .83, (max + min) / 2);
+        // Meet the plaster face without overlapping its exposed end caps.
+        box(.105, 1.7, max - min, walnut, -4.9675, .83, (max + min) / 2);
     }
     box(.2, 1, 8.2, plaster, -5.12, 5, 0);
     box(.2, 2.8, 1.6, plaster, -5.12, 3.1, -3.35);

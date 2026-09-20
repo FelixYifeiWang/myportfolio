@@ -86,10 +86,10 @@ export function createDoorwaySideWall(grain?: THREE.Texture) {
     wall.name = 'Window-side porch wall';
     const plaster = new THREE.MeshStandardMaterial({ color: '#151d1b', roughness: .94, bumpMap: grain ?? null, bumpScale: .022 });
     const base = new THREE.MeshStandardMaterial({ color: '#101613', roughness: .82 });
-    const panel = new THREE.Mesh(new THREE.BoxGeometry(3.6, 4.8, .20), plaster);
-    panel.position.set(-6.84, 2.4, 1.70);
-    const skirting = new THREE.Mesh(new THREE.BoxGeometry(3.6, .35, .22), base);
-    skirting.position.set(-6.84, .18, 1.70);
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(6, 5.6, .20), plaster);
+    panel.position.set(-8.02, 2.8, 1.70);
+    const skirting = new THREE.Mesh(new THREE.BoxGeometry(6, .35, .22), base);
+    skirting.position.set(-8.02, .18, 1.70);
     wall.add(panel, skirting);
     maskDoorwayContent(wall);
     return wall;

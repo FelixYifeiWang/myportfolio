@@ -23,9 +23,11 @@ test('porch light casts face shadows without spilling into the room', () => {
 
 test('the window-side return wall hides the window scenery from the entrance', () => {
   const wall = createDoorwaySideWall(); wall.updateMatrixWorld(true);
-  for (const x of [-5.4, -5.7, -7.5]) {
-    const ray = new THREE.Raycaster(new THREE.Vector3(x, 2.5, 2.6), new THREE.Vector3(0, 0, -1), 0, 4);
-    assert.ok(ray.intersectObject(wall, true).length > 0);
+  for (const x of [-5.3, -5.7, -7.5, -10.0]) {
+    for (const height of [2.5, 5.2]) {
+      const ray = new THREE.Raycaster(new THREE.Vector3(x, height, 2.6), new THREE.Vector3(0, 0, -1), 0, 4);
+      assert.ok(ray.intersectObject(wall, true).length > 0);
+    }
   }
   const bounds = new THREE.Box3().setFromObject(wall);
   assert.ok(bounds.max.z <= 1.81);
