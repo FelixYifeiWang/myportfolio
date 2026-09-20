@@ -21,7 +21,6 @@ export function initDiner() {
     let openTimer: ReturnType<typeof setTimeout>;
     let hintTimer: ReturnType<typeof setTimeout>;
     let lastFocus: HTMLElement | null = null;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const titles: Record<string, string> = { menu: 'The midnight menu', notebook: 'Little ideas, long detours', about: 'Meet Felix' };
     function announce(message: string) {
         clearTimeout(toastTimer);
@@ -61,9 +60,9 @@ export function initDiner() {
             return;
         }
         const destination = (panel.startsWith('project-') ? 'menu' : panel) as ObjectName;
-        scene?.focus(destination, true);
+        const duration = scene?.focus(destination, true) ?? 0;
         // Give the visitor a brief sense of picking the object up before showing its content.
-        openTimer = setTimeout(() => showPanel(panel), scene && !reduceMotion.matches ? 480 : 0);
+        openTimer = setTimeout(() => showPanel(panel), duration);
     }
     function closePanel() {
         clearTimeout(openTimer);
@@ -73,18 +72,24 @@ export function initDiner() {
         scene?.restoreView();
         lastFocus?.focus({ preventScroll: true });
     }
-    async function toggleSound() {
+    function syncSound() {
+        const playing = audio.playing;
+        sound.setAttribute('aria-pressed', String(playing));
+        record.querySelector('.hotspot-label')!.textContent = playing ? 'Next record' : 'Listen';
+        record.setAttribute('aria-label', playing ? `Play the next record. Now playing: ${audio.trackName}` : 'Play a record');
+        sound.setAttribute('aria-label', playing ? `Pause music. Now playing: ${audio.trackName}` : 'Play lounge music and rain ambience');
+        sound.title = playing ? `Pause · ${audio.trackName}` : 'Play music';
+        scene?.setPlaying(playing);
+    }
+    async function playMusic(next = false) {
         try {
-            const playing = await audio.toggle();
-            sound.setAttribute('aria-pressed', String(playing));
-            record.setAttribute('aria-pressed', String(playing));
-            record.querySelector('.hotspot-label')!.textContent = playing ? 'Pause' : 'Listen';
-            sound.setAttribute('aria-label', playing ? 'Turn off lounge music and rain ambience' : 'Turn on the original lounge music and rain ambience');
-            sound.title = playing ? 'Sound on' : 'Sound off';
-            scene?.setPlaying(playing);
-            announce(playing ? 'Lounge music & rain' : 'Sound off');
+            if (next) await audio.nextTrack();
+            else await audio.toggle();
+            syncSound();
+            announce(audio.playing ? `Now playing · ${audio.trackName}` : 'Music paused');
         }
         catch {
+            syncSound();
             announce('Audio is unavailable here. You can still enjoy the room.');
         }
     }
@@ -102,12 +107,14 @@ export function initDiner() {
             return;
         }
         if (name === 'record') {
-            void toggleSound();
+            void playMusic(true);
             return;
         }
         if (name === 'cat') {
+            clearTimeout(openTimer);
             scene?.petCat();
-            announce('The manager is taking a well-earned break. Prrr.');
+            void audio.purr().catch(() => announce('The manager is asleep. Audio is unavailable here.'));
+            announce('The manager is taking a well-earned break.');
             return;
         }
         openPanel(name);
@@ -125,7 +132,7 @@ export function initDiner() {
         event.preventDefault();
         openPanel(`project-${link.dataset.project}`);
     }));
-    sound.addEventListener('click', () => void toggleSound());
+    sound.addEventListener('click', () => void playMusic());
     close.addEventListener('click', closePanel);
     back.addEventListener('click', () => showPanel('menu'));
     dialog.addEventListener('cancel', event => {
@@ -175,6 +182,7 @@ export function initDiner() {
     document.addEventListener('diner-context-lost', () => { scene?.dispose(); scene = undefined; fallback(); });
     import('./scene').then(module => module.createDiner(canvas, action)).then(result => {
         scene = result;
+        scene.setPlaying(audio.playing);
         shell.classList.add('scene-ready');
         hintTimer = setTimeout(() => shell.classList.add('hint-dismissed'), 8000);
         document.querySelector('#scene-loading')!.setAttribute('aria-hidden', 'true');
@@ -187,12 +195,7 @@ export function initDiner() {
         if (!event.persisted)
             scene?.dispose();
         audio.dispose();
-        scene?.setPlaying(false);
-        sound.setAttribute('aria-pressed', 'false');
-        record.setAttribute('aria-pressed', 'false');
-        record.querySelector('.hotspot-label')!.textContent = 'Listen';
-        sound.setAttribute('aria-label', 'Turn on the original lounge music and rain ambience');
-        sound.title = 'Sound off';
+        syncSound();
         clearTimeout(openTimer);
         clearTimeout(toastTimer);
         clearTimeout(hintTimer);

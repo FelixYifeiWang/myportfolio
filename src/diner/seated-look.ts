@@ -26,6 +26,11 @@ export class SeatedLook {
         this.writeTarget();
     }
 
+    /** Keep gaze distance consistent so item focus is a head turn from this seat. */
+    targetFor(point: THREE.Vector3) {
+        return point.clone().sub(this.eye).setLength(this.distance).add(this.eye);
+    }
+
     drag(dx: number, dy: number, viewportHeight: number) {
         const sensitivity = 1.4 / Math.max(1, viewportHeight);
         this.desiredYaw = THREE.MathUtils.clamp(this.desiredYaw - dx * sensitivity, this.centerYaw - 1.15, this.centerYaw + 1.15);

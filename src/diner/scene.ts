@@ -10,7 +10,7 @@ import { buildDiner, type ObjectName } from './models';
 import { seats, isSeat } from './seats';
 type View = ObjectName | 'room';
 export interface DinerScene {
-    focus: (name: View, remember?: boolean) => void;
+    focus: (name: View, remember?: boolean) => number;
     restoreView: () => void;
     petCat: () => void;
     setPlaying: (playing: boolean) => void;
@@ -157,13 +157,21 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             // A second navigation click during the return animation should preserve its destination.
             savedView = { position: (transition?.to ?? camera.position).clone(), target: (transition?.target ?? controls.target).clone(), view: currentView, manual: manualView, exploring: shell.classList.contains('is-exploring') };
         }
+        if (!remember) savedView = null;
+        const duration = reduced.matches ? 0 : remember ? 460 : 1100;
+        if (isSeat(currentView) && name !== 'room' && !isSeat(name)) {
+            // Stay seated: the object changes our gaze, not our eye position or room shell.
+            moveCamera(seats[currentView].position, seatedLook.targetFor(world.targets[name]), { duration });
+            return duration;
+        }
         currentView = name;
         if (isSeat(name)) seatedLook = new SeatedLook(seats[name].position, seats[name].target);
         manualView = false;
         shell.classList.toggle('is-exploring', name !== 'room');
         const target = name === 'room' ? roomTarget : views[name].target;
         const to = viewPosition(name);
-        moveCamera(to, target);
+        moveCamera(to, target, { duration });
+        return duration;
     }
     function viewPosition(name: View) {
         if (name === 'room') return roomPosition;
@@ -494,10 +502,10 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             if (isSeat(currentView)) seatedLook = new SeatedLook(seats[currentView].position, seats[currentView].target);
             manualView = savedView.manual;
             shell.classList.toggle('is-exploring', savedView.exploring);
-            moveCamera(savedView.position, savedView.target);
+            moveCamera(savedView.position, savedView.target, { duration: isSeat(currentView) ? 460 : 1100 });
             savedView = null;
         },
-        petCat() { petUntil = performance.now() + 2600; focus('cat'); },
+        petCat() { petUntil = performance.now() + 6000; focus('cat'); },
         setPlaying(value) { playing = value; wake(); },
         setPaused(value) {
             paused = value;

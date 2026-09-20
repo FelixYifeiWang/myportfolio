@@ -58,3 +58,21 @@ test('reduced motion responds immediately without continuing to drift', () => {
   assert.equal(look.update(1 / 60, true), false);
   assert.ok(look.target.distanceTo(forward) > .5);
 });
+
+test('focusing a counter object turns toward it without moving any seat', () => {
+  for (const x of [-3, -1, 1, 3]) {
+    const seatEye = new THREE.Vector3(x, 2.85, 2.75);
+    const look = new SeatedLook(seatEye, new THREE.Vector3(x * .65, 2.1, -2.7));
+    const camera = new THREE.PerspectiveCamera();
+    for (const point of [new THREE.Vector3(.1, 1.93, .15), new THREE.Vector3(-1.5, 1.93, .16), new THREE.Vector3(-.65, 1.92, -3.15), new THREE.Vector3(-3.25, 2.51, .12)]) {
+      const heading = look.target.clone();
+      look.reset(look.targetFor(point));
+      look.apply(camera);
+      const actual = camera.getWorldDirection(new THREE.Vector3());
+      assert.ok(actual.distanceTo(point.clone().sub(seatEye).normalize()) < 1e-6);
+      assert.ok(camera.position.distanceTo(seatEye) < 1e-10);
+      look.reset(heading);
+      assert.ok(look.target.distanceTo(heading) < 1e-10);
+    }
+  }
+});

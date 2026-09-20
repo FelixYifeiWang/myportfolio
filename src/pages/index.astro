@@ -30,14 +30,14 @@ import { seats } from '../diner/seats';
           <a id="on-the-side" href="/work/#side-projects" data-open="notebook">Notebook</a>
           <a id="about" href="/work/#about-felix" data-open="about">About</a>
         </nav>
-        <button class="sound-button utility-button" id="sound-toggle" type="button" aria-pressed="false" aria-label="Turn on the original lounge music and rain ambience" title="Sound off"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+        <button class="sound-button utility-button" id="sound-toggle" type="button" aria-pressed="false" aria-label="Play lounge music and rain ambience" title="Play music"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
       </header>
       <div class="scene-loading" id="scene-loading" role="status"><span></span>Turning the lights on…</div>
       <div class="hotspots" id="hotspots" aria-label="Objects in the diner">
         <button class="hotspot" data-hotspot="menu" data-action="menu" aria-label="Pick up the menu and explore selected projects" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The menu</span></button>
         <button class="hotspot" data-hotspot="notebook" data-action="notebook" aria-label="Open the notebook of side projects" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The notebook</span></button>
         <button class="hotspot" data-hotspot="cat" data-action="cat" aria-label="Say hello to the sleeping cat" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The manager</span></button>
-        <button class="hotspot" data-hotspot="record" data-action="record" aria-pressed="false" aria-label="Play or pause the record player" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Set the mood</span></button>
+        <button class="hotspot" data-hotspot="record" data-action="record" aria-label="Play a record" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Set the mood</span></button>
         <button class="hotspot" data-hotspot="about" data-action="about" aria-label="Meet Felix, the person behind the counter" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Meet the host</span></button>
         {Object.keys(seats).map((name, index) => (
           <button class="hotspot seat-hotspot" data-hotspot={name} data-action={name} aria-label={`Sit at seat ${index + 1}, ${['left end', 'left center', 'right center', 'right end'][index]} of the counter`} hidden>

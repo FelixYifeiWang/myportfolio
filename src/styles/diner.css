@@ -238,14 +238,16 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
   .scene-loading { left: 25px; top: 104px; }
 }
 @media(max-width:700px) {
-  .diner-header { left: 22px; right: 22px; top: max(23px,env(safe-area-inset-top)); grid-template-columns: 1fr auto; gap: 18px 12px; }
-  .brand-kicker { font-size: 9px; }
-  .diner-header nav { grid-column: 1/-1; grid-row: 2; justify-self: start; gap: 22px; padding: 0 18px; }
-  .sound-button { grid-column: 2; grid-row: 1; }
+  .diner-header { left: max(16px,env(safe-area-inset-left)); right: max(16px,env(safe-area-inset-right)); top: max(20px,env(safe-area-inset-top)); grid-template-columns: minmax(0,1fr) auto; gap: 8px; align-items: center; }
+  .brand-kicker { font-size: 8px; letter-spacing: .16em; }
+  .brand-name { font-size: 30px; white-space: nowrap; }
+  .diner-header nav { grid-column: 2; grid-row: 1; justify-self: end; gap: 0; padding: 0 5px; font-size: 11px; }
+  .diner-header nav a { min-width: 44px; min-height: 44px; justify-content: center; padding: 0 7px; }
+  .sound-button { position: fixed; left: max(22px,env(safe-area-inset-left)); bottom: max(22px,env(safe-area-inset-bottom)); }
   .diner-controls { left: 22px; right: 22px; bottom: max(22px,env(safe-area-inset-bottom)); grid-template-columns: minmax(0,1fr) auto; gap: 14px 10px; }
-  .gesture-hint { grid-column: 1/-1; grid-row: 1; font-size: 10px; }
+  .gesture-hint { grid-column: 1/-1; grid-row: 1; font-size: 10px; margin-bottom: 2px; }
   .utility-controls { grid-column: 2; grid-row: 2; }
-  .scene-loading { top: 150px; left: 23px; max-width: 250px; font-size: 11px; }
+  .scene-loading { top: 94px; left: 23px; max-width: 250px; font-size: 11px; }
   .scene-toast { bottom: 116px; width: max-content; }
 }
 @media(max-height:560px) and (min-width:701px) {
