@@ -71,7 +71,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     pmrem.dispose();
     const [catModel, props] = await Promise.all([loadDinerCat(), loadDinerProps()]);
     const world = buildDiner(catModel, props);
-    const batches = batchStaticMeshes(world.group, [...world.interactives, world.ceiling.group]);
+    const batches = batchStaticMeshes(world.group, [...world.interactives, world.ceiling.group, world.sideWall.group]);
     scene.add(world.group);
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: '#1b211e', roughness: 1 }));
     ground.rotation.x = -Math.PI / 2;
@@ -420,6 +420,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         // Reveal the roof only after the arriving camera is below it and inside the room.
         const underCeiling = isSeat(currentView) && camera.position.y < 4.9 && camera.position.z < 3.9 && Math.abs(camera.position.x) < 4.9;
         moving = world.ceiling.update(delta, underCeiling, reduced.matches) || moving;
+        moving = world.sideWall.update(delta, underCeiling, reduced.matches) || moving;
         if (!paused && !reduced.matches) {
             world.cat.scale.y = 1 + Math.sin(elapsed * (now < petUntil ? 2.1 : 1.4)) * .009;
             if (playing)
@@ -470,8 +471,10 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     resize();
     // Compile asynchronously where supported, avoiding a synchronous first-frame stall.
     world.ceiling.group.visible = true;
+    world.sideWall.group.visible = true;
     await renderer.compileAsync(scene, camera);
     world.ceiling.group.visible = false;
+    world.sideWall.group.visible = false;
     ready = true;
     if (!reduced.matches) {
         camera.position.copy(roomPosition).sub(roomTarget).multiplyScalar(1.04 / (compact() ? .88 : .72)).add(roomTarget);

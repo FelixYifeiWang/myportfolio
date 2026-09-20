@@ -5,6 +5,7 @@ import { addFurnishings, addContactShadows, createBackCounter } from './furnishi
 import type { DinerCat } from './cat';
 import { createWindowRain, type WindowRain } from './rain';
 import { createSeatedCeiling } from './ceiling';
+import { createSeatedSideWall } from './side-wall';
 import { placeProp, type DinerProps } from './assets';
 import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, windowBeadsTexture } from './textures';
 import { seats, type SeatName } from './seats';
@@ -18,6 +19,7 @@ export interface DinerWorld {
     steam: THREE.Sprite[];
     rain: WindowRain;
     ceiling: ReturnType<typeof createSeatedCeiling>;
+    sideWall: ReturnType<typeof createSeatedSideWall>;
     lights: THREE.Light[];
 }
 const materialCache = new Map<string, THREE.MeshStandardMaterial>();
@@ -364,7 +366,8 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     // Floating steam is rendered inside the room, not layered onto the page.
     const soft = softTexture();
     const ceiling = createSeatedCeiling(props.wood.color, soft);
-    group.add(ceiling.group);
+    const sideWall = createSeatedSideWall(props.wood.color, plasterGrain, soft);
+    group.add(ceiling.group, sideWall.group);
     addContactShadows(group, soft);
     const sconceGlow = mesh(new THREE.PlaneGeometry(1.55, 1.6), new THREE.MeshBasicMaterial({ map: soft, color: '#ffbd78', transparent: true, opacity: .16, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [-5.005, 4.03, 2.65], group);
     sconceGlow.rotation.y = Math.PI / 2;
@@ -418,7 +421,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         batchStaticMeshes(object as THREE.Group, [vinyl]);
         object.traverse(child => { child.userData.action = object.userData.action; });
     }
-    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, ceiling, lights };
+    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, ceiling, sideWall, lights };
 }
 function addCounterDetails(parent: THREE.Object3D, props: DinerProps) {
     const bowl = placeProp(props.ramen, .34, new THREE.Vector3(-1.63, 1.85, -.59), .3, parent);
