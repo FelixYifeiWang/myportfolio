@@ -199,9 +199,9 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
   height: 44px;
   padding: 0;
   border: 0;
-  border-radius: 12px;
+  border-radius: 50%;
   background: none;
-  color: #efe2c9;
+  color: var(--cream);
   transform: translate(-50%,-50%);
   pointer-events: auto;
 }
@@ -210,66 +210,50 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
 @media(hover:hover) {
   .hotspot:hover { --active: 1; z-index: 2; }
 }
+/* The same quiet glass and hairline edge as the top navigation. */
 .hotspot-mark {
-  position: relative;
   display: grid;
   place-items: center;
-  width: calc(10px + var(--active) * 22px);
-  height: calc(10px + var(--active) * 22px);
-  border: 1px solid #f1dfbb9c;
-  border-radius: calc(5px + var(--active) * 5px);
-  background: rgb(27 39 32 / calc(.28 + var(--active) * .55));
-  box-shadow: 0 1px 5px #0c171833;
-  transform: translateY(calc(var(--active) * -2px));
-  transition: width .22s, height .22s, border-radius .22s, background .22s, transform .22s, box-shadow .22s;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #ede5d52b;
+  border-radius: 50%;
+  background: #18231e80;
+  backdrop-filter: blur(12px);
+  opacity: calc(.7 + var(--active) * .3);
+  transform: scale(calc(1 + var(--active) * .06));
+  transition: opacity .18s, transform .18s, background .18s;
   pointer-events: none;
 }
-.hotspot-pin { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #f1dfbb; opacity: calc(1 - var(--active)); transition: opacity .12s; }
-.hotspot-icon { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: var(--active); transform: scale(calc(.8 + var(--active) * .2)); transition: opacity .16s .04s, transform .22s; }
-.hotspot:focus-visible .hotspot-mark { outline: 1px solid #ead2a5; outline-offset: 4px; }
-.hotspot:active .hotspot-mark { transform: translateY(0) scale(.92); }
+.hotspot-mark svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+.hotspot:focus-visible .hotspot-mark { outline: 2px solid #eee5d580; outline-offset: 3px; }
+.hotspot:active .hotspot-mark { transform: scale(.96); }
 .hotspot-label {
   position: absolute;
   left: 50%;
-  bottom: 48px;
+  bottom: 45px;
   width: max-content;
   max-width: 170px;
-  padding: 5px 9px;
-  border: 1px solid #eddfbf1a;
+  padding: 6px 12px;
+  border: 1px solid #ede5d51f;
   border-radius: 20px;
-  background: #1b2721d9;
-  color: #e3dac7;
-  font: 11px/1.4 'DM Sans',sans-serif;
-  letter-spacing: .015em;
+  background: #18231eb3;
+  backdrop-filter: blur(12px);
+  color: var(--cream);
+  font: 12px/1.4 'DM Sans',sans-serif;
   white-space: nowrap;
   opacity: var(--active);
-  transform: translate(var(--label-shift),calc((1 - var(--active)) * 3px));
-  transition: opacity .18s .07s, transform .22s;
+  transform: translateX(var(--label-shift));
+  transition: opacity .18s;
   pointer-events: none;
 }
 .hotspot[data-label-side=right] { --label-shift: 0; }
 .hotspot[data-label-side=right] .hotspot-label { left: 18px; }
 .hotspot[data-label-side=left] { --label-shift: 0; }
 .hotspot[data-label-side=left] .hotspot-label { left: auto; right: 18px; }
-.record-pause,.is-playing .record-play { display: none; }
-.is-playing .record-pause { display: block; }
-/* A curved arrival arrow invites entry without drawing another stool on top of the stool. */
-.seat-mark {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: none;
-  box-shadow: none;
-  color: #eee0c5;
-  opacity: var(--active);
-  transform: translateY(calc((1 - var(--active)) * -5px));
-  transition: opacity .18s, transform .24s;
-}
-.seat-mark .hotspot-icon { width: 25px; height: 25px; stroke-width: 1.6; filter: drop-shadow(0 1px 2px #18221c99); }
-.seat-landing { opacity: .45; }
+.seat-mark { opacity: var(--active); }
 @media(hover:none), (pointer:coarse) {
   .seat-hotspot { --active: .7; }
-  .seat-mark .hotspot-icon { width: 22px; height: 22px; }
 }
 .scene-toast { position: absolute; z-index: 10; bottom: 102px; left: 50%; transform: translate(-50%,8px); border: 1px solid #e8d4ac33; border-radius: 8px; background: #15241ee6; backdrop-filter: blur(12px); color: #e4d4b8; font-size: 12px; padding: 10px 16px; opacity: 0; pointer-events: none; transition: .3s; max-width: calc(100% - 40px); text-align: center; }
 .scene-toast.is-visible { opacity: 1; transform: translate(-50%,0); }

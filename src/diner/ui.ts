@@ -79,7 +79,6 @@ export function initDiner() {
             sound.setAttribute('aria-pressed', String(playing));
             record.setAttribute('aria-pressed', String(playing));
             record.querySelector('.hotspot-label')!.textContent = playing ? 'Pause' : 'Listen';
-            shell.classList.toggle('is-playing', playing);
             sound.setAttribute('aria-label', playing ? 'Turn off lounge music and rain ambience' : 'Turn on the original lounge music and rain ambience');
             sound.title = playing ? 'Sound on' : 'Sound off';
             scene?.setPlaying(playing);
@@ -190,7 +189,6 @@ export function initDiner() {
         sound.setAttribute('aria-pressed', 'false');
         record.setAttribute('aria-pressed', 'false');
         record.querySelector('.hotspot-label')!.textContent = 'Listen';
-        shell.classList.remove('is-playing');
         sound.setAttribute('aria-label', 'Turn on the original lounge music and rain ambience');
         sound.title = 'Sound off';
         clearTimeout(openTimer);
