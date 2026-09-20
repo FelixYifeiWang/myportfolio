@@ -5,7 +5,6 @@ export interface Project {
   role: string; tools: string; intro: string; story: string; approach?: string; detail?: string;
   outcomes: { value: string; label: string }[];
   category?: string; organization?: string; brief?: boolean; coverAlt?: string; galleryAlt?: string;
-  flow?: { title: string; steps: { name: string; detail: string }[] };
   note?: string;
 }
 const coreProjects: Project[] = [
@@ -22,7 +21,6 @@ const coreProjects: Project[] = [
     approach: 'I built across the frontend, backend, storage, and processing pipeline. Audio upload came first, followed by video and the ability to turn existing media blocks into AI Meeting Notes. Video required a new path through AWS MediaConvert to extract audio before transcription and summarization.',
     detail: 'I also built support for creating meeting notes through the public API, so integrations and agents could bring recordings into Notion programmatically. Working with design and engineering, I added playback, timestamps, and seeking to connect the transcript back to its source.',
     outcomes: [{ value: '~20,000', label: 'pre-recorded meetings processed at internship presentation' }, { value: 'Audio + video', label: 'file uploads shipped to production' }, { value: 'Public API', label: 'meeting-note creation shipped' }],
-    flow: { title: 'From a recording to reusable knowledge', steps: [{ name: 'Bring a file', detail: 'Audio, video, or an existing media block' }, { name: 'Process', detail: 'Extract audio, transcribe, and summarize' }, { name: 'Use it', detail: 'Search the notes. Play back the source.' }] },
     note: 'Scope: Bring Your Own File and related capabilities within the AI Meeting Notes team. Audio upload, video upload, and API creation reached production; playback was rolling out at the time of my presentation.',
   },
   {
@@ -36,7 +34,6 @@ const coreProjects: Project[] = [
     approach: 'In connected Daily Mode, sensor streams build a personal baseline. AI interprets patterns and translates them into a compact set of deterministic rules: thresholds, severity levels, and corresponding feedback. Those rules are saved locally before the athlete heads out.',
     detail: 'In Extreme Mode, the device evaluates incoming signals against those stored heuristics and triggers feedback without a cloud request. The design separates richer connected learning from predictable local execution, so losing Wi-Fi does not remove the decision layer.',
     outcomes: [{ value: '4', label: 'sensing modalities in the prototype' }, { value: 'Personalized', label: 'rules derived from connected learning' }, { value: 'Offline', label: 'local decisions in Extreme Mode' }],
-    flow: { title: 'The decision system I worked on', steps: [{ name: 'Learn online', detail: 'Sensor data → personal baseline → AI decisions' }, { name: 'Distill', detail: 'Turn decisions into stored heuristic rules' }, { name: 'Act offline', detail: 'Local signals → rules → wearable feedback' }] },
     note: 'Research prototype, developed with Xixi Li, Izzy Shen, and Alfred Wong. The paper describes the architecture and fabrication work; extreme-environment field validation remains future work.',
   },
   { slug: 'relicvr', featured: false, category: 'New interfaces', name: 'RelicVR', number: '05', year: '2023', type: 'VR · Cultural heritage', description: 'An invitation to step inside the places history left behind.', image: 'v3c', cover: 'proj4', gallery: 'i4-6', role: 'Product design, software development & UI/UX', tools: 'Unity VR, CloudCompare, Blender', intro: 'The preview mode of a time machine.', story: 'RelicVR turns archaeological scan data into places people can explore in virtual reality, bringing cultural heritage closer to an everyday audience.', approach: 'Inspired by Google Earth VR, I used open archaeological datasets to reconstruct historical sites. The core challenge was turning LiDAR point clouds into models suitable for an immersive experience.', detail: 'I processed the data in CloudCompare and Blender, then built the experience in Unity. Controllers and hand gestures help visitors move between sites and explore their surroundings.', outcomes: [] },
@@ -44,7 +41,7 @@ const coreProjects: Project[] = [
 ];
 
 export const projects: Project[] = [...coreProjects, ...additionalWorks.map(work => ({
-  ...work, featured: false, brief: true, number: '', intro: work.organization,
+  ...work, name: work.organization, featured: false, brief: true, number: '', intro: work.name,
   cover: work.image, coverAlt: `${work.name} — ${work.organization}`,
   role: work.type, story: work.description, outcomes: [],
 }))];

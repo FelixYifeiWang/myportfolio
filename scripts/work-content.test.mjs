@@ -49,7 +49,7 @@ test('other work offers every contribution as a readable direct link without nes
     assert.ok(!page.includes('<details'));
     for (const project of otherProjects) {
         assert.ok(page.includes(`href="/work/${project.slug}/"`));
-        assert.ok(page.includes(project.description.replaceAll('&', '&amp;')));
+        assert.ok(page.includes((project.brief ? project.intro : project.description).replaceAll('&', '&amp;')));
         assert.ok(existsSync(`dist/work/${project.slug}/index.html`));
     }
 });

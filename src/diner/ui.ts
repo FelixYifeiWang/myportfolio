@@ -70,7 +70,7 @@ export function initDiner() {
         dialog.classList.toggle('is-notebook', panel === 'notebook');
         back.hidden = !panelHistory.previous;
         back.textContent = panelHistory.previous === 'other-work' ? '← Other work' : panelHistory.previous === 'notebook' ? '← The notebook' : '← The menu';
-        location.textContent = project ? `${target.dataset.storyGroup || 'HOUSE SPECIAL'} / THE STORY` : panel === 'other-work' ? 'THE MENU / À LA CARTE' : panel === 'notebook' ? 'A FEW THINGS ON THE SIDE' : panel === 'about' ? 'MEET YOUR HOST' : 'AT THE COUNTER';
+        location.textContent = project ? `${target.dataset.storyGroup || 'HOUSE SPECIAL'} / THE STORY` : panel === 'other-work' ? 'À LA CARTE' : panel === 'notebook' ? 'A FEW THINGS ON THE SIDE' : panel === 'about' ? 'MEET YOUR HOST' : 'AT THE COUNTER';
         dialog.removeAttribute('aria-labelledby');
         dialog.setAttribute('aria-label', titles[panel] || target.querySelector('h2')?.textContent || 'Project story');
         scroll.scrollTop = backwards ? panelPositions.get(panel) ?? 0 : 0;

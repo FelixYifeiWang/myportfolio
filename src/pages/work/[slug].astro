@@ -1,6 +1,5 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import ProjectFlow from '../../components/ProjectFlow.astro';
 import { projects } from '../../data/projects';
 export function getStaticPaths() {
   return projects.map((project, index) => ({ params: { slug: project.slug }, props: { project, next: projects[(index + 1) % projects.length] } }));
@@ -17,7 +16,6 @@ const { project, next } = Astro.props;
     </div>
     <dl class="project-meta"><div><dt>Year</dt><dd>{project.year}</dd></div><div><dt>{project.brief ? 'Focus' : 'My role'}</dt><dd>{project.role}</dd></div><div><dt>Ingredients</dt><dd>{project.tools}</dd></div></dl>
     {project.outcomes.length > 0 && <dl class="project-outcomes" aria-label="Project outcomes">{project.outcomes.map(outcome => <div><dt>{outcome.label}</dt><dd>{outcome.value}</dd></div>)}</dl>}
-    {project.flow && <ProjectFlow flow={project.flow} />}
     {project.cover && <img class="project-cover" src={`/images/${project.cover}.webp`} alt={project.coverAlt || `${project.name} project presentation`} width="1600" height="900" fetchpriority="high" />}
     <section class="project-story" aria-labelledby="idea-title"><h2 id="idea-title">{project.brief ? 'My contribution.' : 'The idea.'}</h2><div><p>{project.story}</p></div></section>
     {project.approach && <section class="project-story" aria-labelledby="process-title"><h2 id="process-title">In the making.</h2><div><p>{project.approach}</p><p>{project.detail}</p></div></section>}
