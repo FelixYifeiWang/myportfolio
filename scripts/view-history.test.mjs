@@ -4,6 +4,16 @@ import { Vector3 } from 'three';
 import { ViewHistory } from '../src/diner/view-history.ts';
 const snapshot = view => ({ view, position: new Vector3(1, 2.85, 2.75), target: new Vector3(-2, 2.2, -1), manual: true, exploring: true });
 
+test('repeated cat visits from the room have only one return step', () => {
+    const history = new ViewHistory();
+    history.enter('cat', snapshot('room'));
+    history.enter('cat', snapshot('cat'));
+    assert.equal(history.back().view, 'room');
+    assert.equal(history.focus, null);
+    assert.equal(history.returnView, undefined);
+    assert.equal(history.back(), undefined);
+});
+
 test('cat and panel visits unwind to the exact previous seated heading', () => {
     for (const seat of ['seat-1', 'seat-2', 'seat-3', 'seat-4']) {
         const history = new ViewHistory(), saved = snapshot(seat);

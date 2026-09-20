@@ -495,7 +495,9 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         restoreView() {
             stopSeatedDrag();
             const savedView = history.back();
-            if (!savedView) {
+            // A top-level room visit exits completely in one step, including any
+            // manual-orbit flag set by clicking the cat mesh on the canvas.
+            if (!savedView || (savedView.view === 'room' && !history.focus)) {
                 focus('room');
                 return;
             }
