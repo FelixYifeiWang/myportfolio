@@ -13,7 +13,7 @@ const coreProjects: Project[] = [
   { slug: 'undecimber', menuDescription: 'History, told through clothing.', featured: true, name: 'Undecimber', number: '03', year: '2021', type: 'Art · Fashion', description: 'A fashion venture taken from concept to production and market.', image: 'v5c', cover: 'proj5', gallery: 'i5-5', role: 'Team lead, product design, concept & marketing', tools: 'CLO 3D, Adobe tools, sustainable materials', intro: 'History recorded on fabric.', story: 'Undecimber is a fashion venture reflecting the events of 2020 through clothing. I led the team across product design, concept development, and marketing, working with suppliers to bring the collection to market.', approach: 'We translated themes from the year into material and visual experiments. A rainbow-reflective fabric became a way to express a silver lining: dark in everyday light, unexpectedly colorful when illuminated.', detail: 'I worked from concept through product development and marketing, balancing expressive clothing with manufacturing constraints. Profits from the project were donated to COVID-19 relief organizations.', outcomes: [{ value: '$30,000+', label: 'revenue' }, { value: '100+', label: 'artists & celebrities wore the collection' }, { value: '100%', label: 'of profits donated to COVID-19 relief' }] },
   {
     slug: 'notion-ai-meeting-notes', menuDescription: 'Recordings into searchable knowledge.', featured: true, name: 'Notion AI Meeting Notes', number: '04', year: '2026',
-    type: 'AI · Productivity', image: '', role: 'Software engineering intern · AI Meeting Notes',
+    type: 'AI · Productivity', image: 'notion-meeting-notes', cover: 'notion-meeting-notes', coverAlt: 'Notion AI Meeting Notes in a Daily Engineering Standup — official product screenshot', gallery: 'notion-summary', galleryAlt: 'An AI-generated meeting summary with design feedback and assigned action items — official Notion product screenshot', role: 'Software engineering intern · AI Meeting Notes',
     tools: 'Full-stack development, media pipelines, AWS MediaConvert, public API',
     description: 'Taking AI Meeting Notes beyond live meetings, from file uploads to a public API.',
     intro: 'Beyond the meeting.',
@@ -25,7 +25,7 @@ const coreProjects: Project[] = [
   },
   {
     slug: 'sixth', menuDescription: 'Connected learning. Offline decisions.', featured: true, name: 'SIXTH', number: '05', year: '2026', type: 'AI · Wearable systems',
-    image: 'sixth-fabric', cover: 'sixth-fabric', coverAlt: 'The SIXTH team assembling conductive textile sensors on a soft wearable vest',
+    image: 'sixth-complete', cover: 'sixth-complete', coverAlt: 'Complete SIXTH wearable concept shown in an exploded view with its textile layers, sensors, and electronics',
     gallery: 'sixth-personalization', galleryAlt: 'SIXTH companion app concept: pairing the wearable, establishing a personal baseline, and preparing for offline use',
     role: 'AI architecture & offline decision logic', tools: 'Time-series models, LLMs, personalized heuristics, ESP32',
     description: 'A soft sensing wearable designed to keep making decisions when connectivity disappears.',

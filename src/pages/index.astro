@@ -1,7 +1,8 @@
 ---
 import '../styles/fonts.css';
 import '../styles/diner.css';
-import { projects } from '../data/projects';
+import { featuredProjects } from '../data/projects';
+import OtherWorkMenu from '../components/OtherWorkMenu.astro';
 import WorkMenu from '../components/WorkMenu.astro';
 import { seats } from '../diner/seats';
 
@@ -77,6 +78,11 @@ import { seats } from '../diner/seats';
             <p class="menu-signature">Thanks for stopping by, <em>Felix</em></p>
           </div>
         </section>
+        <section data-panel="other-work" class="paper-panel other-work-panel" hidden>
+          <p class="paper-eyebrow">OTHER WORK</p><h2 class="panel-heading">À la carte.</h2>
+          <OtherWorkMenu />
+          <div class="story-footer"><a href="/work/other/">Open the standalone menu ↗</a><button data-panel-back>Back to the menu →</button></div>
+        </section>
         <section data-panel="notebook" class="paper-panel notebook-panel" hidden>
           <p class="paper-eyebrow">OFF THE MAIN MENU / PERSONAL NOTEBOOK</p><h2 class="panel-heading">Little ideas.<br /><em>Long detours.</em></h2><p class="panel-intro">Games, art, objects. Sometimes the side quest is the interesting part.</p>
           <article class="notebook-entry"><img src="/images/ow04.webp" alt="Felix’s indie game projects" width="600" height="420" loading="lazy" /><div><span class="paper-eyebrow">01 / PLAY</span><h3>Just one more level.</h3><p>I’ve been making indie games since 2018. Worlds, characters, and the feeling of discovery keep bringing me back.</p><a href="/work/echo-of-mobius/" data-project="echo-of-mobius">A world I helped build ↗</a></div></article>
@@ -90,7 +96,7 @@ import { seats } from '../diner/seats';
           <div class="contact-card"><span class="paper-eyebrow">THERE’S ALWAYS ROOM FOR A CONVERSATION</span><a href="mailto:wangyifeifelix@gmail.com">Say hello <span>↗</span></a><p>wangyifeifelix@gmail.com</p></div>
           <div class="about-links"><a href="https://github.com/FelixYifeiWang" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/felix-wang1" target="_blank" rel="noreferrer">LinkedIn ↗</a></div>
         </section>
-        {projects.map(project => <section class="paper-panel project-panel" data-panel={`project-${project.slug}`} data-story-group={project.featured ? 'HOUSE SPECIAL' : 'OTHER WORK'} hidden>
+        {featuredProjects.map(project => <section class="paper-panel project-panel" data-panel={`project-${project.slug}`} data-story-group={project.featured ? 'HOUSE SPECIAL' : 'OTHER WORK'} hidden>
           <p class="paper-eyebrow">{project.featured ? `HOUSE SPECIAL ${project.number}` : 'OTHER WORK'} / {project.type.toUpperCase()}</p><h2 class="panel-heading">{project.name}</h2><p class="project-intro">{project.intro}</p>
           <dl class="story-meta"><div><dt>YEAR</dt><dd>{project.year}</dd></div><div><dt>{project.brief ? 'FOCUS' : 'MY ROLE'}</dt><dd>{project.role}</dd></div><div><dt>TOOLS</dt><dd>{project.tools}</dd></div></dl>
           {project.cover && <img class="story-cover" src={`/images/${project.cover}.webp`} alt={project.coverAlt || `${project.name} project presentation`} width="1600" height="900" loading="lazy" />}

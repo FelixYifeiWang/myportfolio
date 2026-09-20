@@ -17,10 +17,8 @@ test('the diner and simple portfolio share the same five-entry hierarchy', () =>
         const names = ['DreamIn Engine', 'Echo of Mobius', 'Undecimber', 'Notion AI Meeting Notes', 'SIXTH', 'Other work.'];
         const positions = names.map(name => menu.indexOf(name));
         assert.ok(positions.every((position, index) => position >= 0 && (!index || position > positions[index - 1])), path);
-        assert.ok(menu.includes('<details class="other-work-menu"'));
-        assert.ok(!menu.includes('href="/work/other/"'));
-        assert.ok(menu.indexOf('RelicVR') < menu.indexOf('Orpheus'));
-        assert.ok(menu.indexOf('Orpheus') < menu.indexOf('Driver AI'));
+        assert.ok(menu.includes('href="/work/other/"'));
+        assert.ok(!menu.includes('<details class="other-work-menu"'));
     }
 });
 
@@ -43,20 +41,20 @@ test('added statistics are absent from the menu and standalone stories', () => {
     }
 });
 
-test('supporting work lives in one collapsed section with seven direct project links', () => {
-    for (const path of ['dist/index.html', 'dist/work/index.html']) {
+test('À la carte contains seven inline disclosures without individual supporting-work pages', () => {
+    for (const path of ['dist/index.html', 'dist/work/other/index.html']) {
         const page = readFileSync(path, 'utf8');
-        const disclosure = page.match(/<details class="other-work-menu"[^>]*>[\s\S]*?<\/details>/)?.[0];
-        assert.ok(disclosure);
-        assert.ok(!disclosure.split('>')[0].includes('open'));
-        assert.equal((disclosure.match(/<details/g) || []).length, 1);
-        assert.equal((disclosure.match(/<a /g) || []).length, 7);
-        for (const slug of ['rpg', 'seawater-cement', 'non-electric-refrigerator']) {
-            assert.ok(!page.includes(`/work/${slug}/`));
-        }
+        assert.equal((page.match(/<details class="side-dish"/g) || []).length, 7);
+        assert.ok(page.indexOf('work-relicvr') < page.indexOf('work-orpheus'));
+        assert.ok(page.indexOf('work-orpheus') < page.indexOf('work-driver-ai'));
         for (const project of otherProjects) {
-            assert.ok(disclosure.includes(`href="/work/${project.slug}/"`));
-            assert.ok(existsSync(`dist/work/${project.slug}/index.html`));
+            assert.ok(page.includes(`id="work-${project.slug}"`));
+            assert.ok(!page.includes(`href="/work/${project.slug}/"`));
+            assert.ok(!page.includes(`data-panel="project-${project.slug}"`));
+            assert.ok(!existsSync(`dist/work/${project.slug}/index.html`));
+        }
+        for (const slug of ['rpg', 'seawater-cement', 'non-electric-refrigerator']) {
+            assert.ok(!page.includes(`work-${slug}`));
         }
     }
 });
@@ -67,7 +65,7 @@ test('new featured stories distinguish shipped work and prototype scope, with li
     assert.ok(notion.includes('playback was rolling out'));
     assert.ok(sixth.includes('field validation remains future work'));
     assert.ok(sixth.includes('AI architecture &amp; offline decision logic'));
-    for (const name of ['sixth-fabric', 'sixth-personalization']) {
+    for (const name of ['sixth-complete', 'sixth-personalization', 'notion-meeting-notes', 'notion-summary']) {
         assert.ok(statSync(`public/images/${name}.webp`).size < 250000);
     }
 });

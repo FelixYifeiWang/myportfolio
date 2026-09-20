@@ -1,12 +1,18 @@
 ---
 import { otherProjects } from '../data/projects';
-interface Props { interactive?: boolean; }
-const { interactive = false } = Astro.props;
 const categories = ['New interfaces', 'Software & AI', 'Physical systems'];
-const orderedProjects = categories.flatMap(category => otherProjects.filter(project => project.category === category));
 ---
-<div class="other-work-list">
-  {orderedProjects.map(project => <a class="side-dish" href={`/work/${project.slug}/`} data-project={interactive ? project.slug : undefined}>
-    <div class="side-dish-body"><h4>{project.name}</h4><p>{project.brief ? project.intro : project.menuDescription}</p></div><span class="side-dish-arrow" aria-hidden="true">↗</span>
-  </a>)}
+<div class="a-la-carte">
+  {categories.map(category => <section class="menu-course" aria-label={category}>
+    <h3>{category}</h3>
+    {otherProjects.filter(project => project.category === category).map(project => <details class="side-dish" id={`work-${project.slug}`}>
+      <summary><span class="side-dish-body"><span class="side-dish-name">{project.name}</span><span class="side-dish-caption">{project.brief ? project.intro : project.menuDescription}</span></span><span class="side-dish-toggle" aria-hidden="true">+</span></summary>
+      <div class="side-dish-detail">
+        <p>{project.story}</p>
+        {project.cover && <img src={`/images/${project.cover}.webp`} alt={project.coverAlt || `${project.name} project presentation`} width="1600" height="900" loading="lazy" />}
+        {!project.brief && <p>{project.detail}</p>}
+        <p class="side-dish-tools">{project.tools}</p>
+      </div>
+    </details>)}
+  </section>)}
 </div>

@@ -1,8 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { projects } from '../../data/projects';
+import { featuredProjects } from '../../data/projects';
 export function getStaticPaths() {
-  return projects.map((project, index) => ({ params: { slug: project.slug }, props: { project, next: projects[(index + 1) % projects.length] } }));
+  return featuredProjects.map((project, index) => ({ params: { slug: project.slug }, props: { project, next: featuredProjects[(index + 1) % featuredProjects.length] } }));
 }
 const { project, next } = Astro.props;
 ---

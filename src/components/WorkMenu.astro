@@ -1,6 +1,5 @@
 ---
 import { featuredProjects } from '../data/projects';
-import OtherWorkMenu from './OtherWorkMenu.astro';
 interface Props { interactive?: boolean; }
 const { interactive = false } = Astro.props;
 ---
@@ -11,7 +10,6 @@ const { interactive = false } = Astro.props;
     <span class="dish-arrow" aria-hidden="true">↗</span>
   </a>)}
 </div>
-<details class="other-work-menu" id="other-work">
-  <summary><span class="other-work-title">Other work.</span><span class="other-work-toggle" aria-hidden="true">+</span></summary>
-  <OtherWorkMenu interactive={interactive} />
-</details>
+<a class="other-work-menu" href="/work/other/" data-open={interactive ? 'other-work' : undefined}>
+  <span class="other-work-title">Other work.</span><span aria-hidden="true">↗</span>
+</a>
