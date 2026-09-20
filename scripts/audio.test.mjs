@@ -32,8 +32,8 @@ class Context {
   async close() { this.state = 'closed'; }
 }
 class Media {
-  src = ''; currentTime = 0; paused = true; loads = 0; plays = 0;
-  load() { this.loads++; this.currentTime = 0; }
+  src = ''; currentTime = 0; paused = true; loads = 0; plays = 0; ended = false; onended = null;
+  load() { this.loads++; this.currentTime = 0; this.ended = false; }
   async play() { this.paused = false; this.plays++; }
   pause() { this.paused = true; }
   removeAttribute(name) { if (name === 'src') this.src = ''; }
@@ -91,6 +91,47 @@ test('music button starts the first track after the silent step', async t => {
   await audio.toggle();
   assert.equal(audio.trackName, 'Last light');
   assert.equal(audio.playing, true);
+});
+
+test('a finished recording advances to the next song and updates the player', async t => {
+  const { audio, media } = fixture(t);
+  await audio.nextTrack(); await audio.nextTrack();
+  let changes = 0; audio.onChange = () => changes++;
+  assert.equal(media.loop, false);
+  media.ended = true;
+  await media.onended();
+  assert.equal(audio.trackName, '我只在乎你');
+  assert.equal(media.src, '/audio/wo-zhi-zai-hu-ni.m4a');
+  assert.equal(changes, 1);
+});
+
+test('the final song automatically wraps to the opening track without silence', async t => {
+  const { audio, media } = fixture(t);
+  for (let i = 0; i < 8; i++) await audio.nextTrack();
+  media.ended = true; await media.onended();
+  assert.equal(audio.trackName, 'Last light');
+  assert.equal(audio.playing, true);
+});
+
+test('the original lounge track has an ending and advances after its final bar', async t => {
+  const { audio } = fixture(t);
+  await audio.nextTrack();
+  const tick = globalThis.setInterval.mock.calls[0].arguments[0];
+  for (let i = 0; i < 31; i++) tick();
+  assert.equal(audio.trackName, 'Last light');
+  await tick();
+  assert.equal(audio.trackName, 'Take Five');
+});
+
+test('late ended events cannot restart paused or disposed music', async t => {
+  const { audio, media } = fixture(t);
+  await audio.nextTrack(); await audio.nextTrack();
+  await audio.toggle(); media.ended = true;
+  await media.onended();
+  assert.equal(audio.trackName, 'Take Five');
+  assert.equal(audio.playing, false);
+  audio.dispose();
+  assert.equal(media.onended, null);
 });
 
 test('purring loops independently and repeated cat clicks keep one continuous source', async t => {

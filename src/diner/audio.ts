@@ -89,6 +89,8 @@ export class DinerAudio {
     private playBar() {
         const ctx = this.context;
         if (!ctx || !this.playing || ctx.state !== 'running') return;
+        // Eight passes through the progression give the opening record a natural end.
+        if (this.bar >= 32) return this.advanceAutomatically();
         const track = lounge, beat = 60 / track.bpm;
         const chord = track.chords[this.bar % 4], now = ctx.currentTime + .025;
         chord.forEach((note, i) => this.note(note, now + i * .025, beat * 3.8, .045, track.brightness));
@@ -134,7 +136,10 @@ export class DinerAudio {
         if (!this.media) {
             this.media = this.createMedia();
             this.media.preload = 'none';
-            this.media.loop = true;
+            this.media.loop = false;
+            this.media.onended = () => {
+                if (this.media?.ended && this.playing) return this.advanceAutomatically();
+            };
             this.mediaNode = ctx.createMediaElementSource(this.media);
             this.recordingVolume = ctx.createGain();
             // Files measure -20.04 to -20.09 LUFS; the original arrangement is ~-33.4.
@@ -209,6 +214,18 @@ export class DinerAudio {
     nextTrack() {
         if (this.started) this.index = (this.index + 1) % (records.length + 1);
         return this.setPlaying(this.index < records.length);
+    }
+    private async advanceAutomatically() {
+        if (!this.playing || !this.context) return;
+        // Only manual clicks include the silent step after the final recording.
+        this.index = (this.index + 1) % records.length;
+        try {
+            await this.setPlaying(true);
+        }
+        catch (error) {
+            console.warn('Could not start the next record:', error);
+        }
+        this.onChange?.();
     }
 
     /** Low, quiet throat texture loops while the cat remains the selected focus. */
@@ -304,6 +321,7 @@ export class DinerAudio {
         this.purrWanted = false;
         this.cancelSuspend();
         this.stopMusic();
+        if (this.media) this.media.onended = null;
         this.unloadMedia();
         this.mediaNode?.disconnect();
         this.recordingVolume?.disconnect();
