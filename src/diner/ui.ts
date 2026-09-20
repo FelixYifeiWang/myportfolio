@@ -2,6 +2,7 @@ import type { DinerScene } from './scene';
 import type { ObjectName } from './models';
 import { DinerAudio } from './audio';
 import { PanelTransition } from './panel-transition';
+import { PanelHistory } from './panel-history';
 export function initDiner() {
     const shell = document.querySelector<HTMLElement>('.diner-shell')!;
     const canvas = document.querySelector<HTMLCanvasElement>('#diner-canvas')!;
@@ -18,7 +19,8 @@ export function initDiner() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const panelTransition = new PanelTransition(dialog, scroll, () => reducedMotion.matches);
     const panelPositions = new Map<string, number>();
-    let projectTrigger: HTMLElement | null = null;
+    const panelTriggers = new Map<string, HTMLElement>();
+    const panelHistory = new PanelHistory();
     const audio = new DinerAudio(undefined, () => {
         const media = document.createElement('audio');
         media.id = 'record-audio';
@@ -41,14 +43,13 @@ export function initDiner() {
         toast.classList.add('is-visible');
         toastTimer = setTimeout(() => { toast.classList.remove('is-visible'); toast.textContent = ''; }, 4500);
     }
-    function showPanel(panel: string) {
+    function showPanel(panel: string, backwards = false) {
         const target = document.querySelector<HTMLElement>(`[data-panel="${panel}"]`);
         if (!target) return;
         if (dialog.open && panel !== currentPanel) {
             panelPositions.set(currentPanel, scroll.scrollTop);
-            const backwards = currentPanel.startsWith('project-') && !panel.startsWith('project-');
-            if (panel.startsWith('project-') && !currentPanel.startsWith('project-')) {
-                projectTrigger = document.activeElement instanceof HTMLElement && document.activeElement.matches('[data-project]:focus-visible') ? document.activeElement : null;
+            if (!backwards && document.activeElement instanceof HTMLElement && document.activeElement.matches('[data-project]:focus-visible, [data-open]:focus-visible')) {
+                panelTriggers.set(currentPanel, document.activeElement);
             }
             void panelTransition.run(() => applyPanel(panel, target, backwards), backwards);
         }
@@ -59,13 +60,17 @@ export function initDiner() {
     }
     function applyPanel(panel: string, target: HTMLElement, backwards = false) {
         const alreadyOpen = dialog.open;
+        if (!alreadyOpen) panelHistory.reset(panel);
+        else if (backwards) panelHistory.back();
+        else panelHistory.visit(panel);
         currentPanel = panel;
         document.querySelectorAll<HTMLElement>('[data-panel]').forEach(item => { item.hidden = item !== target; });
         const project = panel.startsWith('project-');
         dialog.classList.toggle('is-story', project);
         dialog.classList.toggle('is-notebook', panel === 'notebook');
-        back.hidden = !project;
-        location.textContent = project ? `${target.dataset.storyGroup || 'HOUSE SPECIAL'} / THE STORY` : panel === 'notebook' ? 'A FEW THINGS ON THE SIDE' : panel === 'about' ? 'MEET YOUR HOST' : 'AT THE COUNTER';
+        back.hidden = !panelHistory.previous;
+        back.textContent = panelHistory.previous === 'other-work' ? '← Other work' : panelHistory.previous === 'notebook' ? '← The notebook' : '← The menu';
+        location.textContent = project ? `${target.dataset.storyGroup || 'HOUSE SPECIAL'} / THE STORY` : panel === 'other-work' ? 'THE MENU / À LA CARTE' : panel === 'notebook' ? 'A FEW THINGS ON THE SIDE' : panel === 'about' ? 'MEET YOUR HOST' : 'AT THE COUNTER';
         dialog.removeAttribute('aria-labelledby');
         dialog.setAttribute('aria-label', titles[panel] || target.querySelector('h2')?.textContent || 'Project story');
         scroll.scrollTop = backwards ? panelPositions.get(panel) ?? 0 : 0;
@@ -74,7 +79,8 @@ export function initDiner() {
         shell.classList.add('panel-open');
         scene?.setPaused(true);
         const heading = target.querySelector<HTMLElement>('h2');
-        if (alreadyOpen && project && heading) {
+        const projectTrigger = panelTriggers.get(panel);
+        if (alreadyOpen && !backwards && heading) {
             heading.tabIndex = -1;
             heading.focus({ preventScroll: true });
         }
@@ -93,7 +99,7 @@ export function initDiner() {
             showPanel(panel);
             return;
         }
-        const destination = (panel.startsWith('project-') ? 'menu' : panel) as ObjectName;
+        const destination = (panel.startsWith('project-') || panel === 'other-work' ? 'menu' : panel) as ObjectName;
         const duration = scene?.focus(destination, true) ?? 0;
         // Give the visitor a brief sense of picking the object up before showing its content.
         openTimer = setTimeout(() => showPanel(panel), duration);
@@ -168,13 +174,16 @@ export function initDiner() {
     }));
     sound.addEventListener('click', () => void playMusic());
     close.addEventListener('click', closePanel);
-    back.addEventListener('click', () => showPanel('menu'));
+    function goBack() {
+        const previous = panelHistory.previous;
+        if (previous) showPanel(previous, true);
+        else closePanel();
+    }
+    back.addEventListener('click', goBack);
+    document.querySelectorAll('[data-panel-back]').forEach(button => button.addEventListener('click', goBack));
     dialog.addEventListener('cancel', event => {
         event.preventDefault();
-        if (currentPanel.startsWith('project-'))
-            showPanel('menu');
-        else
-            closePanel();
+        goBack();
     });
     dialog.addEventListener('click', event => {
         if (event.target === dialog) {

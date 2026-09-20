@@ -1,10 +1,11 @@
+import { projects } from '../src/data/projects.ts';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 
 const out = resolve('dist');
-const pages = ['/', '/work/', '/work/echo-of-mobius/', '/work/dreamin-engine/', '/work/relicvr/', '/work/orpheus/', '/work/undecimber/'];
+const pages = ['/', '/work/', '/work/other/', ...projects.map(project => `/work/${project.slug}/`)];
 if (process.env.SITE_PREVIEW_URL) {
   for (const route of pages) {
     test(`${route} responds successfully in the running preview`, async () => {

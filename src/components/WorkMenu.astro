@@ -1,6 +1,5 @@
 ---
 import { featuredProjects, otherProjects } from '../data/projects';
-import { additionalWorks } from '../data/other-work';
 interface Props { interactive?: boolean; }
 const { interactive = false } = Astro.props;
 ---
@@ -10,20 +9,8 @@ const { interactive = false } = Astro.props;
     <div class="dish-info"><div class="dish-name"><h4>{project.name}</h4><span class="dish-dots"></span><span class="dish-year">{project.year}</span></div><p>{project.description}</p><span class="dish-type">{project.type}</span></div>
     <span class="dish-arrow" aria-hidden="true">↗</span>
   </a>)}
-  <div class="diner-menu-item">
-    <span class="dish-number">04</span>
-    <div class="dish-info"><div class="dish-name"><h4>Notion AI Meeting Notes</h4></div><span class="dish-type">AI · Productivity</span></div>
-  </div>
 </div>
-<details class="other-work-menu">
-  <summary><span><span class="other-work-title">Other work.</span><span class="other-work-caption">Software, experiments & physical things</span></span><span class="other-work-count">{otherProjects.length + additionalWorks.length} projects <span class="disclosure-plus" aria-hidden="true">+</span></span></summary>
-  <div class="other-work-list">
-    {otherProjects.map(project => <a class="other-work-link" href={`/work/${project.slug}/`} data-project={interactive ? project.slug : undefined}>
-      <div><span class="other-work-name">{project.name}</span><p>{project.description}</p><span class="dish-type">{project.type} / {project.year}</span></div><span class="dish-arrow" aria-hidden="true">↗</span>
-    </a>)}
-    {additionalWorks.map(work => <details class="other-work-entry">
-      <summary><span><span class="other-work-name">{work.name}</span><span class="other-work-caption">{work.organization} / {work.year}</span></span><span class="disclosure-plus" aria-hidden="true">+</span></summary>
-      <div class="other-work-detail"><p>{work.description}</p><img src={`/images/${work.image}.webp`} alt={`${work.name} — ${work.organization}`} width="1000" height="787" loading="lazy" /><p class="other-work-tools">{work.tools}</p></div>
-    </details>)}
-  </div>
-</details>
+<a class="other-work-menu" href="/work/other/" data-open={interactive ? 'other-work' : undefined}>
+  <span><span class="other-work-title">Other work.</span><span class="other-work-caption">Software, new interfaces & physical things</span></span>
+  <span class="other-work-count">{otherProjects.length} projects <span aria-hidden="true">↗</span></span>
+</a>
