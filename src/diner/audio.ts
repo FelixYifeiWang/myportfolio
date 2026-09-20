@@ -237,8 +237,8 @@ export class DinerAudio {
             const level = .07 / Math.max(rms, .001);
             for (let i = 0; i < data.length; i++) {
                 const breathTime = (i / ctx.sampleRate) % 2.4;
-                const fadeIn = Math.min(1, breathTime / .4);
-                const fadeOut = Math.max(0, Math.min(1, (1.8 - breathTime) / .65));
+                const fadeIn = Math.min(1, breathTime / .55);
+                const fadeOut = Math.max(0, Math.min(1, (1.8 - breathTime) / .85));
                 // Longer rounded fades ease into 600ms of quiet between sleeping breaths.
                 const envelope = Math.sin(fadeIn * Math.PI / 2) ** 2 * Math.sin(fadeOut * Math.PI / 2) ** 2;
                 data[i] *= level * envelope;
@@ -256,7 +256,7 @@ export class DinerAudio {
         filter.Q.value = .5;
         this.purrGain = gain;
         gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.setTargetAtTime(.30, ctx.currentTime, .2);
+        gain.gain.setTargetAtTime(.27, ctx.currentTime, .25);
         source.connect(filter);
         filter.connect(gain);
         gain.connect(ctx.destination);
