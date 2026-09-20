@@ -661,12 +661,15 @@ h2 {
   line-height:1.6
 }
 .project-cover {
+  display:block;
   width:100%;
   height:auto;
-  max-height:740px;
+  aspect-ratio:1600 / 687;
   object-fit:contain;
-  background:#eae6de
+  background:#f6f5f3
 }
+.project-cover[src$="sixth-complete.webp"] { background:#000 }
+.project-cover[src$="notion-audio-upload.webp"] { background:linear-gradient(90deg, #f6f5f3 50%, #3c28b7 50%) }
 .project-outcomes {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -701,10 +704,13 @@ h2 {
   margin-bottom:23px
 }
 .project-gallery {
+  display:block;
   width:100%;
   height:auto;
+  aspect-ratio:16 / 9;
+  object-fit:contain;
   margin-top:30px;
-  background:#eae6de
+  background:#f6f5f3
 }
 .next-project {
   display:flex;

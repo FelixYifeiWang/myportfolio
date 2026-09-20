@@ -16,3 +16,16 @@ const categories = ['New interfaces', 'Software & AI', 'Physical systems'];
     </details>)}
   </section>)}
 </div>
+<script>
+  import { DisclosureMotion } from '../diner/disclosure-motion';
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLDetailsElement>('.side-dish').forEach(details => {
+    const summary = details.querySelector<HTMLElement>('summary')!;
+    const content = details.querySelector<HTMLElement>('.side-dish-detail')!;
+    const motion = new DisclosureMotion(details, summary, content, () => reduced.matches);
+    summary.addEventListener('click', event => {
+      event.preventDefault();
+      motion.toggle();
+    });
+  });
+</script>

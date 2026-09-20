@@ -62,10 +62,11 @@ test('À la carte contains seven inline disclosures without individual supportin
 test('new featured stories distinguish shipped work and prototype scope, with lightweight imagery', () => {
     const notion = readFileSync('dist/work/notion-ai-meeting-notes/index.html', 'utf8');
     const sixth = readFileSync('dist/work/sixth/index.html', 'utf8');
-    assert.ok(notion.includes('playback was rolling out'));
+    assert.ok(notion.includes('I built Bring Your Own File'));
+    assert.ok(notion.includes('I also worked on Granola migration'));
     assert.ok(sixth.includes('field validation remains future work'));
     assert.ok(sixth.includes('AI architecture &amp; offline decision logic'));
-    for (const name of ['sixth-complete', 'sixth-personalization', 'notion-meeting-notes', 'notion-summary']) {
+    for (const name of ['sixth-complete', 'sixth-personalization', 'notion-audio-upload', 'notion-meeting-library']) {
         assert.ok(statSync(`public/images/${name}.webp`).size < 250000);
     }
 });
