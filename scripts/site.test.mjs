@@ -62,3 +62,13 @@ test('icon-only landing utilities retain accessible names', () => {
     assert.ok(tag && /aria-label="[^"]+"/.test(tag[0]), `${id} needs an accessible name`);
   }
 });
+
+
+test('all four stools expose individually named keyboard controls', () => {
+  const html = readFileSync(join(out, 'index.html'), 'utf8');
+  for (let index = 1; index <= 4; index++) {
+    const button = [...html.matchAll(/<button\b[^>]*>/g)].find(match => match[0].includes(`data-action="seat-${index}"`));
+    assert.ok(button && button[0].includes(`aria-label="Sit at seat ${index},`));
+  }
+  assert.ok(!html.includes('id="take-seat"'));
+});

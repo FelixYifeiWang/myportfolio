@@ -7,7 +7,8 @@ import { SeatedLook } from './seated-look';
 import { loadDinerCat } from './cat';
 import { loadDinerProps } from './assets';
 import { buildDiner, type ObjectName } from './models';
-type View = ObjectName | 'room' | 'seat';
+import { seats, isSeat } from './seats';
+type View = ObjectName | 'room';
 export interface DinerScene {
     focus: (name: View, remember?: boolean) => void;
     restoreView: () => void;
@@ -29,8 +30,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     const resetButton = document.querySelector<HTMLButtonElement>('#reset-view')!;
     const controlsHelp = document.querySelector<HTMLElement>('#controls-help')!;
     const orbitHelp = window.matchMedia('(pointer: coarse)').matches
-        ? 'Drag to look around. Pinch to move closer.'
-        : 'Drag to look around. Scroll to move closer.';
+        ? 'Drag to look around. Pinch to move closer. Choose a stool to sit.'
+        : 'Drag to look around. Scroll to move closer. Choose a stool to sit.';
     // Native MSAA keeps small objects crisp without a full-screen postprocessing chain.
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'default' });
     renderer.info.autoReset = false;
@@ -116,23 +117,23 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     } | null = null;
     let width = 1, height = 1;
     const views = {
-        seat: { position: new THREE.Vector3(1, 2.85, 2.75), target: new THREE.Vector3(-.15, 2.1, -2.7) },
+        ...seats,
         menu: { position: new THREE.Vector3(1.8, 4.5, 4.7), target: new THREE.Vector3(.05, 1.6, 0) },
         notebook: { position: new THREE.Vector3(-.2, 4.3, 4.8), target: new THREE.Vector3(-1.5, 1.65, 0) },
         cat: { position: new THREE.Vector3(-1.6, 3, 3.5), target: new THREE.Vector3(-3.32, 2.19, .08) },
         record: { position: new THREE.Vector3(4.7, 3.5, 3.4), target: new THREE.Vector3(2.7, 1.9, -.25) },
         about: { position: new THREE.Vector3(2.2, 3.5, 4), target: new THREE.Vector3(-.6, 2.4, -2.9) },
     };
-    const seatedLook = new SeatedLook(views.seat.position, views.seat.target);
+    let seatedLook = new SeatedLook(seats['seat-3'].position, seats['seat-3'].target);
     function syncControls() {
-        controls.enabled = !paused && currentView !== 'seat' && (!transition || transition.interruptible);
-        shell.classList.toggle('is-seated', currentView === 'seat');
+        controls.enabled = !paused && !isSeat(currentView) && (!transition || transition.interruptible);
+        shell.classList.toggle('is-seated', isSeat(currentView));
         resetButton.hidden = currentView === 'room' && !manualView;
-        controlsHelp.textContent = currentView === 'seat' ? 'Drag or use arrow keys to look around. Escape returns to the room.' : orbitHelp;
+        controlsHelp.textContent = isSeat(currentView) ? 'Drag or use arrow keys to look around. Escape returns to the room.' : orbitHelp;
     }
     function finishCameraMove() {
         transition = null;
-        if (currentView === 'seat') {
+        if (isSeat(currentView)) {
             seatedLook.reset(controls.target);
             seatedLook.apply(camera);
         }
@@ -157,6 +158,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             savedView = { position: (transition?.to ?? camera.position).clone(), target: (transition?.target ?? controls.target).clone(), view: currentView, manual: manualView, exploring: shell.classList.contains('is-exploring') };
         }
         currentView = name;
+        if (isSeat(name)) seatedLook = new SeatedLook(seats[name].position, seats[name].target);
         manualView = false;
         shell.classList.toggle('is-exploring', name !== 'room');
         const target = name === 'room' ? roomTarget : views[name].target;
@@ -237,7 +239,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         camera.updateMatrixWorld();
         for (const hotspot of hotspots) {
             projected.copy(hotspot.point).project(camera);
-            const hidden = paused || projected.z > 1 || Math.abs(projected.x) > .95 || Math.abs(projected.y) > .85;
+            const hidden = paused || (isSeat(hotspot.button.dataset.hotspot!) && (currentView !== 'room' || !!transition && !transition.interruptible)) || projected.z > 1 || Math.abs(projected.x) > .95 || Math.abs(projected.y) > .85;
             hotspot.button.hidden = hidden;
             if (hidden)
                 continue;
@@ -256,7 +258,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         const rect = canvas.getBoundingClientRect();
         pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
         raycaster.setFromCamera(pointer, camera);
-        return raycaster.intersectObjects(world.interactives, true)[0]?.object.userData.action as ObjectName | undefined;
+        const objects = currentView === 'room' ? world.interactives : world.interactives.filter(object => !isSeat(object.userData.action));
+        return raycaster.intersectObjects(objects, true)[0]?.object.userData.action as ObjectName | undefined;
     }
     function stopSeatedDrag() {
         if (seatedPointer === null) return;
@@ -273,7 +276,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         }
         else
             multiplePointers = true;
-        if (currentView === 'seat' && !paused && !transition && pointerIds.size === 1 && event.button === 0) {
+        if (isSeat(currentView) && !paused && !transition && pointerIds.size === 1 && event.button === 0) {
             seatedPointer = event.pointerId;
             seatedDragged = false;
             lastSeatedPointer.set(event.clientX, event.clientY);
@@ -319,7 +322,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         hotspots.forEach(({ button }) => button.classList.toggle('object-hovered', button.dataset.hotspot === action));
     }
     function seatedKeyDown(event: KeyboardEvent) {
-        if (currentView !== 'seat' || paused || transition || event.altKey || event.ctrlKey || event.metaKey) return;
+        if (!isSeat(currentView) || paused || transition || event.altKey || event.ctrlKey || event.metaKey) return;
         const amount = height / 32;
         const directions: Record<string, [number, number]> = {
             ArrowLeft: [amount, 0], ArrowRight: [-amount, 0],
@@ -365,7 +368,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     function visibilityChanged() {
         if (document.hidden) {
             stopSeatedDrag();
-            if (currentView === 'seat' && !transition) seatedLook.reset(controls.target);
+            if (isSeat(currentView) && !transition) seatedLook.reset(controls.target);
             stopIntro();
             stopScheduledFrame();
         }
@@ -408,14 +411,14 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             camera.lookAt(controls.target);
             if (progress === 1) finishCameraMove();
         }
-        else if (currentView === 'seat') {
+        else if (isSeat(currentView)) {
             cameraChanged = !paused && seatedLook.update(delta, reduced.matches);
             seatedLook.apply(camera);
             controls.target.copy(seatedLook.target);
         }
         else cameraChanged = controls.update();
         // Reveal the roof only after the arriving camera is below it and inside the room.
-        const underCeiling = currentView === 'seat' && camera.position.y < 4.9 && camera.position.z < 3.9 && Math.abs(camera.position.x) < 4.9;
+        const underCeiling = isSeat(currentView) && camera.position.y < 4.9 && camera.position.z < 3.9 && Math.abs(camera.position.x) < 4.9;
         moving = world.ceiling.update(delta, underCeiling, reduced.matches) || moving;
         if (!paused && !reduced.matches) {
             world.cat.scale.y = 1 + Math.sin(elapsed * (now < petUntil ? 2.1 : 1.4)) * .009;
@@ -485,6 +488,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
                 return;
             }
             currentView = savedView.view;
+            if (isSeat(currentView)) seatedLook = new SeatedLook(seats[currentView].position, seats[currentView].target);
             manualView = savedView.manual;
             shell.classList.toggle('is-exploring', savedView.exploring);
             moveCamera(savedView.position, savedView.target);

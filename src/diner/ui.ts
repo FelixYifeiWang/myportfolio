@@ -9,7 +9,6 @@ export function initDiner() {
     const back = document.querySelector<HTMLButtonElement>('#panel-back')!;
     const close = document.querySelector<HTMLButtonElement>('#panel-close')!;
     const sound = document.querySelector<HTMLButtonElement>('#sound-toggle')!;
-    const takeSeat = document.querySelector<HTMLButtonElement>('#take-seat')!;
     const viewOptions = document.querySelector<HTMLDetailsElement>('#view-options')!;
     const viewOptionsToggle = document.querySelector<HTMLElement>('#view-options-toggle')!;
     const toast = document.querySelector<HTMLElement>('#scene-toast')!;
@@ -87,6 +86,16 @@ export function initDiner() {
         }
     }
     function action(name: ObjectName) {
+        if (name.startsWith('seat-')) {
+            if (!scene) return;
+            clearTimeout(openTimer);
+            viewOptions.open = false;
+            shell.classList.add('hint-dismissed');
+            scene.focus(name);
+            canvas.focus({ preventScroll: true });
+            announce('Drag or use arrow keys to look around.');
+            return;
+        }
         if (name === 'record') {
             void toggleSound();
             return;
@@ -128,7 +137,6 @@ export function initDiner() {
                 closePanel();
         }
     });
-    takeSeat.addEventListener('click', () => { viewOptions.open = false; shell.classList.add('hint-dismissed'); scene?.focus('seat'); canvas.focus({ preventScroll: true }); announce('Drag or use arrow keys to look around.'); });
     document.querySelector('#reset-view')!.addEventListener('click', () => { viewOptions.open = false; clearTimeout(openTimer); scene?.focus('room'); canvas.focus({ preventScroll: true }); });
     document.addEventListener('pointerdown', event => {
         if (event.target instanceof Node && !viewOptions.contains(event.target)) viewOptions.open = false;
@@ -153,7 +161,6 @@ export function initDiner() {
     window.addEventListener('hashchange', fromHash);
     fromHash();
     function fallback() {
-        takeSeat.disabled = true;
         shell.classList.add('scene-unavailable');
         shell.classList.remove('scene-ready');
         const loading = document.querySelector<HTMLElement>('#scene-loading')!;
@@ -164,7 +171,6 @@ export function initDiner() {
     import('./scene').then(module => module.createDiner(canvas, action)).then(result => {
         scene = result;
         shell.classList.add('scene-ready');
-        takeSeat.disabled = false;
         hintTimer = setTimeout(() => shell.classList.add('hint-dismissed'), 8000);
         document.querySelector('#scene-loading')!.setAttribute('aria-hidden', 'true');
         if (dialog.open)

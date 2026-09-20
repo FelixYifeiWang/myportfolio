@@ -7,7 +7,8 @@ import { createWindowRain, type WindowRain } from './rain';
 import { createSeatedCeiling } from './ceiling';
 import { placeProp, type DinerProps } from './assets';
 import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, windowBeadsTexture } from './textures';
-export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about';
+import { seats, type SeatName } from './seats';
+export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about' | SeatName;
 export interface DinerWorld {
     group: THREE.Group;
     targets: Record<ObjectName, THREE.Vector3>;
@@ -246,8 +247,10 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         mount.rotation.x = Math.PI / 2;
         line([[x, .27, .44], [x, .27, .75], [x, .32, .92]], .018, palette.brass, group);
     }
-    for (const x of [-3, -1, 1, 3])
-        placeProp(props.stool, 1.16, new THREE.Vector3(x, .025, 1.75), x * .06, group);
+    for (const [name, seat] of Object.entries(seats)) {
+        const stool = placeProp(props.stool, 1.16, seat.stool, seat.stool.x * .06, group);
+        interactive(name as SeatName, stool, new THREE.Vector3(seat.stool.x, 1.2, seat.stool.z));
+    }
     for (const x of [-2.8, 0, 3.35])
         pendant(x, 4.38, -.15, group);
     // A real menu on the counter. Both raycasting and keyboard controls can pick it up.

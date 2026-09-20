@@ -2,6 +2,7 @@
 import '../styles/fonts.css';
 import '../styles/diner.css';
 import { projects } from '../data/projects';
+import { seats } from '../diner/seats';
 ---
 <!doctype html>
 <html lang="en">
@@ -36,18 +37,22 @@ import { projects } from '../data/projects';
         <button class="hotspot" data-hotspot="cat" data-action="cat" aria-label="Say hello to the sleeping cat" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The manager</span></button>
         <button class="hotspot" data-hotspot="record" data-action="record" aria-label="Play or pause the record player" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Set the mood</span></button>
         <button class="hotspot" data-hotspot="about" data-action="about" aria-label="Meet Felix, the person behind the counter" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Meet the host</span></button>
+        {Object.keys(seats).map((name, index) => (
+          <button class="hotspot seat-hotspot" data-hotspot={name} data-action={name} aria-label={`Sit at seat ${index + 1}, ${['left end', 'left center', 'right center', 'right end'][index]} of the counter`} hidden>
+            <span class="seat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v7m-3-3 3 3 3-3M6 13h12v3H6zM8 16l-1 5m9-5 1 5M8 19h8" /></svg></span>
+          </button>
+        ))}
       </div>
       <div class="scene-toast" id="scene-toast" role="status" aria-live="polite"></div>
       <footer class="diner-controls">
-        <p class="gesture-hint" id="gesture-hint">Drag to look around</p>
-        <button id="take-seat" class="take-seat" disabled>Take a seat <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></button>
+        <p class="gesture-hint" id="gesture-hint">Drag to explore · Pick a stool to sit</p>
         <div class="utility-controls">
           <button id="reset-view" class="utility-button" aria-label="Return to the wide view of the diner" title="Room view" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6" /></svg></button>
           <details class="scene-options" id="view-options">
             <summary class="utility-button" id="view-options-toggle" aria-label="View options" title="View options"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></svg></summary>
             <div class="options-menu">
               <p class="options-heading">Make yourself at home</p>
-              <p id="controls-help">Drag to look around. Scroll to move closer.</p>
+              <p id="controls-help">Drag to look around. Scroll to move closer. Choose a stool to sit.</p>
               <a href="/work/">Simple portfolio <span aria-hidden="true">↗</span></a>
             </div>
           </details>
