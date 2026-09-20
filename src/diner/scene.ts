@@ -81,6 +81,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     let multiplePointers = false;
     let transition: {
         start: number;
+        duration: number;
+        interruptible: boolean;
         from: THREE.Vector3;
         to: THREE.Vector3;
         fromTarget: THREE.Vector3;
@@ -142,8 +144,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         const offset = view.position.clone().sub(view.target);
         return offset.setLength(Math.max(offset.length(), 1.02 / Math.sin(limitingAngle))).add(view.target);
     }
-    function moveCamera(to: THREE.Vector3, target: THREE.Vector3) {
-        controls.enabled = false;
+    function moveCamera(to: THREE.Vector3, target: THREE.Vector3, { duration = 1100, interruptible = false } = {}) {
+        controls.enabled = !paused && interruptible;
         if (reduced.matches) {
             camera.position.copy(to);
             controls.target.copy(target);
@@ -152,8 +154,14 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             controls.enabled = !paused;
         }
         else {
-            transition = { start: performance.now(), from: camera.position.clone(), to: to.clone(), fromTarget: controls.target.clone(), target: target.clone() };
+            transition = { start: performance.now(), duration, interruptible, from: camera.position.clone(), to: to.clone(), fromTarget: controls.target.clone(), target: target.clone() };
         }
+        wake();
+    }
+    function stopIntro() {
+        if (!transition?.interruptible) return;
+        transition = null;
+        controls.enabled = !paused;
         wake();
     }
     function setResolution() {
@@ -171,6 +179,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         roomPosition.set(small ? 12.8 : 10, small ? 10.5 : 7.6, small ? 16.8 : 12.3);
         if (small)
             roomPosition.multiplyScalar(Math.max(1, .68 / aspect));
+        // Let the counter details fill the view; portrait screens retain more room at the edges.
+        roomPosition.sub(roomTarget).multiplyScalar(small ? .92 : .82).add(roomTarget);
         // Keep the room clear when a narrow viewport needs a more distant camera.
         const fog = scene.fog as THREE.Fog;
         fog.near = Math.max(23, roomPosition.length() + 8);
@@ -249,6 +259,9 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     controls.addEventListener('start', startInteraction);
     controls.addEventListener('end', endInteraction);
     controls.addEventListener('change', wake);
+    shell.addEventListener('pointerdown', stopIntro, true);
+    shell.addEventListener('wheel', stopIntro, { capture: true, passive: true });
+    shell.addEventListener('keydown', stopIntro, true);
     canvas.addEventListener('pointerdown', pointerDown);
     canvas.addEventListener('pointerup', pointerUp);
     canvas.addEventListener('pointercancel', pointerCancel);
@@ -261,8 +274,10 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         timer = undefined;
     }
     function visibilityChanged() {
-        if (document.hidden)
+        if (document.hidden) {
+            stopIntro();
             stopScheduledFrame();
+        }
         else {
             last = performance.now();
             wake();
@@ -295,7 +310,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         elapsed += delta;
         const moving = !!transition || interacting || now - lastMovement < 250;
         if (transition) {
-            const progress = Math.min((now - transition.start) / 1100, 1);
+            const progress = Math.min((now - transition.start) / transition.duration, 1);
             const t = progress < .5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
             camera.position.lerpVectors(transition.from, transition.to, t);
             controls.target.lerpVectors(transition.fromTarget, transition.target, t);
@@ -357,8 +372,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     await renderer.compileAsync(scene, camera);
     ready = true;
     if (!reduced.matches) {
-        camera.position.multiplyScalar(1.04);
-        focus('room');
+        camera.position.copy(roomPosition).sub(roomTarget).multiplyScalar(1.04 / (compact() ? .92 : .82)).add(roomTarget);
+        moveCamera(roomPosition, roomTarget, { duration: 5200, interruptible: true });
     }
     else
         wake();
@@ -377,7 +392,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         },
         petCat() { petUntil = performance.now() + 2600; focus('cat'); },
         setPlaying(value) { playing = value; wake(); },
-        setPaused(value) { paused = value; controls.enabled = !value && !transition; updateHotspots(); wake(); },
+        setPaused(value) { paused = value; if (value) stopIntro(); controls.enabled = !value && (!transition || transition.interruptible); updateHotspots(); wake(); },
         dispose() {
             disposed = true;
             stopScheduledFrame();
@@ -385,6 +400,9 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             controls.dispose();
             document.removeEventListener('visibilitychange', visibilityChanged);
             reduced.removeEventListener('change', motionChanged);
+            shell.removeEventListener('pointerdown', stopIntro, true);
+            shell.removeEventListener('wheel', stopIntro, true);
+            shell.removeEventListener('keydown', stopIntro, true);
             canvas.removeEventListener('pointerdown', pointerDown);
             canvas.removeEventListener('pointerup', pointerUp);
             canvas.removeEventListener('pointercancel', pointerCancel);
