@@ -123,7 +123,7 @@ export function initDiner() {
                 closePanel();
         }
     });
-    document.querySelector('#take-seat')!.addEventListener('click', () => { scene?.focus('seat'); announce('Make yourself at home. The menu is right in front of you.'); });
+    document.querySelector('#take-seat')!.addEventListener('click', () => { scene?.focus('seat'); canvas.focus({ preventScroll: true }); announce('Make yourself at home. Drag or use the arrow keys to look around.'); });
     document.querySelector('#reset-view')!.addEventListener('click', () => { clearTimeout(openTimer); scene?.focus('room'); });
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && !dialog.open) {

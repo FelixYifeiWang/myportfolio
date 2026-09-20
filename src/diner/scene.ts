@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { batchStaticMeshes } from './optimize';
+import { SeatedLook } from './seated-look';
 import { loadDinerCat } from './cat';
 import { loadDinerProps } from './assets';
 import { buildDiner, type ObjectName } from './models';
@@ -25,6 +26,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     const shell = canvas.closest('.diner-shell')!;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const compact = () => canvas.clientWidth < 700;
+    const gestureHint = document.querySelector<HTMLElement>('#gesture-hint')!;
+    const orbitHint = gestureHint.textContent;
     // Native MSAA keeps small objects crisp without a full-screen postprocessing chain.
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'default' });
     renderer.info.autoReset = false;
@@ -80,6 +83,9 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     const down = new THREE.Vector2();
     const pointerIds = new Set<number>();
     let multiplePointers = false;
+    let seatedPointer: number | null = null;
+    let seatedDragged = false;
+    const lastSeatedPointer = new THREE.Vector2();
     let transition: {
         start: number;
         duration: number;
@@ -107,13 +113,27 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     } | null = null;
     let width = 1, height = 1;
     const views = {
-        seat: { position: new THREE.Vector3(.4, 2.85, 5.1), target: new THREE.Vector3(-.15, 2.6, -2.7) },
+        seat: { position: new THREE.Vector3(1, 2.85, 1.95), target: new THREE.Vector3(-.15, 2.1, -2.7) },
         menu: { position: new THREE.Vector3(1.8, 4.5, 4.7), target: new THREE.Vector3(.05, 1.6, 0) },
         notebook: { position: new THREE.Vector3(-.2, 4.3, 4.8), target: new THREE.Vector3(-1.5, 1.65, 0) },
         cat: { position: new THREE.Vector3(-1.6, 3, 3.5), target: new THREE.Vector3(-3.32, 2.19, .08) },
         record: { position: new THREE.Vector3(4.7, 3.5, 3.4), target: new THREE.Vector3(2.7, 1.9, -.25) },
         about: { position: new THREE.Vector3(2.2, 3.5, 4), target: new THREE.Vector3(-.6, 2.4, -2.9) },
     };
+    const seatedLook = new SeatedLook(views.seat.position, views.seat.target);
+    function syncControls() {
+        controls.enabled = !paused && currentView !== 'seat' && (!transition || transition.interruptible);
+        gestureHint.textContent = currentView === 'seat' ? 'Drag to look around from your seat' : orbitHint;
+    }
+    function finishCameraMove() {
+        transition = null;
+        if (currentView === 'seat') {
+            seatedLook.reset(controls.target);
+            seatedLook.apply(camera);
+        }
+        else camera.lookAt(controls.target);
+        syncControls();
+    }
     function wake() {
         dirty = true;
         if (!ready || disposed || document.hidden || rendering || frame)
@@ -125,6 +145,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         frame = requestAnimationFrame(update);
     }
     function focus(name: View, remember = false) {
+        stopSeatedDrag();
         if (remember)
             savedView = { position: camera.position.clone(), target: controls.target.clone(), view: currentView, manual: manualView, exploring: shell.classList.contains('is-exploring') };
         currentView = name;
@@ -146,23 +167,22 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         return offset.setLength(Math.max(offset.length(), 1.02 / Math.sin(limitingAngle))).add(view.target);
     }
     function moveCamera(to: THREE.Vector3, target: THREE.Vector3, { duration = 1100, interruptible = false } = {}) {
-        controls.enabled = !paused && interruptible;
+        controls.enabled = false;
         if (reduced.matches) {
             camera.position.copy(to);
             controls.target.copy(target);
-            transition = null;
-            controls.update();
-            controls.enabled = !paused;
+            finishCameraMove();
         }
         else {
             transition = { start: performance.now(), duration, interruptible, from: camera.position.clone(), to: to.clone(), fromTarget: controls.target.clone(), target: target.clone() };
         }
+        syncControls();
         wake();
     }
     function stopIntro() {
         if (!transition?.interruptible) return;
         transition = null;
-        controls.enabled = !paused;
+        syncControls();
         wake();
     }
     function setResolution() {
@@ -194,13 +214,13 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             camera.position.copy(roomPosition);
             controls.target.copy(roomTarget);
             transition = null;
-            controls.enabled = !paused;
+            syncControls();
         }
         else if (currentView === 'cat' && !manualView) {
             camera.position.copy(viewPosition('cat'));
             controls.target.copy(views.cat.target);
             transition = null;
-            controls.enabled = !paused;
+            syncControls();
         }
         setResolution();
         wake();
@@ -229,6 +249,13 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         raycaster.setFromCamera(pointer, camera);
         return raycaster.intersectObjects(world.interactives, true)[0]?.object.userData.action as ObjectName | undefined;
     }
+    function stopSeatedDrag() {
+        if (seatedPointer === null) return;
+        const id = seatedPointer;
+        seatedPointer = null;
+        if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
+        endInteraction();
+    }
     function pointerDown(event: PointerEvent) {
         pointerIds.add(event.pointerId);
         if (pointerIds.size === 1) {
@@ -237,23 +264,60 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         }
         else
             multiplePointers = true;
+        if (currentView === 'seat' && !paused && !transition && pointerIds.size === 1 && event.button === 0) {
+            seatedPointer = event.pointerId;
+            seatedDragged = false;
+            lastSeatedPointer.set(event.clientX, event.clientY);
+            canvas.setPointerCapture(event.pointerId);
+            canvas.focus({ preventScroll: true });
+            startInteraction();
+        }
     }
     function pointerUp(event: PointerEvent) {
         pointerIds.delete(event.pointerId);
-        if (!multiplePointers && !paused && Math.hypot(event.clientX - down.x, event.clientY - down.y) < 6) {
+        const wasSeatedDrag = seatedPointer === event.pointerId && seatedDragged;
+        if (seatedPointer === event.pointerId) stopSeatedDrag();
+        if (!multiplePointers && !wasSeatedDrag && !paused && !transition && Math.hypot(event.clientX - down.x, event.clientY - down.y) < 6) {
             const action = hit(event);
             if (action)
                 select(action);
         }
     }
-    function pointerCancel(event: PointerEvent) { pointerIds.delete(event.pointerId); multiplePointers = true; }
+    function pointerCancel(event: PointerEvent) {
+        pointerIds.delete(event.pointerId);
+        multiplePointers = true;
+        if (seatedPointer === event.pointerId) stopSeatedDrag();
+    }
     function pointerMove(event: PointerEvent) {
+        if (seatedPointer === event.pointerId) {
+            if (!multiplePointers && !paused && !transition) {
+                if (Math.hypot(event.clientX - down.x, event.clientY - down.y) >= 6) seatedDragged = true;
+                if (seatedDragged) seatedLook.drag(event.clientX - lastSeatedPointer.x, event.clientY - lastSeatedPointer.y, height);
+                lastSeatedPointer.set(event.clientX, event.clientY);
+                wake();
+            }
+            return;
+        }
         if (interacting || paused || performance.now() - lastHover < 50)
             return;
         lastHover = performance.now();
         const action = hit(event);
         canvas.style.cursor = action ? 'pointer' : 'grab';
         hotspots.forEach(({ button }) => button.classList.toggle('object-hovered', button.dataset.hotspot === action));
+    }
+    function seatedKeyDown(event: KeyboardEvent) {
+        if (currentView !== 'seat' || paused || transition || event.altKey || event.ctrlKey || event.metaKey) return;
+        const amount = height / 32;
+        const directions: Record<string, [number, number]> = {
+            ArrowLeft: [amount, 0], ArrowRight: [-amount, 0],
+            ArrowUp: [0, amount], ArrowDown: [0, -amount],
+        };
+        const direction = directions[event.key];
+        if (!direction) return;
+        event.preventDefault();
+        manualView = true;
+        seatedLook.drag(...direction, height);
+        wake();
     }
     function startInteraction() { manualView = true; interacting = true; lastMovement = performance.now(); shell.classList.add('is-exploring'); wake(); }
     function endInteraction() { interacting = false; lastMovement = performance.now(); wake(); }
@@ -267,6 +331,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     canvas.addEventListener('pointerup', pointerUp);
     canvas.addEventListener('pointercancel', pointerCancel);
     canvas.addEventListener('pointermove', pointerMove);
+    canvas.addEventListener('lostpointercapture', pointerCancel);
+    canvas.addEventListener('keydown', seatedKeyDown);
     function stopScheduledFrame() {
         cancelAnimationFrame(frame);
         frame = 0;
@@ -276,6 +342,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     }
     function visibilityChanged() {
         if (document.hidden) {
+            stopSeatedDrag();
+            if (currentView === 'seat' && !transition) seatedLook.reset(controls.target);
             stopIntro();
             stopScheduledFrame();
         }
@@ -289,8 +357,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         if (reduced.matches && transition) {
             camera.position.copy(transition.to);
             controls.target.copy(transition.target);
-            transition = null;
-            controls.enabled = !paused;
+            finishCameraMove();
         }
         wake();
     }
@@ -310,17 +377,21 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         last = now;
         elapsed += delta;
         const moving = !!transition || interacting || now - lastMovement < 250;
+        let cameraChanged = !!transition;
         if (transition) {
             const progress = Math.min((now - transition.start) / transition.duration, 1);
             const t = progress < .5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
             camera.position.lerpVectors(transition.from, transition.to, t);
             controls.target.lerpVectors(transition.fromTarget, transition.target, t);
-            if (progress === 1) {
-                transition = null;
-                controls.enabled = !paused;
-            }
+            camera.lookAt(controls.target);
+            if (progress === 1) finishCameraMove();
         }
-        const cameraChanged = controls.update();
+        else if (currentView === 'seat') {
+            cameraChanged = !paused && seatedLook.update(delta, reduced.matches);
+            seatedLook.apply(camera);
+            controls.target.copy(seatedLook.target);
+        }
+        else cameraChanged = controls.update();
         if (!paused && !reduced.matches) {
             world.cat.scale.y = 1 + Math.sin(elapsed * (now < petUntil ? 2.1 : 1.4)) * .009;
             if (playing)
@@ -381,6 +452,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     return {
         focus,
         restoreView() {
+            stopSeatedDrag();
             if (!savedView) {
                 focus('room');
                 return;
@@ -393,9 +465,16 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         },
         petCat() { petUntil = performance.now() + 2600; focus('cat'); },
         setPlaying(value) { playing = value; wake(); },
-        setPaused(value) { paused = value; if (value) stopIntro(); controls.enabled = !value && (!transition || transition.interruptible); updateHotspots(); wake(); },
+        setPaused(value) {
+            paused = value;
+            if (value) { stopIntro(); stopSeatedDrag(); }
+            syncControls();
+            updateHotspots();
+            wake();
+        },
         dispose() {
             disposed = true;
+            stopSeatedDrag();
             stopScheduledFrame();
             observer.disconnect();
             controls.dispose();
@@ -408,6 +487,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             canvas.removeEventListener('pointerup', pointerUp);
             canvas.removeEventListener('pointercancel', pointerCancel);
             canvas.removeEventListener('pointermove', pointerMove);
+            canvas.removeEventListener('lostpointercapture', pointerCancel);
+            canvas.removeEventListener('keydown', seatedKeyDown);
             canvas.removeEventListener('webglcontextlost', onLost);
             const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>(), textures = new Set<THREE.Texture>();
             scene.traverse(object => {
