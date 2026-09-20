@@ -33,11 +33,10 @@ export function placeDoorwayVisitor(visitor: THREE.Group) {
     visitor.position.set(0, 0, 0);
     const bounds = new THREE.Box3().setFromObject(visitor, true);
     const peekOffset = visitor.userData.peekOffset ?? 0;
-    // A broad visitor can peek beside the jamb, entirely outside the wall thickness.
-    visitor.position.set((peekOffset ? -5.25 : -5.12) - bounds.max.x, .04, 3.43 + peekOffset - bounds.max.z);
+    // Keep a small porch gap; lateral framing accommodates each source pose.
+    visitor.position.set(-5.40 - bounds.max.x, .04, 3.25 + peekOffset - bounds.max.z);
     maskDoorwayContent(visitor);
 }
-
 
 /** A quiet night gradient, clipped to the opening. No skyline or texture download. */
 export function createDoorwayNight() {
@@ -64,9 +63,24 @@ export function createDoorwayNight() {
 
 /** Broad porch bounce aimed outwards: readable faces without another shadow map. */
 export function createDoorwayLight() {
-    const light = new THREE.RectAreaLight('#f5d7ae', 2.2, 2.2, 2.8);
+    const light = new THREE.RectAreaLight('#ffe8ca', 2.7, 2.6, 3.2);
     light.name = 'Warm doorway bounce';
-    light.position.set(-4.95, 3.2, 4.2);
-    light.lookAt(-5.9, 1.65, 2.65);
+    light.position.set(-5.24, 2.55, 3.15);
+    light.lookAt(-6.5, 2.55, 3.15);
     return light;
+}
+
+/** Solid porch return separates the entrance from the window's miniature scenery. */
+export function createDoorwaySideWall(grain?: THREE.Texture) {
+    const wall = new THREE.Group();
+    wall.name = 'Window-side porch wall';
+    const plaster = new THREE.MeshStandardMaterial({ color: '#58605a', roughness: .94, bumpMap: grain, bumpScale: .022 });
+    const base = new THREE.MeshStandardMaterial({ color: '#303b37', roughness: .82 });
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(3.6, 4.8, .20), plaster);
+    panel.position.set(-6.84, 2.4, 1.70);
+    const skirting = new THREE.Mesh(new THREE.BoxGeometry(3.6, .35, .22), base);
+    skirting.position.set(-6.84, .18, 1.70);
+    wall.add(panel, skirting);
+    maskDoorwayContent(wall);
+    return wall;
 }

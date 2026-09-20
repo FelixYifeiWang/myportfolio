@@ -28,6 +28,12 @@ temporary.writeUInt32LE(chunk.length, 12); temporary.writeUInt32LE(0x4e4f534a, 1
 chunk.copy(temporary, 20); bytes.copy(temporary, 20 + chunk.length, 20 + jsonLength);
 const gltf = await new GLTFLoader().parseAsync(temporary.buffer.slice(temporary.byteOffset, temporary.byteOffset + temporary.byteLength), '');
 gltf.scene.updateMatrixWorld(true);
+if ((id === 'mime-raw' || id === 'jar-raw') && gltf.animations.length) {
+    const pose = new THREE.AnimationMixer(gltf.scene);
+    pose.clipAction(gltf.animations[0]).play();
+    pose.setTime(id === 'mime-raw' ? 1.0 : .1);
+    gltf.scene.updateMatrixWorld(true);
+}
 if (id === 'link') {
     gltf.scene.traverse(object => {
         if (!/^Arm_1_[LR]_\d+$/.test(object.name) || !object.parent) return;
@@ -37,8 +43,8 @@ if (id === 'link') {
         gltf.scene.updateMatrixWorld(true);
     });
 }
-if (id === 'joker' || id === 'kim') {
-    const shoulders = id === 'joker' ? [['bone_18_019', -.55], ['bone_19_020', .55]] : [['mixamorigLeftArm_08', -.36], ['mixamorigRightArm_020', .36]];
+if (id === 'joker' || id === 'kim' || id === 'jinx') {
+    const shoulders = id === 'jinx' ? [['upperarm_l_26', -.58], ['upperarm_r_55', .58]] : id === 'joker' ? [['bone_18_019', -.55], ['bone_19_020', .55]] : [['mixamorigLeftArm_08', -.36], ['mixamorigRightArm_020', .36]];
     for (const [name, angle] of shoulders) {
         const bone = gltf.scene.getObjectByName(name);
         if (!bone?.parent) throw new Error(`Missing visitor shoulder: ${name}`);
@@ -112,7 +118,7 @@ for (const node of baked) bakedScene.addChild(node);
 root.setDefaultScene(bakedScene);
 for (const animation of root.listAnimations()) animation.dispose();
 // Retain float positions: this source's closely layered clothing flickers when quantized.
-await document.transform(prune(), dedup(), weld(), join(), textureCompress({ encoder: sharp, targetFormat: 'webp', resize: ['chamber', 'ranni', 'esquie', 'wolf'].includes(id) ? [768, 768] : [1024, 1024], quality: ['chamber', 'ranni', 'esquie', 'wolf'].includes(id) ? 82 : 88 }));
-if (['ranni', 'jackie', 'esquie', 'shadowheart', 'wolf', 'astarion'].includes(id)) await document.transform(meshopt({ encoder: MeshoptEncoder, level: 'high', quantizePosition: 16, quantizeNormal: 10, quantizeTexcoord: 14 }));
+await document.transform(prune(), dedup(), weld(), join(), textureCompress({ encoder: sharp, targetFormat: 'webp', resize: ['chamber', 'ranni', 'esquie', 'wolf', 'mime'].includes(id) ? [768, 768] : [1024, 1024], quality: ['chamber', 'ranni', 'esquie', 'wolf', 'mime'].includes(id) ? 82 : 88 }));
+if (['ranni', 'jackie', 'esquie', 'shadowheart', 'wolf', 'astarion', 'jinx', 'mime', 'murloc', 'jar'].includes(id)) await document.transform(meshopt({ encoder: MeshoptEncoder, level: 'high', quantizePosition: 16, quantizeNormal: 10, quantizeTexcoord: 14 }));
 await io.write(destination, document);
 console.log(`${id}: ${(await fs.stat(destination)).size} bytes; ${root.listMeshes().reduce((n,m) => n + m.listPrimitives().length, 0)} material batches; ${root.listSkins().length} skins`);

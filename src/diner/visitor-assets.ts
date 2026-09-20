@@ -15,17 +15,16 @@ export const visitors: readonly VisitorSpec[] = [
     { id: 'eye', name: 'Eye of Cthulhu', url: '/models/visitors/eye.glb', height: 1.10, rotation: Math.PI * .34, elevation: 1.35 },
     { id: 'link', name: 'Link', url: '/models/visitors/link.glb', height: 2.75, rotation: Math.PI * .37 },
     { id: 'pikachu', name: 'Pikachu', url: '/models/visitors/pikachu.glb', height: 1.4, rotation: Math.PI / 2 },
+    { id: 'jinx', name: 'Jinx', url: '/models/visitors/jinx.glb', height: 2.65, rotation: Math.PI * .37 },
+    { id: 'murloc', name: 'Murloc', url: '/models/visitors/murloc.glb', height: 1.65, rotation: Math.PI * .37 },
+    { id: 'mime', name: 'Mime', url: '/models/visitors/mime.glb', height: 2.55, rotation: Math.PI * .32, peekOffset: -.18 },
+    { id: 'jar', name: 'Jar-Bairn', url: '/models/visitors/jar.glb', height: 1.35, rotation: Math.PI * .37 },
     { id: 'chamber', name: 'Chamber', url: '/models/visitors/chamber.glb', height: 2.8, rotation: -Math.PI * .13 },
-    { id: 'arthas', name: 'Arthas', url: '/models/visitors/arthas.glb', height: 2.8, rotation: Math.PI * .37, peekOffset: .02 },
     { id: 'joker', name: 'Joker', url: '/models/visitors/joker.glb', height: 2.8, rotation: Math.PI * .37 },
-    { id: 'azir', name: 'Azir', url: '/models/visitors/azir.glb', height: 2.6, rotation: Math.PI * .37, peekOffset: .15 },
-    { id: 'ranni', name: 'Ranni', url: '/models/visitors/ranni.glb', height: 2.8, rotation: Math.PI * .37, peekOffset: .15 },
     { id: 'byleth', name: 'Byleth', url: '/models/visitors/byleth.glb', height: 2.8, rotation: Math.PI * .37 },
     { id: 'jackie', name: 'Jackie Welles', url: '/models/visitors/jackie.glb', height: 2.8, rotation: Math.PI * .37 },
     { id: 'kim', name: 'Kim Kitsuragi', url: '/models/visitors/kim.glb', height: 2.8, rotation: Math.PI * .37 },
-    { id: 'astarion', name: 'Astarion', url: '/models/visitors/astarion.glb', height: 1.9, rotation: Math.PI * .37 },
     { id: 'wolf', name: 'Wolf', url: '/models/visitors/wolf.glb', height: 2.7, rotation: Math.PI * .37 },
-    { id: 'esquie', name: 'Esquie', url: '/models/visitors/esquie.glb', height: 2.8, rotation: Math.PI * .37, peekOffset: .15 },
 ];
 
 /** Preserve the artist's pose; fit the whole silhouette inside the entrance. */

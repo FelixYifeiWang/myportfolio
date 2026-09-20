@@ -41,15 +41,9 @@ for (const visitor of visitors) {
     const prepared = prepareVisitor(source, visitor);
     placeDoorwayVisitor(prepared);
     const bounds = new THREE.Box3().setFromObject(prepared, true);
-    assert.ok(bounds.max.x <= -5.119, 'Face or accessory intersects the closed leaf');
-    assert.ok(bounds.min.x > -7.24, 'Visitor intersects the back wall');
-    if (visitor.peekOffset) {
-      assert.ok(bounds.max.x <= -5.249, 'Peeking visitor intersects the outer wall surface');
-      assert.ok(bounds.min.z < 3.5 && bounds.max.z > 1.8, 'Peeking visitor misses the aperture');
-      assert.ok(visitor.peekOffset <= .65, 'Peek offset moves the face too far out of the opening');
-    } else {
-      assert.ok(bounds.min.z > 1.80 && bounds.max.z < 3.50, 'Visitor intersects a jamb');
-    }
+    assert.ok(bounds.max.x <= -5.399, 'Face or accessory intersects the closed leaf');
+    assert.ok(bounds.min.x > -8.1, 'Visitor intersects the back wall');
+    assert.ok(bounds.min.z > 1.81 && bounds.max.z < 3.65, 'Visitor intersects the porch side wall or misses the opening');
     assert.ok(bounds.min.y >= .039 && bounds.max.y < 3.67, 'Visitor intersects floor or lintel');
     assert.ok(bounds.max.y - bounds.min.y <= 2.801, 'Visitor exceeds the human height ceiling');
     const firstPosition = prepared.position.clone();

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { batchStaticMeshes } from './optimize';
-import { createDoorwayMask, maskDoorwayContent, createDoorwayNight, createDoorwayLight } from './doorway';
+import { createDoorwayMask, maskDoorwayContent, createDoorwayNight, createDoorwayLight, createDoorwaySideWall } from './doorway';
 import { createEntranceWall } from './entrance-wall';
 import { addFurnishings, addContactShadows, createBackCounter } from './furnishings';
 import type { DinerCat } from './cat';
@@ -375,7 +375,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     // An aperture mask keeps the exterior recess inside the real doorway silhouette.
     const doorstep = new THREE.Group();
     doorstep.name = 'Doorstep';
-    doorstep.add(createDoorwayNight());
+    doorstep.add(createDoorwayNight(), createDoorwaySideWall(plasterGrain));
     // Keep the outward-facing light registered even with the door shut, avoiding
     // lighting-program recompilation on each arrival. It has no shadow map.
     group.add(createDoorwayLight());
