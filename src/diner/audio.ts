@@ -115,6 +115,10 @@ export class DinerAudio {
             }, 1000);
         }
     }
+    private updateMix() {
+        if (!this.context || !this.volume) return;
+        this.volume.gain.setTargetAtTime(this.playing ? (this.purrWanted ? .28 : .42) : 0, this.context.currentTime, .3);
+    }
     private async setPlaying(playing: boolean) {
         const ctx = this.ensureContext(), request = ++this.request;
         this.cancelSuspend();
@@ -131,7 +135,7 @@ export class DinerAudio {
             this.playBar();
             this.timer = setInterval(() => this.playBar(), 240000 / tracks[this.index].bpm);
         }
-        this.volume?.gain.setTargetAtTime(this.playing ? .42 : 0, ctx.currentTime, .18);
+        this.updateMix();
         this.suspendWhenIdle();
         return this.playing;
     }
@@ -159,8 +163,8 @@ export class DinerAudio {
                 noise = noise * .96 + (Math.random() * 2 - 1) * .04;
                 const breath = .35 + .65 * Math.sin(Math.PI * t / 2.4) ** 2;
                 const pulse = (.5 + .5 * Math.sin(2 * Math.PI * 25 * t + .4 * Math.sin(2 * Math.PI * t / duration))) ** 2;
-                const body = Math.sin(2 * Math.PI * 70 * t);
-                data[i] = (noise * .6 + body * .10) * (.3 + pulse * .7) * breath;
+                const body = .5 * Math.sin(2 * Math.PI * 70 * t) + Math.sin(2 * Math.PI * 140 * t) + .3 * Math.sin(2 * Math.PI * 210 * t);
+                data[i] = (noise * .4 + body * .12) * (.3 + pulse * .7) * breath;
             }
             // Crossfade the loop seam; playback resumes after the overlapped opening.
             const overlap = Math.floor(ctx.sampleRate * .04);
@@ -169,19 +173,24 @@ export class DinerAudio {
                 const end = data.length - overlap + i;
                 data[end] = data[end] * (1 - weight) + data[i] * weight;
             }
+            // Set a predictable listening level; the earlier texture was nearly inaudible.
+            const rms = Math.sqrt(data.reduce((sum, value) => sum + value * value, 0) / data.length);
+            const level = .07 / Math.max(rms, .001);
+            for (let i = 0; i < data.length; i++) data[i] *= level;
         }
         this.cancelSuspend();
+        this.updateMix();
         const source = ctx.createBufferSource(), gain = ctx.createGain(), filter = ctx.createBiquadFilter();
         source.buffer = this.purrBuffer;
         source.loop = true;
         source.loopStart = .04;
         source.loopEnd = 4.8;
         filter.type = 'lowpass';
-        filter.frequency.value = 180;
+        filter.frequency.value = 420;
         filter.Q.value = .5;
         this.purrGain = gain;
         gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.setTargetAtTime(.22, ctx.currentTime, .2);
+        gain.gain.setTargetAtTime(.32, ctx.currentTime, .2);
         source.connect(filter);
         filter.connect(gain);
         gain.connect(ctx.destination);
@@ -196,6 +205,7 @@ export class DinerAudio {
     }
     stopPurr() {
         this.purrWanted = false;
+        this.updateMix();
         this.purrRequest++;
         if (this.context && this.purrSource) {
             this.purrGain?.gain.setTargetAtTime(0, this.context.currentTime, .08);

@@ -20,8 +20,8 @@ class Node {
 }
 class Context {
   state = 'suspended'; currentTime = 0; sampleRate = 8000; destination = new Node();
-  sources = [];
-  createGain() { return new Node(); }
+  sources = []; gains = [];
+  createGain() { const n = new Node(); this.gains.push(n); return n; }
   createBiquadFilter() { return new Node(); }
   createOscillator() { const n = new Node(); this.sources.push(n); return n; }
   createBufferSource() { const n = new Node(); this.sources.push(n); return n; }
@@ -113,4 +113,19 @@ test('disposing during an audio start cannot resurrect the player', async t => {
   assert.equal(contexts[0].state, 'running');
   audio.stopPurr();
   assert.equal(purr.stopped, true);
+});
+
+test('cat focus gently lowers music and restores it when leaving', async t => {
+  const { audio, contexts } = fixture(t);
+  await audio.nextTrack();
+  const music = contexts[0].gains[0];
+  const normal = music.gain.value;
+  await audio.purr();
+  assert.ok(music.gain.value < normal && music.gain.value > normal / 2);
+  const samples = contexts[0].sources.filter(n => n.buffer).at(-1).buffer.getChannelData(0);
+  const rms = Math.sqrt(samples.reduce((sum, value) => sum + value * value, 0) / samples.length);
+  assert.ok(rms > .06 && rms < .08);
+  assert.ok(samples.every(value => Math.abs(value) < 1));
+  audio.stopPurr();
+  assert.equal(music.gain.value, normal);
 });

@@ -103,7 +103,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     let frame = 0, timer: ReturnType<typeof setTimeout> | undefined;
     let dirty = true, rendering = false, measured = false, ready = false;
     let renderCount = 0;
-    let last = performance.now(), elapsed = 0, petUntil = 0, lastMovement = 0, lastHover = 0;
+    let last = performance.now(), elapsed = 0, lastMovement = 0, lastHover = 0;
     let qualityScale = 1, slowFrames = 0, sampledFrames = 0;
     const createdAt = performance.now();
     let currentView: View = 'room';
@@ -430,7 +430,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         moving = world.ceiling.update(delta, underCeiling, reduced.matches) || moving;
         moving = world.sideWall.update(delta, underCeiling, reduced.matches) || moving;
         if (!paused && !reduced.matches) {
-            world.cat.scale.y = 1 + Math.sin(elapsed * (now < petUntil ? 2.1 : 1.4)) * .009;
+            world.cat.scale.y = 1 + Math.sin(elapsed * 1.4) * .009;
             if (playing)
                 world.vinyl.rotation.y -= delta * .9;
             world.steam.forEach((sprite, i) => {
@@ -506,7 +506,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             shell.classList.toggle('is-exploring', savedView.exploring);
             moveCamera(savedView.position, savedView.target);
         },
-        petCat() { petUntil = performance.now() + 2600; focus('cat'); },
+        petCat() { if (history.focus !== 'cat') focus('cat'); },
         setPlaying(value) { playing = value; wake(); },
         setPaused(value) {
             paused = value;
