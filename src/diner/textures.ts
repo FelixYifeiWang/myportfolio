@@ -240,3 +240,20 @@ export function windowBeadsTexture() {
         }
     });
 }
+
+/** One small shared glaze map adds ceramic grain without extra geometry. */
+export function ceramicTexture() {
+    return canvasTexture(256, 256, ctx => {
+        ctx.fillStyle = '#d7c8ad';
+        ctx.fillRect(0, 0, 256, 256);
+        let seed = 29;
+        for (let i = 0; i < 650; i++) {
+            seed = seed * 16807 % 2147483647;
+            ctx.fillStyle = i % 5 ? '#836b4920' : '#fff7df2b';
+            const radius = i % 7 ? .45 : .75;
+            ctx.beginPath();
+            ctx.arc(seed % 256, Math.floor(seed / 256) % 256, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    });
+}

@@ -7,8 +7,9 @@ import { createWindowRain, type WindowRain } from './rain';
 import { createSeatedCeiling } from './ceiling';
 import { createSeatedSideWall } from './side-wall';
 import { placeProp, type DinerProps } from './assets';
-import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, windowBeadsTexture } from './textures';
+import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, windowBeadsTexture, ceramicTexture } from './textures';
 import { seats, type SeatName } from './seats';
+import { createVaseArrangement, createUtensilHolder } from './counter-props';
 export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about' | SeatName;
 export interface DinerWorld {
     group: THREE.Group;
@@ -221,21 +222,14 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     art.colorSpace = THREE.SRGBColorSpace;
     box(1.36, 1.16, .07, palette.darkwood, -3.4, 3.5, -3.92, group);
     texturePlane(art, 1.18, .98, -3.4, 3.5, -3.873, group);
-    // A quiet ceramic vase replaces another text sign on the back counter.
-    const vase = surface('#b89b79', .85);
-    const vaseProfile = [[0, 0], [.12, 0], [.17, .05], [.185, .23], [.14, .37], [.072, .44], [.07, .49], [.055, .49], [.057, .43], [.125, .36], [.16, .22], [.14, .065], [0, .03]];
-    mesh(new THREE.LatheGeometry(vaseProfile.map(([r, h]) => new THREE.Vector2(r, h)), 28), vase, [1.08, 1.48, -3.30], group);
-    const stemMaterial = surface('#687057', .95);
-    for (const [index, offset] of [-.17, .04, .21].entries()) {
-        const top = 2.40 + index * .09;
-        line([[1.08, 1.73, -3.30], [1.10 + offset * .3, 2.04, -3.30], [1.08 + offset, top, -3.32]], .006, stemMaterial, group);
-        for (let j = 0; j < 3; j++) {
-            const y = 2.09 + j * .09 + index * .035;
-            const leaf = mesh(new THREE.SphereGeometry(1, 10, 6), stemMaterial, [1.10 + offset * .55 + (j % 2 ? .045 : -.045), y, -3.30], group);
-            leaf.scale.set(.065, .025, .034);
-            leaf.rotation.z = j % 2 ? .5 : -.5;
-        }
-    }
+    const pottery = {
+        ceramic: new THREE.MeshStandardMaterial({ map: ceramicTexture(), roughness: .38, bumpMap: plasterGrain, bumpScale: .0012 }),
+        clay: surface('#947456', .95),
+        wood: palette.walnut,
+    };
+    const arrangement = createVaseArrangement(pottery);
+    arrangement.position.set(1.08, 1.48, -3.30);
+    group.add(arrangement);
     // The counter is a thick oak slab over a fluted, moss-green base.
     const baseMaterial = new THREE.MeshStandardMaterial({ color: '#354238', roughness: .72 });
     box(8.6, 1.65, 1.08, baseMaterial, 0, .82, -.15, group, .025);
@@ -344,11 +338,10 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     portrait.colorSpace = THREE.SRGBColorSpace;
     texturePlane(portrait, .56, .44, 0, .26, .045, about);
     interactive('about', about, new THREE.Vector3(-.65, 1.92, -3.15));
-    cylinder(.105, .095, .24, palette.cream, 1.95, 1.96, -.54, group);
-    for (let i = 0; i < 8; i++) {
-        const stick = cylinder(.009, .009, .51, palette.walnut, 1.91 + (i % 3) * .033, 2.11, -.55 + Math.floor(i / 3) * .03, group, 6);
-        stick.rotation.z = (i - 3) * .04;
-    }
+    const utensils = createUtensilHolder(pottery);
+    utensils.position.set(1.95, 1.84, -.54);
+    utensils.rotation.y = .3;
+    group.add(utensils);
     bottle(1.65, 1.84, -.56, .30, '#4c3925', group);
     placeProp(props.plant, .98, new THREE.Vector3(-4.83, 1.68, -.2), .25, group);
     placeProp(props.plant, .96, new THREE.Vector3(4.28, 1.48, -3.1), 2.2, group);
