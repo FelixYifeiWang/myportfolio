@@ -28,7 +28,9 @@ export function batchStaticMeshes(root: THREE.Group, excluded: THREE.Object3D[])
         if (objects.length < 2)
             continue;
         const pieces = objects.map(object => {
-            const geometry = object.geometry.index ? object.geometry.toNonIndexed() : object.geometry.clone();
+            // Preserve existing indices instead of expanding and re-welding every
+            // vertex in the room. Only non-indexed source pieces need welding.
+            const geometry = object.geometry.index ? object.geometry.clone() : mergeVertices(object.geometry);
             // Quantized attributes cannot store baked world coordinates beyond [-1, 1].
             // Expand before transforming, otherwise repeated GLB props wrap or disappear.
             for (const name of ['position', 'normal']) {
@@ -48,14 +50,12 @@ export function batchStaticMeshes(root: THREE.Group, excluded: THREE.Object3D[])
         pieces.forEach(piece => piece.dispose());
         if (!merged)
             throw new Error('Could not combine compatible diner geometry.');
-        const indexed = mergeVertices(merged);
-        merged.dispose();
-        const batch = new THREE.Mesh(indexed, objects[0].material);
+        const batch = new THREE.Mesh(merged, objects[0].material);
         batch.castShadow = objects[0].castShadow;
         batch.receiveShadow = objects[0].receiveShadow;
         batch.renderOrder = objects[0].renderOrder;
         batch.name = 'Static room batch';
-        indexed.computeBoundingSphere();
+        merged.computeBoundingSphere();
         root.add(batch);
         objects.forEach(object => { retired.add(object.geometry); object.removeFromParent(); });
     }

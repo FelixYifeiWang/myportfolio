@@ -6,7 +6,7 @@ import { profile } from '../data/profile';
 import OtherWorkMenu from '../components/OtherWorkMenu.astro';
 import WorkMenu from '../components/WorkMenu.astro';
 import { seats } from '../diner/seats';
-import { roomAssetNames, roomAssetUrl, touchAssetMedia } from '../diner/asset-urls';
+import { roomAssetNames, roomAssetUrl, roomTextureNames, roomTextureUrl, touchAssetMedia } from '../diner/asset-urls';
 
 
 ---
@@ -30,6 +30,12 @@ import { roomAssetNames, roomAssetUrl, touchAssetMedia } from '../diner/asset-ur
         <link rel="preload" href={roomAssetUrl(name)} media={`not all and ${touchAssetMedia}`} as="fetch" crossorigin />
       </>
     ))}
+    {roomTextureNames.map(name => (
+      <>
+        <link rel="preload" href={roomTextureUrl(name, true)} media={touchAssetMedia} as="image" crossorigin />
+        <link rel="preload" href={roomTextureUrl(name)} media={`not all and ${touchAssetMedia}`} as="image" crossorigin />
+      </>
+    ))}
   </head>
   <body>
     <main id="main" class="diner-shell">
@@ -45,7 +51,20 @@ import { roomAssetNames, roomAssetUrl, touchAssetMedia } from '../diner/asset-ur
         </nav>
         <button class="sound-button utility-button" id="sound-toggle" type="button" aria-pressed="false" aria-label="Play lounge music and rain ambience" title="Play music"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
       </header>
-      <div class="scene-loading" id="scene-loading" role="status"><span></span>Turning the lights on…</div>
+      <div class="scene-loading" id="scene-loading">
+        <svg class="loading-lamp" viewBox="0 0 120 130" fill="none" aria-hidden="true">
+          <defs><linearGradient id="loading-light" x1="60" y1="71" x2="60" y2="125" gradientUnits="userSpaceOnUse"><stop stop-color="#e8c789" /><stop offset="1" stop-color="#e8c789" stop-opacity="0" /></linearGradient></defs>
+          <path class="loading-beam" d="M42 71 12 125h96L78 71Z" />
+          <path class="loading-cord" d="M60 0v42" />
+          <path class="loading-shade" d="M28 68c8-3 13-26 32-26s24 23 32 26c-8 7-56 7-64 0Z" />
+          <ellipse class="loading-bulb" cx="60" cy="70" rx="27" ry="3" />
+        </svg>
+        <h2 class="loading-title" id="loading-title">Opening for the night.</h2>
+        <p class="loading-detail" id="loading-detail" role="status">Getting the room ready…</p>
+        <div class="loading-progress" id="loading-progress" role="progressbar" aria-label="Preparing the diner" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+        <a class="loading-work" href="/work/">Browse the work while you wait <span aria-hidden="true">↗</span></a>
+        <button class="loading-retry" id="loading-retry" hidden>Try the room again</button>
+      </div>
       <div class="hotspots" id="hotspots" aria-label="Objects in the diner">
         <button class="hotspot" data-hotspot="menu" data-action="menu" aria-label="Pick up the menu and explore selected projects" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The menu</span></button>
         <button class="hotspot" data-hotspot="notebook" data-action="notebook" aria-label="Open the notebook of side projects" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The notebook</span></button>
@@ -75,7 +94,7 @@ import { roomAssetNames, roomAssetUrl, touchAssetMedia } from '../diner/asset-ur
           </details>
         </div>
       </footer>
-      <noscript><div class="no-script">Welcome to After Hours. <a href="/work/">Explore the portfolio →</a></div></noscript>
+      <noscript><style is:inline>.scene-loading,.diner-controls{display:none}</style><div class="no-script">Welcome to After Hours. <a href="/work/">Explore the portfolio →</a></div></noscript>
     </main>
 
     <dialog class="diner-dialog" id="diner-dialog" aria-labelledby="dialog-title">

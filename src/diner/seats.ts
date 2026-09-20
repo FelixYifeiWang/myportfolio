@@ -1,4 +1,5 @@
 import { Vector3 } from 'three';
+export { isSeat, type SeatName } from './seat-names.ts';
 
 function seat(x: number) {
     return {
@@ -14,7 +15,3 @@ export const seats = {
     'seat-3': seat(1),
     'seat-4': seat(3),
 };
-export type SeatName = keyof typeof seats;
-export function isSeat(name: string): name is SeatName {
-    return Object.hasOwn(seats, name);
-}

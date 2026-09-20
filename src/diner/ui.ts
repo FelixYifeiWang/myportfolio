@@ -1,4 +1,4 @@
-import { isSeat } from './seats';
+import { isSeat } from './seat-names';
 import type { DinerScene } from './scene';
 import type { ObjectName } from './models';
 import { DinerAudio } from './audio';
@@ -16,6 +16,10 @@ export function initDiner() {
     const viewOptions = document.querySelector<HTMLDetailsElement>('#view-options')!;
     const viewOptionsToggle = document.querySelector<HTMLElement>('#view-options-toggle')!;
     const toast = document.querySelector<HTMLElement>('#scene-toast')!;
+    const loadingDetail = document.querySelector<HTMLElement>('#loading-detail')!;
+    const loadingProgress = document.querySelector<HTMLElement>('#loading-progress')!;
+    const loadingRetry = document.querySelector<HTMLButtonElement>('#loading-retry')!;
+    loadingRetry.addEventListener('click', () => window.location.reload());
     const location = document.querySelector<HTMLElement>('#dialog-location')!;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const panelTransition = new PanelTransition(dialog, scroll, () => reducedMotion.matches);
@@ -31,6 +35,7 @@ export function initDiner() {
     });
     audio.onChange = () => syncSound();
     let scene: DinerScene | undefined;
+    let startupFailed = false;
     let currentPanel = 'menu';
     let toastTimer: ReturnType<typeof setTimeout>;
     let openTimer: ReturnType<typeof setTimeout>;
@@ -224,17 +229,26 @@ export function initDiner() {
     window.addEventListener('hashchange', fromHash);
     fromHash();
     function fallback() {
+        startupFailed = true;
         shell.classList.add('scene-unavailable');
         shell.classList.remove('scene-ready');
         const loading = document.querySelector<HTMLElement>('#scene-loading')!;
         loading.removeAttribute('aria-hidden');
-        loading.textContent = 'The room couldn’t load. Explore the work above.';
+        document.querySelector('#loading-title')!.textContent = 'The room couldn’t open.';
+        loadingDetail.textContent = 'You can still explore the work.';
+        loadingRetry.hidden = false;
     }
     document.addEventListener('diner-context-lost', () => { scene?.dispose(); scene = undefined; fallback(); });
     import('./scene').then(module => module.createDiner(canvas, action, cat => {
         if (cat) void audio.purr().catch(() => announce('The manager is asleep. Audio is unavailable here.'));
         else audio.stopPurr();
-    }, announce)).then(result => {
+    }, announce, state => {
+        if (startupFailed) return;
+        loadingDetail.textContent = state.message;
+        loadingProgress.setAttribute('aria-valuenow', String(state.value));
+        loadingProgress.style.setProperty('--loading-progress', String(state.value / 100));
+    })).then(result => {
+        if (startupFailed) { result.dispose(); return; }
         scene = result;
         scene.setPlaying(audio.playing);
         shell.classList.add('scene-ready');

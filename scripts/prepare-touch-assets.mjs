@@ -29,3 +29,10 @@ for (const name of ['color', 'normal', 'roughness']) {
   await sharp(`public/textures/walnut-${name}.webp`).resize(512, 512).webp({ quality: 85 })
     .toFile(`public/textures/touch/walnut-${name}.webp`);
 }
+// Scene frames need smaller textures than full portfolio illustrations.
+for (const [name, input] of [['art', 'ow02'], ['portrait', 'profile']]) {
+  for (const touch of [false, true]) {
+    await sharp(`public/images/${input}.webp`).resize({width:touch ? 512 : 768}).webp({quality:88})
+      .toFile(`public/textures/${touch ? 'touch/' : ''}frame-${name}.webp`);
+  }
+}

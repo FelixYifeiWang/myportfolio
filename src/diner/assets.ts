@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { roomAssetUrl, woodTextureUrl } from './asset-urls';
+import { roomAssetUrl, woodTextureUrl, roomTextureUrl } from './asset-urls';
+import type { AssetProgress } from './loading-progress';
 
 export interface DinerProps {
     plant: THREE.Group;
@@ -10,15 +11,31 @@ export interface DinerProps {
     ramen: THREE.Group;
     stool: THREE.Group;
     wood: { color: THREE.Texture; normal: THREE.Texture; roughness: THREE.Texture };
+    art: THREE.Texture;
+    portrait: THREE.Texture;
 }
 
-export async function loadDinerProps(touch = false): Promise<DinerProps> {
+export async function loadDinerProps(touch = false, progress: AssetProgress = () => {}): Promise<DinerProps> {
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
     const names = ['plant', 'kettle', 'espresso', 'ramen', 'stool'] as const;
     const textures = new THREE.TextureLoader();
-    const [loaded, wood] = await Promise.all([
-        Promise.all(names.map(name => loader.loadAsync(roomAssetUrl(name, touch)))),
-        Promise.all(['color', 'normal', 'roughness'].map(name => textures.loadAsync(woodTextureUrl(name, touch)))),
+    const [loaded, wood, frames] = await Promise.all([
+        Promise.all(names.map(async name => {
+            const model = await loader.loadAsync(roomAssetUrl(name, touch), event => progress(name, event));
+            progress(name);
+            return model;
+        })),
+        Promise.all(['color', 'normal', 'roughness'].map(async name => {
+            const texture = await textures.loadAsync(woodTextureUrl(name, touch));
+            progress(`wood-${name}`);
+            return texture;
+        })),
+        Promise.all(['art', 'portrait'].map(async name => {
+            const texture = await textures.loadAsync(roomTextureUrl(`frame-${name}`, touch));
+            texture.colorSpace = THREE.SRGBColorSpace;
+            progress(name);
+            return texture;
+        })),
     ]);
     const props = {} as DinerProps;
     loaded.forEach(({scene}, index) => {
@@ -28,6 +45,7 @@ export async function loadDinerProps(touch = false): Promise<DinerProps> {
     wood[0].colorSpace = THREE.SRGBColorSpace;
     for (const texture of wood) { texture.wrapS = texture.wrapT = THREE.RepeatWrapping; texture.anisotropy = 4; }
     props.wood = { color: wood[0], normal: wood[1], roughness: wood[2] };
+    [props.art, props.portrait] = frames;
     return props;
 }
 

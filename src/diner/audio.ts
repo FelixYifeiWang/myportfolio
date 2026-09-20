@@ -1,4 +1,5 @@
 import { records } from './records.ts';
+import { createPurrJob } from './purr-job.ts';
 
 /** Original opening record; supplied recordings stream only when selected. */
 const lounge = { bpm: 72, chords: [[48, 52, 55, 59], [45, 48, 52, 55], [50, 53, 57, 60], [43, 50, 53, 57]], melody: [76, 74, 71, 67, 69, 72, 71, 67], brightness: .24 };
@@ -21,6 +22,8 @@ export class DinerAudio {
     private cleanupTimers = new Set<ReturnType<typeof setTimeout>>();
     private purrSource: AudioBufferSourceNode | null = null;
     private purrBuffer: AudioBuffer | null = null;
+    private purrJob: ReturnType<typeof createPurrJob> | null = null;
+    private purrPreparing: Promise<void> | null = null;
     private purrGain: GainNode | null = null;
     private request = 0;
     private purrRequest = 0;
@@ -237,29 +240,19 @@ export class DinerAudio {
         if (!this.hidden) await ctx.resume();
         if (request !== this.purrRequest || this.context !== ctx || this.hidden || !this.purrWanted) return;
         if (!this.purrBuffer) {
-            const duration = 4.8;
-            this.purrBuffer = ctx.createBuffer(1, ctx.sampleRate * duration, ctx.sampleRate);
-            const data = this.purrBuffer.getChannelData(0);
-            let noise = 0;
-            for (let i = 0; i < data.length; i++) {
-                const t = i / ctx.sampleRate;
-                noise = noise * .96 + (Math.random() * 2 - 1) * .04;
-                const breath = .35 + .65 * Math.sin(Math.PI * t / 2.4) ** 2;
-                const pulse = (.5 + .5 * Math.sin(2 * Math.PI * 25 * t + .4 * Math.sin(2 * Math.PI * t / duration))) ** 2;
-                const body = .5 * Math.sin(2 * Math.PI * 70 * t) + Math.sin(2 * Math.PI * 140 * t) + .3 * Math.sin(2 * Math.PI * 210 * t);
-                data[i] = (noise * .4 + body * .12) * (.3 + pulse * .7) * breath;
+            if (!this.purrPreparing) {
+                const job = this.purrJob = createPurrJob(ctx.sampleRate);
+                this.purrPreparing = job.result.then(samples => {
+                    if (this.context !== ctx || !samples.length) return;
+                    this.purrBuffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+                    this.purrBuffer.getChannelData(0).set(samples);
+                }).finally(() => {
+                    if (this.purrJob === job) { this.purrJob = null; this.purrPreparing = null; }
+                });
             }
-            // Normalize before adding pauses so each purr keeps its listening level.
-            const rms = Math.sqrt(data.reduce((sum, value) => sum + value * value, 0) / data.length);
-            const level = .07 / Math.max(rms, .001);
-            for (let i = 0; i < data.length; i++) {
-                const breathTime = (i / ctx.sampleRate) % 2.4;
-                // One continuous swell, with no plateau or abrupt change into the fade.
-                // The envelope reaches silence smoothly before the 600ms breathing pause.
-                const envelope = breathTime < 1.8 ? Math.sin(Math.PI * breathTime / 1.8) ** 2 : 0;
-                data[i] *= level * envelope;
-            }
+            await this.purrPreparing;
         }
+        if (request !== this.purrRequest || this.context !== ctx || this.hidden || !this.purrWanted || !this.purrBuffer) return;
         this.cancelSuspend();
         this.updateMix();
         const source = ctx.createBufferSource(), gain = ctx.createGain(), filter = ctx.createBiquadFilter();
@@ -333,6 +326,9 @@ export class DinerAudio {
         this.cleanupTimers.clear();
         this.purrSource?.stop();
         this.purrSource = null;
+        this.purrJob?.cancel();
+        this.purrJob = null;
+        this.purrPreparing = null;
         this.purrBuffer = null;
         this.purrGain = null;
         this.noise?.stop();

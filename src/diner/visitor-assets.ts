@@ -76,6 +76,7 @@ function disposeVisitor(model: THREE.Group) {
     model.traverse(object => {
         if (!(object instanceof THREE.Mesh)) return;
         geometries.add(object.geometry);
+        if (object.customDepthMaterial) materials.add(object.customDepthMaterial);
         for (const material of Array.isArray(object.material) ? object.material : [object.material]) materials.add(material);
         if (object instanceof THREE.SkinnedMesh) object.skeleton.dispose();
     });

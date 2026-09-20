@@ -4,6 +4,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { surfaceTexture } from './textures';
 import { configureAsset } from './assets';
 import { roomAssetUrl } from './asset-urls';
+import type { AssetProgress } from './loading-progress';
 
 export interface DinerCat {
     root: THREE.Group;
@@ -11,8 +12,9 @@ export interface DinerCat {
 }
 
 /** The finished textured sculpture is generated and compressed offline. */
-export async function loadDinerCat(touch = false): Promise<DinerCat> {
-    const { scene: model } = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(roomAssetUrl('cat', touch));
+export async function loadDinerCat(touch = false, progress: AssetProgress = () => {}): Promise<DinerCat> {
+    const { scene: model } = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(roomAssetUrl('cat', touch), event => progress('cat', event));
+    progress('cat');
     const root = new THREE.Group();
     root.name = 'DinerCat';
     const body = new THREE.Group();

@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DinerAudio } from '../src/diner/audio.ts';
+import { synthesizePurr } from '../src/diner/purr-synthesis.ts';
 
 class Param {
   value = 0;
@@ -49,6 +50,39 @@ function fixture(t) {
   t.after(() => audio.dispose());
   return { audio, contexts, media };
 }
+
+function workerFixture(t) {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, 'Worker');
+  const workers = [];
+  globalThis.Worker = class {
+    terminated = false;
+    constructor() { workers.push(this); }
+    postMessage(sampleRate) { this.sampleRate = sampleRate; }
+    terminate() { this.terminated = true; }
+    finish() { this.onmessage({data:synthesizePurr(this.sampleRate)}); }
+  };
+  t.after(() => { if (previous) Object.defineProperty(globalThis,'Worker',previous); else delete globalThis.Worker; });
+  return workers;
+}
+
+test('leaving the cat while its worker prepares audio cannot start a late purr', async t => {
+  const workers = workerFixture(t), {audio,contexts} = fixture(t);
+  const pending = audio.purr(); await Promise.resolve();
+  assert.equal(workers.length,1);
+  audio.stopPurr();workers[0].finish();await pending;
+  assert.equal(contexts[0].sources.filter(source=>source.buffer).length,1);
+  assert.equal(workers[0].terminated,true);
+  await audio.purr();
+  assert.equal(workers.length,1,'a completed waveform is reused');
+});
+
+test('disposal terminates pending sound preparation without resurrecting audio', async t => {
+  const workers = workerFixture(t), {audio,contexts} = fixture(t);
+  const pending = audio.purr();await Promise.resolve();
+  audio.dispose();await pending;
+  assert.equal(workers[0].terminated,true);
+  assert.equal(contexts[0].sources.filter(source=>source.buffer).length,1);
+});
 
 test('records follow the requested order, then silence, then start again', async t => {
   const { audio } = fixture(t);

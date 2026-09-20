@@ -14,6 +14,9 @@ import { DoorEncounter } from './door-encounter';
 import { DoorKnock } from './door-knock';
 import { VisitorLibrary, visitors } from './visitor-assets';
 import { touchAssetMedia } from './asset-urls';
+import { RoomLoadingProgress, type LoadingSnapshot } from './loading-progress';
+import { freezeStaticTransforms, pickVisibleObject, createShadowWarmup, warmTextures } from './render-preparation';
+import { AdaptiveQuality } from './adaptive-quality';
 export interface DinerScene {
     focus: (name: View, remember?: boolean) => number;
     restoreView: () => void;
@@ -23,11 +26,13 @@ export interface DinerScene {
     setPaused: (paused: boolean) => void;
     dispose: () => void;
 }
-export async function createDiner(canvas: HTMLCanvasElement, select: (name: ObjectName) => void, focusChanged: (cat: boolean) => void = () => {}, announce: (message: string) => void = () => {}): Promise<DinerScene> {
+export async function createDiner(canvas: HTMLCanvasElement, select: (name: ObjectName) => void, focusChanged: (cat: boolean) => void = () => {}, announce: (message: string) => void = () => {}, onProgress: (state: LoadingSnapshot) => void = () => {}): Promise<DinerScene> {
+    const loading = new RoomLoadingProgress(onProgress);
+    const progress = loading.asset.bind(loading);
     const touch = window.matchMedia(touchAssetMedia).matches;
     const assetsReady = Promise.all([
-        loadDinerCat(touch),
-        loadDinerProps(touch),
+        loadDinerCat(touch, progress),
+        loadDinerProps(touch, progress),
         document.fonts.load('48px "Instrument Serif"'),
         document.fonts.load('italic 48px "Instrument Serif"'),
         document.fonts.load('16px "DM Mono"'),
@@ -79,6 +84,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     roomEnvironment.dispose();
     pmrem.dispose();
     const [catModel, props] = await assetsReady;
+    loading.stage('room');
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
     const world = buildDiner(catModel, props);
     const batches = batchStaticMeshes(world.group, [...world.interactives, world.ceiling.group, world.sideWall.group, world.entrance.hinge, world.doorstep]);
     scene.add(world.group);
@@ -87,6 +94,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     ground.position.y = -.32;
     ground.receiveShadow = true;
     scene.add(ground);
+    freezeStaticTransforms(scene, [world.cat, world.vinyl, world.entrance.hinge, ...world.steam]);
+    const seatedPickTargets = world.interactives.filter(object => !isSeat(object.userData.action));
     const hotspots = [...document.querySelectorAll<HTMLButtonElement>('[data-hotspot]')].map(button => ({
         button, point: world.targets[button.dataset.hotspot as ObjectName], x: NaN, y: NaN,
     }));
@@ -113,7 +122,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     let dirty = true, rendering = false, measured = false, ready = false;
     let renderCount = 0;
     let last = performance.now(), elapsed = 0, lastMovement = 0, lastHover = 0;
-    let qualityScale = 1, slowFrames = 0, sampledFrames = 0;
+    let qualityScale = 1;
+    const quality = new AdaptiveQuality();
     const createdAt = performance.now();
     const visitorLibrary = new VisitorLibrary();
     const doorKnock = new DoorKnock();
@@ -128,7 +138,14 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             const visitor = await visitorLibrary.load(id);
             if (disposed) throw new Error('Diner is disposed.');
             placeDoorwayVisitor(visitor);
+            freezeStaticTransforms(visitor);
+            await warmTextures(renderer, visitor, () => !disposed);
+            if (disposed) throw new Error('Diner is disposed.');
             await renderer.compileAsync(visitor, camera, scene);
+            if (disposed) throw new Error('Diner is disposed.');
+            // Color-shader compilation alone does not prepare the shadow shaders.
+            await renderer.compileAsync(createShadowWarmup(visitor), camera, scene);
+            if (disposed) throw new Error('Diner is disposed.');
             return visitor;
         },
         show(visitor) {
@@ -260,8 +277,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     }
     function setResolution() {
         const pixelBudget = Math.sqrt(2000000 / (width * height));
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, compact() ? 1.3 : 1.65, pixelBudget) * qualityScale);
-        renderer.setSize(width, height, false);
+        renderer.setDrawingBufferSize(width, height, Math.min(window.devicePixelRatio, compact() ? 1.3 : 1.65, pixelBudget) * qualityScale);
     }
     function resize() {
         const rect = canvas.getBoundingClientRect();
@@ -321,8 +337,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         const rect = canvas.getBoundingClientRect();
         pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
         raycaster.setFromCamera(pointer, camera);
-        const objects = currentView === 'room' ? world.interactives : world.interactives.filter(object => !isSeat(object.userData.action));
-        return raycaster.intersectObjects(objects, true)[0]?.object.userData.action as ObjectName | undefined;
+        return pickVisibleObject(raycaster, currentView === 'room' ? world.interactives : seatedPickTargets) as ObjectName | undefined;
     }
     function stopSeatedDrag() {
         if (seatedPointer === null) return;
@@ -511,19 +526,10 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             measured = true;
             console.info('Diner render optimized', JSON.stringify({ calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, batches }));
         }
-        // Sustained slow frames while moving lower resolution, not model detail.
-        if (moving && now - createdAt > 4000) {
-            sampledFrames++;
-            if (frameTime > 29)
-                slowFrames++;
-            if (sampledFrames >= 50) {
-                if (slowFrames > 30 && qualityScale > .7) {
-                    qualityScale = Math.max(.7, qualityScale - .15);
-                    setResolution();
-                }
-                sampledFrames = 0;
-                slowFrames = 0;
-            }
+        const nextQuality = quality.sample(frameTime, moving || cameraChanged, now);
+        if (nextQuality !== qualityScale) {
+            qualityScale = nextQuality;
+            setResolution();
         }
         dirty = false;
         rendering = false;
@@ -538,6 +544,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     observer.observe(canvas);
     resize();
     // Compile asynchronously where supported, avoiding a synchronous first-frame stall.
+    loading.stage('lighting');
     world.doorstep.visible = true;
     world.ceiling.group.visible = true;
     world.sideWall.group.visible = true;
@@ -545,6 +552,10 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     world.doorstep.visible = false;
     world.ceiling.group.visible = false;
     world.sideWall.group.visible = false;
+    // Finish initial GPU uploads and shadow programs behind the loading screen.
+    // Start the entrance animation only after this first frame is prepared.
+    renderer.render(scene, camera);
+    loading.stage('ready');
     ready = true;
     if (!reduced.matches) {
         camera.position.copy(roomPosition).sub(roomTarget).multiplyScalar(1.04 / (compact() ? .88 : .72)).add(roomTarget);

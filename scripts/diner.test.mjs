@@ -88,3 +88,18 @@ test('distance detail levels stay separate so only the selected level renders', 
   camera.position.z = 3; camera.updateMatrixWorld(); lod.update(camera);
   assert.ok(high.visible && !low.visible);
 });
+
+test('batching mixes indexed and non-indexed pieces without changing triangle count or source geometry', () => {
+  const root = new THREE.Group(), material = new THREE.MeshStandardMaterial();
+  const indexed = new THREE.BoxGeometry(), nonindexed = indexed.toNonIndexed();
+  const a = new THREE.Mesh(indexed, material), b = new THREE.Mesh(nonindexed, material);
+  b.position.x = 3; root.add(a, b);
+  const expected = indexed.index.count + nonindexed.attributes.position.count;
+  batchStaticMeshes(root, []);
+  const result = root.children.find(object => object.isMesh);
+  assert.equal(result.geometry.index.count, expected);
+  assert.equal(indexed.index.count, 36);
+  assert.equal(nonindexed.index, null);
+  result.geometry.computeBoundingBox();
+  assert.equal(result.geometry.boundingBox.max.x, 3.5);
+});

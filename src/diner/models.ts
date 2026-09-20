@@ -217,8 +217,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     const sign = texturePlane(signTexture(), 4.2, 1.4, -.45, 3.57, -3.96, group, true);
     sign.renderOrder = 2;
     // Frame the canvas itself, correcting the perspective of the studio photograph.
-    const loader = new THREE.TextureLoader();
-    const art = loader.load('/images/ow02.webp');
+    const art = props.art;
     art.colorSpace = THREE.SRGBColorSpace;
     box(1.34, 1.34, .07, palette.darkwood, -3.4, 3.5, -3.92, group);
     box(1.22, 1.22, .008, surface('#d1c4a8', .95), -3.4, 3.5, -3.879, group, 0);
@@ -345,12 +344,13 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     about.rotation.y = .12;
     group.add(about);
     box(.65, .53, .07, palette.brass, 0, .26, 0, about, .015);
-    const portrait = loader.load('/images/profile.webp', texture => {
+    const portrait = props.portrait;
+    {
         // Cover the frame without squeezing the landscape photo; keep Felix centered.
-        const image = texture.image as HTMLImageElement;
-        texture.repeat.x = (.56 / .44) / (image.width / image.height);
-        texture.offset.x = .53 - texture.repeat.x / 2;
-    });
+        const image = portrait.image as HTMLImageElement;
+        portrait.repeat.x = (.56 / .44) / (image.width / image.height);
+        portrait.offset.x = .53 - portrait.repeat.x / 2;
+    }
     portrait.colorSpace = THREE.SRGBColorSpace;
     texturePlane(portrait, .56, .44, 0, .26, .045, about);
     interactive('about', about, new THREE.Vector3(-.65, 1.92, -3.15));
