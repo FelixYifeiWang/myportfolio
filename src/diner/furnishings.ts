@@ -7,7 +7,7 @@ type Palette = Record<'wood' | 'walnut' | 'darkwood' | 'brass' | 'cream' | 'gree
 /** A continuous wooden worktop with a genuine opening for the basin. */
 export function createBackCounter(material: THREE.Material) {
     const shape = rectangle(9.3, 1.1);
-    const hole = rectangle(.80, .51, 2.39);
+    const hole = roundedRectangle(.80, .51, .08, 2.39);
     shape.holes.push(new THREE.Path(hole.getPoints()));
     const geometry = new THREE.ExtrudeGeometry(shape, { depth: .09, bevelEnabled: true, bevelThickness: .015, bevelSize: .015, bevelSegments: 1, steps: 1 });
     geometry.rotateX(-Math.PI / 2);
@@ -82,16 +82,18 @@ export function addFurnishings(parent: THREE.Group, palette: Palette, doorTextur
     sink.position.set(2.39, 1.48, -3.28);
     parent.add(sink);
     const rim = rectangle(.98, .68);
-    rim.holes.push(new THREE.Path(rectangle(.80, .51).getPoints()));
+    rim.holes.push(new THREE.Path(roundedRectangle(.80, .51, .08).getPoints()));
     const rimGeometry = new THREE.ExtrudeGeometry(rim, { depth: .018, bevelEnabled: false, steps: 1 });
     rimGeometry.rotateX(-Math.PI / 2);
     mesh(rimGeometry, palette.metal, 0, .004, 0, sink);
     const basinMaterial = palette.metal.clone();
     basinMaterial.side = THREE.DoubleSide;
     basinMaterial.roughness = .36;
-    const basin = mesh(new THREE.SphereGeometry(1, 28, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), basinMaterial, 0, .008, 0, sink);
-    basin.scale.set(.405, .20, .26);
-    cylinder(.045, .006, palette.black, 0, -.187, 0, sink);
+    const basin = createSinkBasin(basinMaterial);
+    sink.add(basin);
+    cylinder(.043, .006, palette.metal, 0, -.164, 0, sink);
+    cylinder(.031, .007, palette.black, 0, -.163, 0, sink);
+    for (const z of [-.016, 0, .016]) box(.047, .003, .005, palette.metal, 0, -.158, z, sink, .001);
     tube([[0, .04, -.37], [0, .41, -.37], [0, .48, -.29], [0, .46, -.08], [0, .36, -.05]], .025, palette.metal, sink);
     for (const x of [-.16, .16]) {
         cylinder(.042, .09, palette.metal, x, .07, -.37, sink);
@@ -110,6 +112,60 @@ export function addFurnishings(parent: THREE.Group, palette: Palette, doorTextur
         box(.56, .09, .34, material, -1.32, 1.535 + i * .10, -3.28, parent);
         box(.47, .052, .005, linen, -1.32, 1.535 + i * .10, -3.105, parent);
     }
+}
+
+function roundedRectangle(width: number, depth: number, radius: number, x = 0) {
+    const shape = new THREE.Shape();
+    const w = width / 2, d = depth / 2;
+    shape.moveTo(x + w, -d + radius);
+    shape.lineTo(x + w, d - radius);
+    shape.absarc(x + w - radius, d - radius, radius, 0, Math.PI / 2, false);
+    shape.lineTo(x - w + radius, d);
+    shape.absarc(x - w + radius, d - radius, radius, Math.PI / 2, Math.PI, false);
+    shape.lineTo(x - w, -d + radius);
+    shape.absarc(x - w + radius, -d + radius, radius, Math.PI, Math.PI * 1.5, false);
+    shape.lineTo(x + w - radius, -d);
+    shape.absarc(x + w - radius, -d + radius, radius, Math.PI * 1.5, Math.PI * 2, false);
+    shape.closePath();
+    return shape;
+}
+
+/** A rectangular pressed-metal basin with a closed floor and rounded internal corners. */
+export function createSinkBasin(material: THREE.Material) {
+    const profiles = [[.80, .51, .08, .003], [.786, .496, .08, -.012], [.758, .468, .09, -.046], [.676, .386, .10, -.131], [.612, .322, .095, -.160], [.57, .28, .085, -.168]];
+    const positions: number[] = [], indices: number[] = [], uv: number[] = [];
+    const segments = 8, ringSize = (segments + 1) * 4;
+    for (const [width, depth, radius, y] of profiles) {
+        for (let corner = 0; corner < 4; corner++) {
+            const cx = (corner === 0 || corner === 3 ? 1 : -1) * (width / 2 - radius);
+            const cz = (corner < 2 ? 1 : -1) * (depth / 2 - radius);
+            for (let i = 0; i <= segments; i++) {
+                const angle = (corner + i / segments) * Math.PI / 2;
+                const x = cx + Math.cos(angle) * radius, z = cz + Math.sin(angle) * radius;
+                positions.push(x, y, z);
+                uv.push(x / .8 + .5, z / .51 + .5);
+            }
+        }
+    }
+    for (let row = 0; row < profiles.length - 1; row++) {
+        for (let i = 0; i < ringSize; i++) {
+            const a = row * ringSize + i, next = row * ringSize + (i + 1) % ringSize;
+            indices.push(a, a + ringSize, next, next, a + ringSize, next + ringSize);
+        }
+    }
+    const center = positions.length / 3;
+    positions.push(0, -.168, 0); uv.push(.5, .5);
+    const last = (profiles.length - 1) * ringSize;
+    for (let i = 0; i < ringSize; i++) indices.push(last + i, center, last + (i + 1) % ringSize);
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    const basin = new THREE.Mesh(geometry, material);
+    basin.name = 'Recessed sink basin';
+    basin.castShadow = basin.receiveShadow = true;
+    return basin;
 }
 
 /** One shared translucent batch gives furniture a soft contact footprint. */

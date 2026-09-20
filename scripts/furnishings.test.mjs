@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { addFurnishings, addContactShadows, createBackCounter } from '../src/diner/furnishings.ts';
+import { addFurnishings, addContactShadows, createBackCounter, createSinkBasin } from '../src/diner/furnishings.ts';
 import { batchStaticMeshes } from '../src/diner/optimize.ts';
 
 test('environment finishing stays inside the room and a modest geometry budget', () => {
@@ -34,4 +34,14 @@ test('the sink has a real opening while the surrounding counter stays solid', ()
   assert.equal(ray.intersectObject(counter).length, 0);
   ray.ray.origin.x = 1.4;
   assert.ok(ray.intersectObject(counter).length > 0);
+});
+
+
+test('sink has a closed recessed floor rather than exposing cabinetry beneath it', () => {
+  const basin = createSinkBasin(new THREE.MeshStandardMaterial({side: THREE.DoubleSide}));
+  basin.updateMatrixWorld();
+  for (const [x,z] of [[0,0],[.20,.08],[-.20,-.08]]) {
+    const hits = new THREE.Raycaster(new THREE.Vector3(x, 1, z), new THREE.Vector3(0,-1,0)).intersectObject(basin);
+    assert.ok(hits.length && Math.abs(hits[0].point.y + .168) < .003);
+  }
 });
