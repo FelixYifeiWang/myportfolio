@@ -17,12 +17,15 @@ test('the diner and simple portfolio share the same five-entry hierarchy', () =>
         const names = ['DreamIn Engine', 'Echo of Mobius', 'Undecimber', 'Notion AI Meeting Notes', 'SIXTH', 'Other work.'];
         const positions = names.map(name => menu.indexOf(name));
         assert.ok(positions.every((position, index) => position >= 0 && (!index || position > positions[index - 1])), path);
-        assert.ok(menu.includes('href="/work/other/"'));
+        assert.ok(menu.includes('<details class="other-work-menu"'));
+        assert.ok(!menu.includes('href="/work/other/"'));
+        assert.ok(menu.indexOf('RelicVR') < menu.indexOf('Orpheus'));
+        assert.ok(menu.indexOf('Orpheus') < menu.indexOf('Driver AI'));
     }
 });
 
-test('all original additional professional contributions have usable lightweight images', () => {
-    assert.deepEqual(additionalWorks.map(work => work.organization), ['Driver AI', 'JJE', 'PixAI', 'Amazon', 'Inkheart', 'Brown University', 'Brown University', 'RPG']);
+test('the retained additional professional contributions have usable lightweight images', () => {
+    assert.deepEqual(additionalWorks.map(work => work.organization), ['Driver AI', 'JJE', 'PixAI', 'Amazon', 'Inkheart']);
     for (const work of additionalWorks) {
         assert.ok(work.description && work.tools && work.year);
         const path = `public/images/${work.image}.webp`;
@@ -31,26 +34,30 @@ test('all original additional professional contributions have usable lightweight
     }
 });
 
-test('the featured ventures include concise outcome evidence in both presentations', () => {
+test('added statistics are absent from the menu and standalone stories', () => {
     const diner = readFileSync('dist/index.html', 'utf8');
+    assert.ok(!diner.includes('class="story-outcomes"'));
     for (const project of featuredProjects) {
         const page = readFileSync(`dist/work/${project.slug}/index.html`, 'utf8');
-        assert.equal(project.outcomes.length, 3);
-        for (const outcome of project.outcomes) {
-            assert.ok(diner.includes(outcome.value));
-            assert.ok(page.includes(outcome.value));
-        }
+        assert.ok(!page.includes('class="project-outcomes"'));
     }
 });
 
-
-test('other work offers every contribution as a readable direct link without nested disclosures', () => {
-    const page = readFileSync('dist/work/other/index.html', 'utf8');
-    assert.ok(!page.includes('<details'));
-    for (const project of otherProjects) {
-        assert.ok(page.includes(`href="/work/${project.slug}/"`));
-        assert.ok(page.includes((project.brief ? project.intro : project.description).replaceAll('&', '&amp;')));
-        assert.ok(existsSync(`dist/work/${project.slug}/index.html`));
+test('supporting work lives in one collapsed section with seven direct project links', () => {
+    for (const path of ['dist/index.html', 'dist/work/index.html']) {
+        const page = readFileSync(path, 'utf8');
+        const disclosure = page.match(/<details class="other-work-menu"[^>]*>[\s\S]*?<\/details>/)?.[0];
+        assert.ok(disclosure);
+        assert.ok(!disclosure.split('>')[0].includes('open'));
+        assert.equal((disclosure.match(/<details/g) || []).length, 1);
+        assert.equal((disclosure.match(/<a /g) || []).length, 7);
+        for (const slug of ['rpg', 'seawater-cement', 'non-electric-refrigerator']) {
+            assert.ok(!page.includes(`/work/${slug}/`));
+        }
+        for (const project of otherProjects) {
+            assert.ok(disclosure.includes(`href="/work/${project.slug}/"`));
+            assert.ok(existsSync(`dist/work/${project.slug}/index.html`));
+        }
     }
 });
 

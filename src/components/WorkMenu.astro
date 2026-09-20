@@ -1,16 +1,17 @@
 ---
-import { featuredProjects, otherProjects } from '../data/projects';
+import { featuredProjects } from '../data/projects';
+import OtherWorkMenu from './OtherWorkMenu.astro';
 interface Props { interactive?: boolean; }
 const { interactive = false } = Astro.props;
 ---
 <div class="diner-menu-items">
   {featuredProjects.map(project => <a class="diner-menu-item" href={`/work/${project.slug}/`} data-project={interactive ? project.slug : undefined}>
     <span class="dish-number">{project.number}</span>
-    <div class="dish-info"><div class="dish-name"><h4>{project.name}</h4><span class="dish-dots"></span><span class="dish-year">{project.year}</span></div><p>{project.description}</p><span class="dish-type">{project.type}</span></div>
+    <div class="dish-info"><div class="dish-name"><h4>{project.name}</h4></div><p>{project.menuDescription}</p></div>
     <span class="dish-arrow" aria-hidden="true">↗</span>
   </a>)}
 </div>
-<a class="other-work-menu" href="/work/other/" data-open={interactive ? 'other-work' : undefined}>
-  <span><span class="other-work-title">Other work.</span><span class="other-work-caption">Software, new interfaces & physical things</span></span>
-  <span class="other-work-count">{otherProjects.length} projects <span aria-hidden="true">↗</span></span>
-</a>
+<details class="other-work-menu" id="other-work">
+  <summary><span class="other-work-title">Other work.</span><span class="other-work-toggle" aria-hidden="true">+</span></summary>
+  <OtherWorkMenu interactive={interactive} />
+</details>

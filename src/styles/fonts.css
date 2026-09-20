@@ -47,3 +47,12 @@
   font-display: swap;
   src: url(/fonts/font-6.ttf) format('truetype');
 }
+
+/* A locally hosted, five-letter subset for the menu signature. */
+@font-face {
+  font-family: 'Felix Signature';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/felix-signature.ttf) format('truetype');
+}

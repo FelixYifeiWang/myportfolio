@@ -5,7 +5,7 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 
 const out = resolve('dist');
-const pages = ['/', '/work/', '/work/other/', ...projects.map(project => `/work/${project.slug}/`)];
+const pages = ['/', '/work/', ...projects.map(project => `/work/${project.slug}/`)];
 if (process.env.SITE_PREVIEW_URL) {
   for (const route of pages) {
     test(`${route} responds successfully in the running preview`, async () => {

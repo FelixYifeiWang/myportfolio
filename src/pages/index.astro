@@ -3,7 +3,6 @@ import '../styles/fonts.css';
 import '../styles/diner.css';
 import { projects } from '../data/projects';
 import WorkMenu from '../components/WorkMenu.astro';
-import OtherWorkMenu from '../components/OtherWorkMenu.astro';
 import { seats } from '../diner/seats';
 
 
@@ -72,19 +71,11 @@ import { seats } from '../diner/seats';
       <div class="dialog-scroll" id="dialog-scroll">
         <section data-panel="menu" class="paper-panel menu-panel">
           <div class="paper-border">
-            <p class="paper-eyebrow">FELIX WANG’S</p><h2 class="menu-logo" id="dialog-title">after hours</h2><p class="menu-subtitle">THE MIDNIGHT MENU</p>
-            <div class="menu-rule"><span>✳</span></div>
-            <div class="menu-intro"><h3>House specials.</h3><span>SELECTED WORK</span></div>
-            <p class="menu-intro-copy">Products I’ve helped build, launch, and grow.</p>
+            <p class="paper-eyebrow">FELIX WANG’S</p><h2 class="menu-logo" id="dialog-title">after hours</h2>
+            <div class="menu-intro"><h3>House specials.</h3></div>
             <WorkMenu interactive />
-            <div class="menu-bottom-note"><span>Made from scratch.</span><span>Best shared with good company.</span></div>
             <p class="menu-signature">Thanks for stopping by, <em>Felix</em></p>
           </div>
-        </section>
-        <section data-panel="other-work" class="paper-panel other-work-panel" hidden>
-          <p class="paper-eyebrow">AFTER HOURS / OTHER WORK</p><h2 class="panel-heading">À la carte.</h2><p class="other-work-deck">A few more things I’ve had a hand in.</p>
-          <OtherWorkMenu interactive />
-          <div class="story-footer"><a href="/work/other/">Open the standalone menu ↗</a><button data-panel-back>Back to the menu →</button></div>
         </section>
         <section data-panel="notebook" class="paper-panel notebook-panel" hidden>
           <p class="paper-eyebrow">OFF THE MAIN MENU / PERSONAL NOTEBOOK</p><h2 class="panel-heading">Little ideas.<br /><em>Long detours.</em></h2><p class="panel-intro">Games, art, objects. Sometimes the side quest is the interesting part.</p>
@@ -102,7 +93,6 @@ import { seats } from '../diner/seats';
         {projects.map(project => <section class="paper-panel project-panel" data-panel={`project-${project.slug}`} data-story-group={project.featured ? 'HOUSE SPECIAL' : 'OTHER WORK'} hidden>
           <p class="paper-eyebrow">{project.featured ? `HOUSE SPECIAL ${project.number}` : 'OTHER WORK'} / {project.type.toUpperCase()}</p><h2 class="panel-heading">{project.name}</h2><p class="project-intro">{project.intro}</p>
           <dl class="story-meta"><div><dt>YEAR</dt><dd>{project.year}</dd></div><div><dt>{project.brief ? 'FOCUS' : 'MY ROLE'}</dt><dd>{project.role}</dd></div><div><dt>TOOLS</dt><dd>{project.tools}</dd></div></dl>
-          {project.outcomes.length > 0 && <dl class="story-outcomes" aria-label="Project outcomes">{project.outcomes.map(outcome => <div><dt>{outcome.label}</dt><dd>{outcome.value}</dd></div>)}</dl>}
           {project.cover && <img class="story-cover" src={`/images/${project.cover}.webp`} alt={project.coverAlt || `${project.name} project presentation`} width="1600" height="900" loading="lazy" />}
           <div class="story-section"><h3>{project.brief ? 'My contribution.' : 'The idea.'}</h3><p>{project.story}</p></div>{project.approach && <div class="story-section"><h3>In the making.</h3><p>{project.approach}</p><p>{project.detail}</p></div>}
           {project.gallery && <img class="story-gallery" src={`/images/${project.gallery}.webp`} alt={project.galleryAlt || `A closer look at ${project.name}`} width="1600" height="900" loading="lazy" />}

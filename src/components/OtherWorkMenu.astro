@@ -2,13 +2,11 @@
 import { otherProjects } from '../data/projects';
 interface Props { interactive?: boolean; }
 const { interactive = false } = Astro.props;
-const categories = ['Software & AI', 'New interfaces', 'Physical systems'];
+const categories = ['New interfaces', 'Software & AI', 'Physical systems'];
+const orderedProjects = categories.flatMap(category => otherProjects.filter(project => project.category === category));
 ---
-<div class="a-la-carte">
-  {categories.map((category, index) => <section class="menu-course" aria-label={category}>
-    <header><span aria-hidden="true">0{index + 1}</span><h3>{category}</h3><span class="course-count">{otherProjects.filter(project => project.category === category).length}</span></header>
-    <div>{otherProjects.filter(project => project.category === category).map(project => <a class="side-dish" href={`/work/${project.slug}/`} data-project={interactive ? project.slug : undefined}>
-      <div class="side-dish-body"><div class="side-dish-title"><h4>{project.name}</h4><span class="dish-dots" aria-hidden="true"></span><span class="dish-year">{project.year}</span></div><p>{project.brief ? project.intro : project.description}</p></div><span class="side-dish-arrow" aria-hidden="true">↗</span>
-    </a>)}</div>
-  </section>)}
+<div class="other-work-list">
+  {orderedProjects.map(project => <a class="side-dish" href={`/work/${project.slug}/`} data-project={interactive ? project.slug : undefined}>
+    <div class="side-dish-body"><h4>{project.name}</h4><p>{project.brief ? project.intro : project.menuDescription}</p></div><span class="side-dish-arrow" aria-hidden="true">↗</span>
+  </a>)}
 </div>
