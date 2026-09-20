@@ -89,6 +89,8 @@ export function initDiner() {
         }
     }
     function action(name: ObjectName) {
+        const hotspot = document.querySelector<HTMLElement>(`[data-hotspot="${name}"]`);
+        if (hotspot) hotspot.dataset.explored = 'true';
         if (name.startsWith('seat-')) {
             if (!scene) return;
             clearTimeout(openTimer);
