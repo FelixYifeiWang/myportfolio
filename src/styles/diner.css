@@ -571,6 +571,9 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
 .project-panel {
   padding: 40px 48px;
 }
+.project-panel .panel-heading:focus {
+  outline: none;
+}
 .project-intro {
   font: 27px/1.4 var(--serif);
   color: #8a6343;
