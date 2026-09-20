@@ -12,11 +12,13 @@ test('night background stays behind all visitors and is clipped to the aperture'
   assert.equal(night.material.map, null);
   assert.ok(night.geometry.index.count / 3 <= 500);
 });
-test('porch lighting faces outside and adds no shadow rendering', () => {
+test('porch light casts face shadows without spilling into the room', () => {
   const light = createDoorwayLight();
-  const outward = new THREE.Vector3(0, 0, -1).applyQuaternion(light.quaternion);
-  assert.ok(outward.x < -.999, 'Light must face directly outwards so it cannot illuminate through the room wall');
-  assert.equal(light.castShadow, false);
+  const outward = light.target.position.clone().sub(light.position).normalize();
+  assert.ok(outward.x < -Math.sin(light.angle), 'The entire light cone must point outside');
+  assert.equal(light.castShadow, true);
+  assert.ok(light.shadow.mapSize.x <= 512 && light.shadow.mapSize.y <= 512);
+  assert.equal(light.shadow.autoUpdate, false, 'A static visitor should not redraw its shadow every frame');
 });
 
 test('the window-side return wall hides the window scenery from the entrance', () => {

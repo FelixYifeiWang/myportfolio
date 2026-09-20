@@ -28,6 +28,7 @@ export interface DinerWorld {
     lights: THREE.Light[];
     entrance: ReturnType<typeof addFurnishings>;
     doorstep: THREE.Group;
+    doorstepLight: THREE.SpotLight;
 }
 const materialCache = new Map<string, THREE.MeshStandardMaterial>();
 function surface(color: string, roughness = .7, metalness = 0) {
@@ -377,9 +378,10 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     doorstep.name = 'Doorstep';
     doorstep.add(createDoorwayNight(), createDoorwaySideWall(plasterGrain));
     // Keep the outward-facing light registered even with the door shut, avoiding
-    // lighting-program recompilation on each arrival. It has no shadow map.
-    group.add(createDoorwayLight());
-    box(3, .08, 6, surface('#303b39', .48), -6.525, -.005, 2.65, doorstep, 0);
+    // lighting-program recompilation on each arrival. Its small shadow map is cached.
+    const doorstepLight = createDoorwayLight();
+    group.add(doorstepLight, doorstepLight.target);
+    box(3, .08, 6, surface('#121a17', .92), -6.525, -.005, 2.65, doorstep, 0);
     doorstep.visible = false;
     group.add(doorstep);
     // Floating steam is rendered inside the room, not layered onto the page.
@@ -446,7 +448,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         batchStaticMeshes(object as THREE.Group, [vinyl]);
         object.traverse(child => { child.userData.action = object.userData.action; });
     }
-    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, ceiling, sideWall, lights, entrance, doorstep };
+    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, ceiling, sideWall, lights, entrance, doorstep, doorstepLight };
 }
 function addCounterDetails(parent: THREE.Object3D, props: DinerProps) {
     const bowl = placeProp(props.ramen, .34, new THREE.Vector3(-1.63, 1.85, -.59), .3, parent);

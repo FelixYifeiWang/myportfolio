@@ -132,6 +132,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             shell.dataset.visitor = visitor.name;
             world.doorstep.add(visitor);
             world.doorstep.visible = true;
+            world.doorstepLight.shadow.needsUpdate = true;
             renderer.shadowMap.needsUpdate = true;
         },
         hide() {
@@ -615,6 +616,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
                 textures.add(value); }); material.dispose(); });
             geometries.forEach(geometry => geometry.dispose());
             textures.forEach(texture => texture.dispose());
+            world.doorstepLight.dispose();
             environment.dispose();
             renderer.dispose();
         },

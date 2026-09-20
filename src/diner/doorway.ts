@@ -43,8 +43,8 @@ export function createDoorwayNight() {
     const geometry = new THREE.PlaneGeometry(20, 12, 20, 12);
     const positions = geometry.getAttribute('position');
     const colors = new Float32Array(positions.count * 3);
-    const low = new THREE.Color('#111e23'), high = new THREE.Color('#344b53');
-    const warm = new THREE.Color('#594b37');
+    const low = new THREE.Color('#080e11'), high = new THREE.Color('#18252a');
+    const warm = new THREE.Color('#282820');
     for (let i = 0; i < positions.count; i++) {
         const x = positions.getX(i), y = positions.getY(i);
         const haze = Math.exp(-(x * x / 24 + (y - 1) ** 2 / 14));
@@ -61,12 +61,22 @@ export function createDoorwayNight() {
     return night;
 }
 
-/** Broad porch bounce aimed outwards: readable faces without another shadow map. */
+/** Dim overhead porch light: directional modelling and a cached face shadow. */
 export function createDoorwayLight() {
-    const light = new THREE.RectAreaLight('#ffe8ca', 2.7, 2.6, 3.2);
-    light.name = 'Warm doorway bounce';
-    light.position.set(-5.24, 2.55, 3.15);
-    light.lookAt(-6.5, 2.55, 3.15);
+    const light = new THREE.SpotLight('#f3ddc0', 3.0, 7, .38, .65, 2);
+    light.name = 'Porch downlight';
+    light.position.set(-5.30, 3.8, 3.5);
+    light.target.position.set(-6.3, 1.8, 2.6);
+    light.castShadow = true;
+    light.shadow.mapSize.set(512, 512);
+    light.shadow.camera.near = .1;
+    light.shadow.camera.far = 7;
+    light.shadow.bias = -.0002;
+    light.shadow.normalBias = .008;
+    light.shadow.radius = 2;
+    // Only rebuild when a new visitor arrives; the porch and visitor stay still.
+    light.shadow.autoUpdate = false;
+    light.shadow.needsUpdate = true;
     return light;
 }
 
@@ -74,8 +84,8 @@ export function createDoorwayLight() {
 export function createDoorwaySideWall(grain?: THREE.Texture) {
     const wall = new THREE.Group();
     wall.name = 'Window-side porch wall';
-    const plaster = new THREE.MeshStandardMaterial({ color: '#58605a', roughness: .94, bumpMap: grain, bumpScale: .022 });
-    const base = new THREE.MeshStandardMaterial({ color: '#303b37', roughness: .82 });
+    const plaster = new THREE.MeshStandardMaterial({ color: '#151d1b', roughness: .94, bumpMap: grain ?? null, bumpScale: .022 });
+    const base = new THREE.MeshStandardMaterial({ color: '#101613', roughness: .82 });
     const panel = new THREE.Mesh(new THREE.BoxGeometry(3.6, 4.8, .20), plaster);
     panel.position.set(-6.84, 2.4, 1.70);
     const skirting = new THREE.Mesh(new THREE.BoxGeometry(3.6, .35, .22), base);
