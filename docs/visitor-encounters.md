@@ -6,7 +6,7 @@ Local feature branch: `feature/door-visitors`. Not deployed. Preview: http://127
 
 Click the existing door. Download and prepare one visitor behind the closed leaf, open inward to **30°** over 1.3 seconds, hold for 2.5 seconds, then close before removing the visitor. The camera stays exactly where the viewer put it. Escape closes the encounter without leaving a seat or resetting the camera. Other item/seat navigation cancels the visit. No immediate repeat when multiple visitors are available.
 
-The restricted swing clears the left stool, frame, mat, and threshold throughout the motion. Each visitor is placed by its nearest surface, including accessories, to prevent the closed leaf passing through it. A stencil aperture confines the nighttime exterior to the doorway, so no extra border appears outside the room. The backdrop is a single curved panorama with soft city lights, rather than a boxed-in wall. Some seated angles naturally see less of the doorway behind the leaf; there is deliberately no automatic reframing. The overview provides the clearest reveal.
+The restricted swing clears the left stool, frame, mat, and threshold throughout the motion. Each visitor is placed by its nearest surface, including accessories, to prevent the closed leaf passing through it. A stencil aperture confines the nighttime exterior to the doorway, so no extra border appears outside the room. There is no exterior backdrop; the visitor appears against the scene’s plain dark background. Some seated angles naturally see less of the doorway behind the leaf; there is deliberately no automatic reframing. The overview provides the clearest reveal.
 
 Three visitors are accepted in the local preview:
 

@@ -9,7 +9,7 @@ import { createWindowRain, type WindowRain } from './rain';
 import { createSeatedCeiling } from './ceiling';
 import { createSeatedSideWall } from './side-wall';
 import { placeProp, type DinerProps } from './assets';
-import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, doorwayNightTexture, windowBeadsTexture, ceramicTexture } from './textures';
+import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, windowBeadsTexture, ceramicTexture } from './textures';
 import { seats, type SeatName } from './seats';
 import { createVaseArrangement, createUtensilHolder } from './counter-props';
 import { createShelfBracket, createFootRail } from './hardware';
@@ -375,11 +375,6 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     // An aperture mask keeps the exterior recess inside the real doorway silhouette.
     const doorstep = new THREE.Group();
     doorstep.name = 'Doorstep';
-    const night = new THREE.MeshBasicMaterial({ map: doorwayNightTexture(), side: THREE.BackSide, toneMapped: false });
-    const street = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 6, 32, 1, true, Math.PI, Math.PI), night);
-    street.name = 'Distant night street';
-    street.position.set(-5.025, 3, 2.65);
-    doorstep.add(street);
     box(3, .08, 6, surface('#303b39', .48), -6.525, -.005, 2.65, doorstep, 0);
     doorstep.visible = false;
     group.add(doorstep);
