@@ -28,30 +28,35 @@ function rectangle(width: number, height: number, x = 0) {
     return shape;
 }
 
-/** Small environmental pieces share the room palette and are batched with its shell. */
-export function addFurnishings(parent: THREE.Group, palette: Palette, doorTexture: THREE.Texture) {
-    const painted = new THREE.MeshStandardMaterial({ color: '#344a40', roughness: .72 });
-    const linen = new THREE.MeshStandardMaterial({ color: '#b5ad94', roughness: 1 });
-    const clay = new THREE.MeshStandardMaterial({ color: '#a46c49', roughness: .85 });
+/** Original entrance styling, with a separate hinged leaf for visitor encounters. */
+export function createEntrance(palette: Palette, doorTexture: THREE.Texture,
+    painted = new THREE.MeshStandardMaterial({ color: '#344a40', roughness: .72 }),
+    linen = new THREE.MeshStandardMaterial({ color: '#b5ad94', roughness: 1 })) {
     const door = new THREE.Group();
     door.name = 'Entrance';
     door.position.set(-4.86, 0, 2.65);
     door.rotation.y = Math.PI / 2;
-    parent.add(door);
-    box(1.72, 3.67, .20, palette.darkwood, 0, 1.85, -.05, door);
-    box(1.53, 3.48, .12, painted, 0, 1.80, .055, door);
-    for (const x of [-.69, .69]) box(.055, 3.39, .035, palette.walnut, x, 1.8, .129, door);
-    box(1.18, 1.50, .04, palette.brass, 0, 2.48, .132, door);
+
+    const hinge = new THREE.Group();
+    hinge.position.x = .86;
+    door.add(hinge);
+    const leaf = new THREE.Group();
+    leaf.position.x = -.86;
+    hinge.add(leaf);
+    box(1.72, 3.67, .20, palette.darkwood, 0, 1.85, -.05, leaf);
+    box(1.53, 3.48, .12, painted, 0, 1.80, .055, leaf);
+    for (const x of [-.69, .69]) box(.055, 3.39, .035, palette.walnut, x, 1.8, .129, leaf);
+    box(1.18, 1.50, .04, palette.brass, 0, 2.48, .132, leaf);
     const glass = new THREE.MeshStandardMaterial({ map: doorTexture, roughness: .4, emissive: '#8ba59b', emissiveIntensity: .12 });
-    box(1.10, 1.42, .03, glass, 0, 2.48, .16, door, 0);
+    box(1.10, 1.42, .03, glass, 0, 2.48, .16, leaf, 0);
     for (const y of [.63, 1.27]) {
-        box(1.17, .48, .04, palette.darkwood, 0, y, .131, door);
-        box(1.10, .41, .044, painted, 0, y, .147, door);
+        box(1.17, .48, .04, palette.darkwood, 0, y, .131, leaf);
+        box(1.10, .41, .044, painted, 0, y, .147, leaf);
     }
-    box(.12, .40, .03, palette.brass, -.55, 1.49, .15, door);
-    const handle = tube([[-.55, 1.37, .19], [-.55, 1.39, .25], [-.55, 1.61, .25], [-.55, 1.63, .19]], .025, palette.brass, door);
+    box(.12, .40, .03, palette.brass, -.55, 1.49, .15, leaf);
+    const handle = tube([[-.55, 1.37, .19], [-.55, 1.39, .25], [-.55, 1.61, .25], [-.55, 1.63, .19]], .025, palette.brass, leaf);
     handle.name = 'Door pull';
-    box(1.36, .10, .025, palette.brass, 0, .21, .133, door);
+    box(1.36, .10, .025, palette.brass, 0, .21, .133, leaf);
     box(1.64, .035, .28, palette.walnut, 0, .035, .13, door);
     const mat = new THREE.MeshStandardMaterial({ color: '#414338', roughness: 1 });
     box(1.35, .025, .73, mat, 0, .03, .61, door);
@@ -61,6 +66,19 @@ export function addFurnishings(parent: THREE.Group, palette: Palette, doorTextur
     tube([[0, 3.99, -.09], [0, 4.0, .28], [0, 4.19, .32]], .024, palette.brass, door);
     sphere(.14, .19, .14, palette.glow, 0, 4.08, .32, door);
     lathe([[0, .12], [.08, .12], [.20, 0], [.21, -.025]], palette.brass, 0, 4.24, .32, door);
+
+    return { group: door, hinge, leaf, setOpen(openness: number) {
+        hinge.rotation.y = Math.max(0, Math.min(1, openness)) * Math.PI * .53;
+    } };
+}
+
+/** Small environmental pieces share the room palette and are batched with its shell. */
+export function addFurnishings(parent: THREE.Group, palette: Palette, doorTexture: THREE.Texture) {
+    const painted = new THREE.MeshStandardMaterial({ color: '#344a40', roughness: .72 });
+    const linen = new THREE.MeshStandardMaterial({ color: '#b5ad94', roughness: 1 });
+    const clay = new THREE.MeshStandardMaterial({ color: '#a46c49', roughness: .85 });
+    const entrance = createEntrance(palette, doorTexture, painted, linen);
+    parent.add(entrance.group);
 
     // Deliberately varied shelf groups: storage ceramics, bowls and a few bottles.
     for (const [x, height] of [[2.05, .42], [2.56, .56]]) {
