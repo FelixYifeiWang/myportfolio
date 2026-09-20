@@ -71,7 +71,7 @@ export function createEntrance(palette: Palette, doorTexture: THREE.Texture,
     lathe([[0, .12], [.08, .12], [.20, 0], [.21, -.025]], palette.brass, 0, 4.24, .32, door);
 
     return { group: door, hinge, leaf, setOpen(openness: number) {
-        hinge.rotation.y = Math.max(0, Math.min(1, openness)) * Math.PI / 6;
+        hinge.rotation.y = Math.max(0, Math.min(1, openness)) * Math.PI * 35 / 180;
     } };
 }
 

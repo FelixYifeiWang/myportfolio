@@ -63,3 +63,12 @@ test('floating visitors retain their configured ground clearance', () => {
   const asset = prepareVisitor(model(), { ...spec, elevation: 1.25 });
   assert.ok(Math.abs(new THREE.Box3().setFromObject(asset).min.y - 1.25) < 1e-5);
 });
+
+test('oversized source requests are capped at human height without stretching', () => {
+  const source = new THREE.Group();
+  source.add(new THREE.Mesh(new THREE.BoxGeometry(.4, 10, .3), new THREE.MeshStandardMaterial()));
+  const asset = prepareVisitor(source, { ...spec, height: 10, rotation: 0 });
+  const size = new THREE.Box3().setFromObject(asset).getSize(new THREE.Vector3());
+  assert.ok(Math.abs(size.y - 2.8) < 1e-5);
+  assert.ok(Math.abs(size.x / size.y - .04) < 1e-5);
+});

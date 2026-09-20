@@ -1,6 +1,8 @@
 type Phase = 'closed' | 'loading' | 'opening' | 'holding' | 'closing';
 interface EncounterHooks<T> {
     load: (id: string) => Promise<T>;
+    knock?: () => Promise<void>;
+    stopKnock?: () => void;
     show: (asset: T) => void;
     hide: () => void;
     angle: (openness: number) => void;
@@ -34,7 +36,9 @@ export class DoorEncounter<T> {
         this.phase = 'loading';
         this.hooks.changed();
         try {
-            const asset = await this.hooks.load(id);
+            // Begin audio while the original click still grants playback permission.
+            const knock = this.hooks.knock?.();
+            const [asset] = await Promise.all([this.hooks.load(id), knock]);
             if (request !== this.request || this.disposed) return;
             this.hooks.show(asset);
             this.previous = id;
@@ -44,6 +48,7 @@ export class DoorEncounter<T> {
         catch (error) {
             if (request !== this.request || this.disposed) return;
             this.phase = 'closed';
+            this.hooks.stopKnock?.();
             this.hooks.error(error);
         }
         this.hooks.changed();
@@ -51,6 +56,7 @@ export class DoorEncounter<T> {
     close() {
         if (this.disposed || this.phase === 'closed' || this.phase === 'closing') return;
         this.request++;
+        this.hooks.stopKnock?.();
         if (this.phase === 'loading') this.phase = 'closed';
         else {
             this.closeFrom = this.openness;
@@ -80,6 +86,7 @@ export class DoorEncounter<T> {
     }
     dispose() {
         this.request++;
+        this.hooks.stopKnock?.();
         this.disposed = true;
         this.phase = 'closed';
         this.hooks.angle(0);

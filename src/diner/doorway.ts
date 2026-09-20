@@ -32,6 +32,8 @@ export function maskDoorwayContent(content: THREE.Object3D) {
 export function placeDoorwayVisitor(visitor: THREE.Group) {
     visitor.position.set(0, 0, 0);
     const bounds = new THREE.Box3().setFromObject(visitor, true);
-    visitor.position.set(-5.12 - bounds.max.x, .04, 3.43 - bounds.max.z);
+    const peekOffset = visitor.userData.peekOffset ?? 0;
+    // A broad visitor can peek beside the jamb, entirely outside the wall thickness.
+    visitor.position.set((peekOffset ? -5.25 : -5.12) - bounds.max.x, .04, 3.43 + peekOffset - bounds.max.z);
     maskDoorwayContent(visitor);
 }

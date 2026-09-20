@@ -11,6 +11,7 @@ import { seats, isSeat } from './seats';
 import { ViewHistory, type View } from './view-history';
 import { placeDoorwayVisitor } from './doorway';
 import { DoorEncounter } from './door-encounter';
+import { DoorKnock } from './door-knock';
 import { VisitorLibrary, visitors } from './visitor-assets';
 export interface DinerScene {
     focus: (name: View, remember?: boolean) => number;
@@ -111,11 +112,14 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     let qualityScale = 1, slowFrames = 0, sampledFrames = 0;
     const createdAt = performance.now();
     const visitorLibrary = new VisitorLibrary();
+    const doorKnock = new DoorKnock();
     let visibleVisitor: THREE.Group | null = null;
     const doorButton = document.querySelector<HTMLButtonElement>('[data-hotspot="door"]')!;
     const previewVisitor = import.meta.env.DEV ? new URL(window.location.href).searchParams.get('visitor') : null;
     const roster = visitors.some(visitor => visitor.id === previewVisitor) ? [previewVisitor!] : visitors.map(visitor => visitor.id);
     const encounter = new DoorEncounter(roster, {
+        knock: () => doorKnock.play(),
+        stopKnock: () => doorKnock.stop(),
         async load(id) {
             const visitor = await visitorLibrary.load(id);
             if (disposed) throw new Error('Diner is disposed.');
@@ -419,6 +423,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     }
     function visibilityChanged() {
         if (document.hidden) {
+            encounter.close();
             stopSeatedDrag();
             if (isSeat(currentView) && !transition) seatedLook.reset(controls.target);
             stopIntro();
@@ -574,6 +579,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         dispose() {
             disposed = true;
             encounter.dispose();
+            doorKnock.dispose();
             visitorLibrary.dispose();
             stopSeatedDrag();
             stopScheduledFrame();

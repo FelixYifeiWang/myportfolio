@@ -81,3 +81,37 @@ test('disposal cancels pending loads and all later interactions', async () => {
   tick(encounter, 10);
   assert.equal(events.length, count);
 });
+
+test('each accepted visit knocks before opening; busy clicks do not knock again', async () => {
+  let finishKnock, knocks = 0;
+  const encounter = new DoorEncounter(['link'], {
+    load: async id => id,
+    knock: () => { knocks++; return new Promise(resolve => { finishKnock = resolve; }); },
+    stopKnock() {}, show() {}, hide() {}, angle() {}, changed() {}, error: assert.fail,
+  });
+  const pending = encounter.open();
+  await encounter.open();
+  await Promise.resolve();
+  assert.equal(encounter.phase, 'loading');
+  assert.equal(knocks, 1);
+  finishKnock(); await pending;
+  assert.equal(encounter.phase, 'opening');
+  tick(encounter, 10);
+  const second = encounter.open();
+  assert.equal(knocks, 2);
+  finishKnock(); await second;
+});
+test('escape during the knock cancels sound and cannot open a late visitor', async () => {
+  let finishKnock, stopped = false, shown = false;
+  const encounter = new DoorEncounter(['link'], {
+    load: async id => id,
+    knock: () => new Promise(resolve => { finishKnock = resolve; }),
+    stopKnock() { stopped = true; finishKnock(); },
+    show() { shown = true; }, hide() {}, angle() {}, changed() {}, error: assert.fail,
+  });
+  const pending = encounter.open();
+  encounter.close(); await pending;
+  assert.equal(stopped, true);
+  assert.equal(shown, false);
+  assert.equal(encounter.phase, 'closed');
+});

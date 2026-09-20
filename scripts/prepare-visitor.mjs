@@ -3,12 +3,12 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { metalRough, dedup, prune, join, weld, textureCompress } from '@gltf-transform/functions';
+import { metalRough, dedup, prune, join, weld, textureCompress, meshopt } from '@gltf-transform/functions';
 import { MeshoptEncoder, MeshoptDecoder } from 'meshoptimizer';
 import sharp from 'sharp';
 
 const [id, source, destination] = process.argv.slice(2);
-if (!['link', 'pikachu', 'eye'].includes(id) || !source || !destination) throw new Error('Usage: node scripts/prepare-visitor.mjs <link|pikachu|eye> <source.glb> <output.glb>');
+if (!id || !/^[a-z-]+$/.test(id) || !source || !destination) throw new Error('Usage: node scripts/prepare-visitor.mjs <id> <source.glb> <output.glb>');
 await MeshoptEncoder.ready;
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.encoder': MeshoptEncoder, 'meshopt.decoder': MeshoptDecoder });
 const document = await io.read(source);
@@ -37,6 +37,17 @@ if (id === 'link') {
         gltf.scene.updateMatrixWorld(true);
     });
 }
+if (id === 'joker' || id === 'kim') {
+    const shoulders = id === 'joker' ? [['bone_18_019', -.55], ['bone_19_020', .55]] : [['mixamorigLeftArm_08', -.36], ['mixamorigRightArm_020', .36]];
+    for (const [name, angle] of shoulders) {
+        const bone = gltf.scene.getObjectByName(name);
+        if (!bone?.parent) throw new Error(`Missing visitor shoulder: ${name}`);
+        const turn = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
+        const world = bone.getWorldQuaternion(new THREE.Quaternion());
+        bone.quaternion.copy(bone.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(turn.multiply(world)));
+        gltf.scene.updateMatrixWorld(true);
+    }
+}
 const root = document.getRoot();
 const originalMeshes = root.listMeshes();
 const bakedScene = document.createScene('Doorway visitor');
@@ -51,11 +62,21 @@ gltf.scene.traverse(object => {
     // The source includes a spare sword and shield floating beside the hands.
     // Keep the carried gear on Link's back; omit those unattached duplicates.
     if (id === 'link' && ref.meshes >= 38) return;
+    // Chamber includes both a static character and a second rigged copy.
+    if (id === 'chamber' && ref.meshes >= 5) return;
+    // Keep Azir and his staff; omit the separate display sun disc.
+    if (id === 'azir' && ref.meshes === 0) return;
+    // His outstretched hammer pushes the face too far behind the door leaf.
+    if (id === 'arthas' && ref.meshes === 1) return;
     const mesh = originalMeshes[ref.meshes];
-    const primitive = mesh.listPrimitives()[ref.primitives];
+    const sourcePrimitive = mesh.listPrimitives()[ref.primitives];
+    // Remove the display plinth; the visitor stands directly on the doorstep.
+    if (id === 'astarion' && sourcePrimitive.getMaterial()?.getName() === 'Base.002') return;
+    const primitive = sourcePrimitive.clone();
     // The exporter made the cornea opaque, covering the entire iris.
     if (id === 'eye' && primitive.getMaterial()?.getName() === 'boss_eye_cthulhu_glass_v2') return;
     const geometry = object.geometry;
+    if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
     const count = geometry.getAttribute('position').count;
     const positions = new Float32Array(count * 3), normals = new Float32Array(count * 3);
     if (object.isSkinnedMesh) object.skeleton.update();
@@ -80,7 +101,10 @@ gltf.scene.traverse(object => {
     primitive.setAttribute('POSITION', document.createAccessor().setType('VEC3').setArray(positions).setBuffer(buffer));
     primitive.setAttribute('NORMAL', document.createAccessor().setType('VEC3').setArray(normals).setBuffer(buffer));
     for (const semantic of ['JOINTS_0', 'WEIGHTS_0', 'TANGENT']) primitive.setAttribute(semantic, null);
-    baked.push(document.createNode(object.name).setMesh(mesh));
+    // GLTFLoader splits multi-material meshes into one object per primitive.
+    // Bake only that primitive, otherwise every material duplicates the full mesh.
+    const bakedMesh = document.createMesh(object.name).addPrimitive(primitive);
+    baked.push(document.createNode(object.name).setMesh(bakedMesh));
 });
 for (const scene of root.listScenes()) if (scene !== bakedScene) scene.dispose();
 for (const node of root.listNodes()) if (!baked.includes(node)) { node.setMesh(null); node.setSkin(null); }
@@ -88,6 +112,7 @@ for (const node of baked) bakedScene.addChild(node);
 root.setDefaultScene(bakedScene);
 for (const animation of root.listAnimations()) animation.dispose();
 // Retain float positions: this source's closely layered clothing flickers when quantized.
-await document.transform(prune(), dedup(), weld(), join(), textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [1024, 1024], quality: 88 }));
+await document.transform(prune(), dedup(), weld(), join(), textureCompress({ encoder: sharp, targetFormat: 'webp', resize: ['chamber', 'ranni', 'esquie', 'wolf'].includes(id) ? [768, 768] : [1024, 1024], quality: ['chamber', 'ranni', 'esquie', 'wolf'].includes(id) ? 82 : 88 }));
+if (['ranni', 'jackie', 'esquie', 'shadowheart', 'wolf', 'astarion'].includes(id)) await document.transform(meshopt({ encoder: MeshoptEncoder, level: 'high', quantizePosition: 16, quantizeNormal: 10, quantizeTexcoord: 14 }));
 await io.write(destination, document);
 console.log(`${id}: ${(await fs.stat(destination)).size} bytes; ${root.listMeshes().reduce((n,m) => n + m.listPrimitives().length, 0)} material batches; ${root.listSkins().length} skins`);

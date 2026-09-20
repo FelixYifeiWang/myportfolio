@@ -55,8 +55,8 @@ test('the limited door swing leaves clearance around the left stool', () => {
 test('the door opens only far enough for a peek', () => {
   const door = createEntrance(palette, new THREE.Texture());
   door.setOpen(1);
-  assert.ok(door.hinge.rotation.y <= Math.PI / 6 + 1e-8);
-  assert.ok(door.hinge.rotation.y >= Math.PI / 7);
+  assert.ok(door.hinge.rotation.y <= Math.PI * 35 / 180 + 1e-8);
+  assert.ok(door.hinge.rotation.y >= Math.PI * 34 / 180);
 });
 
 test('the leaf clears the hinge jamb, threshold, and mat throughout its swing', () => {
