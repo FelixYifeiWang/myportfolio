@@ -65,7 +65,7 @@ export function initDiner() {
         dialog.classList.toggle('is-story', project);
         dialog.classList.toggle('is-notebook', panel === 'notebook');
         back.hidden = !project;
-        location.textContent = project ? 'HOUSE SPECIAL / THE STORY' : panel === 'notebook' ? 'A FEW THINGS ON THE SIDE' : panel === 'about' ? 'MEET YOUR HOST' : 'AT THE COUNTER';
+        location.textContent = project ? `${target.dataset.storyGroup || 'HOUSE SPECIAL'} / THE STORY` : panel === 'notebook' ? 'A FEW THINGS ON THE SIDE' : panel === 'about' ? 'MEET YOUR HOST' : 'AT THE COUNTER';
         dialog.removeAttribute('aria-labelledby');
         dialog.setAttribute('aria-label', titles[panel] || target.querySelector('h2')?.textContent || 'Project story');
         scroll.scrollTop = backwards ? panelPositions.get(panel) ?? 0 : 0;

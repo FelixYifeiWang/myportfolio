@@ -2,6 +2,7 @@
 import '../styles/fonts.css';
 import '../styles/diner.css';
 import { projects } from '../data/projects';
+import WorkMenu from '../components/WorkMenu.astro';
 import { seats } from '../diner/seats';
 
 
@@ -72,9 +73,9 @@ import { seats } from '../diner/seats';
           <div class="paper-border">
             <p class="paper-eyebrow">FELIX WANG’S</p><h2 class="menu-logo" id="dialog-title">after hours</h2><p class="menu-subtitle">THE MIDNIGHT MENU</p>
             <div class="menu-rule"><span>✳</span></div>
-            <div class="menu-intro"><h3>House specials.</h3><span>SELECTED WORK<br />2021 — 2024</span></div>
-            <p class="menu-intro-copy">A few things I’ve made with curiosity, care,<br />and the occasional very late night.</p>
-            <div class="diner-menu-items">{projects.map(project => <a class="diner-menu-item" href={`/work/${project.slug}/`} data-project={project.slug}><span class="dish-number">{project.number}</span><div class="dish-info"><div class="dish-name"><h4>{project.name}</h4><span class="dish-dots"></span><span class="dish-year">{project.year}</span></div><p>{project.description}</p><span class="dish-type">{project.type}</span></div><span class="dish-arrow" aria-hidden="true">↗</span></a>)}</div>
+            <div class="menu-intro"><h3>House specials.</h3><span>SELECTED WORK</span></div>
+            <p class="menu-intro-copy">Products I’ve helped build, launch, and grow.</p>
+            <WorkMenu interactive />
             <div class="menu-bottom-note"><span>Made from scratch.</span><span>Best shared with good company.</span></div>
             <p class="menu-signature">Thanks for stopping by, <em>Felix</em></p>
           </div>
@@ -92,9 +93,10 @@ import { seats } from '../diner/seats';
           <div class="contact-card"><span class="paper-eyebrow">THERE’S ALWAYS ROOM FOR A CONVERSATION</span><a href="mailto:wangyifeifelix@gmail.com">Say hello <span>↗</span></a><p>wangyifeifelix@gmail.com</p></div>
           <div class="about-links"><a href="https://github.com/FelixYifeiWang" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/felix-wang1" target="_blank" rel="noreferrer">LinkedIn ↗</a></div>
         </section>
-        {projects.map(project => <section class="paper-panel project-panel" data-panel={`project-${project.slug}`} hidden>
-          <p class="paper-eyebrow">HOUSE SPECIAL {project.number} / {project.type.toUpperCase()}</p><h2 class="panel-heading">{project.name}</h2><p class="project-intro">{project.intro}</p>
+        {projects.map(project => <section class="paper-panel project-panel" data-panel={`project-${project.slug}`} data-story-group={project.featured ? 'HOUSE SPECIAL' : 'OTHER WORK'} hidden>
+          <p class="paper-eyebrow">{project.featured ? `HOUSE SPECIAL ${project.number}` : 'OTHER WORK'} / {project.type.toUpperCase()}</p><h2 class="panel-heading">{project.name}</h2><p class="project-intro">{project.intro}</p>
           <dl class="story-meta"><div><dt>YEAR</dt><dd>{project.year}</dd></div><div><dt>MY ROLE</dt><dd>{project.role}</dd></div><div><dt>TOOLS</dt><dd>{project.tools}</dd></div></dl>
+          {project.outcomes.length > 0 && <dl class="story-outcomes" aria-label="Project outcomes">{project.outcomes.map(outcome => <div><dt>{outcome.label}</dt><dd>{outcome.value}</dd></div>)}</dl>}
           <img class="story-cover" src={`/images/${project.cover}.webp`} alt={`${project.name} project presentation`} width="1600" height="900" loading="lazy" />
           <div class="story-section"><h3>The idea.</h3><p>{project.story}</p></div><div class="story-section"><h3>In the making.</h3><p>{project.approach}</p><p>{project.detail}</p></div>
           <img class="story-gallery" src={`/images/${project.gallery}.webp`} alt={`A closer look at ${project.name}`} width="1600" height="900" loading="lazy" />

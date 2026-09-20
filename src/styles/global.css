@@ -667,6 +667,23 @@ h2 {
   object-fit:contain;
   background:#eae6de
 }
+.project-outcomes {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:20px;
+  padding:0 0 35px;
+  margin:0 0 35px;
+  border-bottom:1px solid var(--line)
+}
+.project-outcomes>div { display:flex; flex-direction:column-reverse; justify-content:end; gap:8px }
+.project-outcomes dt { font-size:13px; line-height:1.5; color:var(--muted) }
+.project-outcomes dd { margin:0; font:clamp(26px,4vw,50px)/1.1 var(--serif); color:var(--accent) }
+@media(max-width:600px) {
+  .project-outcomes { grid-template-columns:1fr; gap:18px }
+  .project-outcomes>div { flex-direction:row-reverse; align-items:baseline; justify-content:space-between; gap:20px }
+  .project-outcomes dd { flex:0 0 130px; font-size:36px }
+  .project-outcomes dt { flex:1 }
+}
 .project-story {
   display:grid;
   grid-template-columns:200px 1fr;

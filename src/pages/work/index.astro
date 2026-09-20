@@ -1,7 +1,30 @@
 ---
 import '../../styles/fonts.css';
 import '../../styles/diner.css';
-import { projects } from '../../data/projects';
+import WorkMenu from '../../components/WorkMenu.astro';
 ---
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="Selected projects by Yifei Felix Wang: technology, games, and art."/><title>The menu — After Hours / Felix Wang</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"/></head><body><main id="main" class="static-work-page"><a class="static-back" href="/">← Step into the diner</a><article><p class="paper-eyebrow">FELIX WANG’S AFTER HOURS</p><h1>House specials.</h1><p>Technology, games, art, and other curious things I’ve made.</p>{projects.map(project=><a class="diner-menu-item" href={`/work/${project.slug}/`}><span class="dish-number">{project.number}</span><div class="dish-info"><div class="dish-name"><h4>{project.name}</h4><span class="dish-dots"></span><span class="dish-year">{project.year}</span></div><p>{project.description}</p><span class="dish-type">{project.type}</span></div><span aria-hidden="true">↗</span></a>)}<section id="side-projects"><h2>On the side.</h2><p>Indie games, fine art, and custom 3D-printed toys. I like following an idea beyond the screen.</p><a href="/#on-the-side">Open the notebook in the diner ↗</a></section><section id="about-felix"><h2>Hi, I’m Felix.</h2><p>I build cool tech stuff to make people happy. Outside of making things: art, cats, games, and a very good meal.</p><p><a href="mailto:wangyifeifelix@gmail.com">wangyifeifelix@gmail.com ↗</a></p></section></article></main></body></html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Products Yifei Felix Wang has helped build, launch, and grow. AI, games, software, and physical products." />
+    <title>The menu — After Hours / Felix Wang</title>
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  </head>
+  <body>
+    <main id="main" class="static-work-page">
+      <a class="static-back" href="/">← Step into the diner</a>
+      <article>
+        <p class="paper-eyebrow">FELIX WANG’S AFTER HOURS</p>
+        <h1>House specials.</h1>
+        <p>Products I’ve helped build, launch, and grow.</p>
+        <WorkMenu />
+        <section id="side-projects"><h2>On the side.</h2><p>Indie games, fine art, and custom 3D-printed toys. I like following an idea beyond the screen.</p><a href="/#on-the-side">Open the notebook in the diner ↗</a></section>
+        <section id="about-felix"><h2>Hi, I’m Felix.</h2><p>I build cool tech stuff to make people happy. Outside of making things: art, cats, games, and a very good meal.</p><p><a href="mailto:wangyifeifelix@gmail.com">wangyifeifelix@gmail.com ↗</a></p></section>
+      </article>
+    </main>
+  </body>
+</html>
