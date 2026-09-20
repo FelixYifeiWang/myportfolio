@@ -85,8 +85,20 @@ export function signTexture() {
         ctx.fillText('after hours', 768, 238);
         ctx.shadowBlur = 0;
         ctx.font = '500 52px "DM Mono", monospace';
-        ctx.fillStyle = '#594331';
-        ctx.fillText('BY FELIX WANG', 768, 413);
+        ctx.fillStyle = '#eee5d5';
+        // Warm ivory lettering with a restrained edge shadow, like painted enamel.
+        ctx.shadowColor = '#49372b99';
+        ctx.shadowBlur = 2;
+        ctx.shadowOffsetY = 2;
+        const byline = 'BY FELIX WANG';
+        const tracking = 5;
+        const widths = [...byline].map(letter => ctx.measureText(letter).width);
+        let x = 768 - (widths.reduce((sum, width) => sum + width, 0) + tracking * (byline.length - 1)) / 2;
+        ctx.textAlign = 'left';
+        [...byline].forEach((letter, index) => {
+            ctx.fillText(letter, x, 416);
+            x += widths[index] + tracking;
+        });
     });
 }
 export function labelTexture(title: string, subtitle: string, color = '#dbcba8', ink = '#604735') {
