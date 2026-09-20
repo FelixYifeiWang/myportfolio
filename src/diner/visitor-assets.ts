@@ -12,7 +12,7 @@ export interface VisitorSpec {
 }
 export const visitors: readonly VisitorSpec[] = [
     { id: 'eye', name: 'Eye of Cthulhu', url: '/models/visitors/eye.glb', height: 1.10, rotation: Math.PI * .34, elevation: 1.35 },
-    { id: 'link', name: 'Link', url: '/models/visitors/link.glb', height: 2.75, rotation: Math.PI / 2 },
+    { id: 'link', name: 'Link', url: '/models/visitors/link.glb', height: 2.75, rotation: Math.PI * .37 },
     { id: 'pikachu', name: 'Pikachu', url: '/models/visitors/pikachu.glb', height: 1.4, rotation: Math.PI / 2 },
 ];
 

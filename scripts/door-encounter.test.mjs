@@ -21,7 +21,7 @@ test('visitor is ready before the door opens and disappears only after it closes
   assert.deepEqual(events[0], ['show', 'pikachu']);
   tick(encounter, 1.4);
   assert.equal(encounter.phase, 'holding');
-  tick(encounter, 6);
+  tick(encounter, 2.5);
   assert.equal(encounter.phase, 'closing');
   assert.ok(!events.some(([event]) => event === 'hide'));
   tick(encounter, 1.4);

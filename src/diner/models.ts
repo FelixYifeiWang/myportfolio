@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { batchStaticMeshes } from './optimize';
+import { createDoorwayMask, maskDoorwayContent } from './doorway';
 import { createEntranceWall } from './entrance-wall';
 import { addFurnishings, addContactShadows, createBackCounter } from './furnishings';
 import type { DinerCat } from './cat';
@@ -8,7 +9,7 @@ import { createWindowRain, type WindowRain } from './rain';
 import { createSeatedCeiling } from './ceiling';
 import { createSeatedSideWall } from './side-wall';
 import { placeProp, type DinerProps } from './assets';
-import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, windowBeadsTexture, ceramicTexture } from './textures';
+import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, doorwayNightTexture, windowBeadsTexture, ceramicTexture } from './textures';
 import { seats, type SeatName } from './seats';
 import { createVaseArrangement, createUtensilHolder } from './counter-props';
 import { createShelfBracket, createFootRail } from './hardware';
@@ -371,15 +372,15 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     addCounterDetails(group, props);
     const entrance = addFurnishings(group, palette, doorGlassTexture());
     interactive('door', entrance.leaf, new THREE.Vector3(-4.69, 1.5, 3.20));
-    // A shallow exterior recess is visible only during a visit. Its sides conceal
-    // the cutaway edge, keeping visitors grounded rather than floating in space.
+    // An aperture mask keeps the exterior recess inside the real doorway silhouette.
     const doorstep = new THREE.Group();
     doorstep.name = 'Doorstep';
-    const night = surface('#192b31', 1);
-    box(1.9, .08, 1.80, surface('#4c5350', .75), -5.70, -.005, 2.65, doorstep, 0);
-    box(.08, 3.7, 1.80, night, -6.65, 1.85, 2.65, doorstep, 0);
-    for (const z of [1.74, 3.56]) box(1.9, 3.7, .06, night, -5.70, 1.85, z, doorstep, 0);
-    batchStaticMeshes(doorstep, []);
+    const night = new THREE.MeshBasicMaterial({ map: doorwayNightTexture(), side: THREE.BackSide, toneMapped: false });
+    const street = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 6, 32, 1, true, Math.PI, Math.PI), night);
+    street.name = 'Distant night street';
+    street.position.set(-5.025, 3, 2.65);
+    doorstep.add(street);
+    box(3, .08, 6, surface('#303b39', .48), -6.525, -.005, 2.65, doorstep, 0);
     doorstep.visible = false;
     group.add(doorstep);
     // Floating steam is rendered inside the room, not layered onto the page.
@@ -388,6 +389,8 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     doorstepShadow.rotation.x = -Math.PI / 2;
     doorstepShadow.position.set(-5.60, .038, 2.65);
     doorstep.add(doorstepShadow);
+    maskDoorwayContent(doorstep);
+    doorstep.add(createDoorwayMask());
     const ceiling = createSeatedCeiling(props.wood.color, soft);
     const sideWall = createSeatedSideWall(props.wood.color, plasterGrain, soft);
     group.add(ceiling.group, sideWall.group);

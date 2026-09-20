@@ -63,7 +63,7 @@ export class DoorEncounter<T> {
         if (this.disposed || this.phase === 'closed' || this.phase === 'loading') return false;
         this.time += Math.max(0, delta);
         if (this.phase === 'holding') {
-            if (this.time >= 6) this.close();
+            if (this.time >= 2.5) this.close();
             return true;
         }
         const progress = reduced ? 1 : Math.min(this.time / 1.3, 1);

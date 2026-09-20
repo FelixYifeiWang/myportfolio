@@ -41,12 +41,12 @@ export function createEntrance(palette: Palette, doorTexture: THREE.Texture,
     for (const x of [-.90, .90]) box(.09, 3.78, .26, palette.darkwood, x, 1.90, -.06, door);
     box(1.89, .10, .26, palette.darkwood, 0, 3.76, -.06, door);
     const hinge = new THREE.Group();
-    hinge.position.x = .86;
+    hinge.position.set(.81, 0, .18);
     door.add(hinge);
     const leaf = new THREE.Group();
-    leaf.position.x = -.86;
+    leaf.position.set(-.81, 0, -.18);
     hinge.add(leaf);
-    box(1.72, 3.67, .20, palette.darkwood, 0, 1.85, -.05, leaf);
+    box(1.62, 3.62, .20, palette.darkwood, 0, 1.875, -.05, leaf);
     box(1.53, 3.48, .12, painted, 0, 1.80, .055, leaf);
     for (const x of [-.69, .69]) box(.055, 3.39, .035, palette.walnut, x, 1.8, .129, leaf);
     box(1.18, 1.50, .04, palette.brass, 0, 2.48, .132, leaf);
@@ -71,7 +71,7 @@ export function createEntrance(palette: Palette, doorTexture: THREE.Texture,
     lathe([[0, .12], [.08, .12], [.20, 0], [.21, -.025]], palette.brass, 0, 4.24, .32, door);
 
     return { group: door, hinge, leaf, setOpen(openness: number) {
-        hinge.rotation.y = Math.max(0, Math.min(1, openness)) * Math.PI * .23;
+        hinge.rotation.y = Math.max(0, Math.min(1, openness)) * Math.PI / 6;
     } };
 }
 

@@ -9,6 +9,7 @@ import { loadDinerProps } from './assets';
 import { buildDiner, type ObjectName } from './models';
 import { seats, isSeat } from './seats';
 import { ViewHistory, type View } from './view-history';
+import { placeDoorwayVisitor } from './doorway';
 import { DoorEncounter } from './door-encounter';
 import { VisitorLibrary, visitors } from './visitor-assets';
 export interface DinerScene {
@@ -36,7 +37,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         ? 'Drag to look around. Pinch to move closer. Choose a stool to sit.'
         : 'Drag to look around. Scroll to move closer. Choose a stool to sit.';
     // Native MSAA keeps small objects crisp without a full-screen postprocessing chain.
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'default' });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, stencil: true, alpha: false, powerPreference: 'default' });
     renderer.info.autoReset = false;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -124,7 +125,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         show(visitor) {
             visibleVisitor = visitor;
             shell.dataset.visitor = visitor.name;
-            visitor.position.set(-5.60, .04, 2.65);
+            placeDoorwayVisitor(visitor);
             world.doorstep.add(visitor);
             world.doorstep.visible = true;
             renderer.shadowMap.needsUpdate = true;

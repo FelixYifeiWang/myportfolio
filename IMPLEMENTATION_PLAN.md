@@ -13,7 +13,7 @@
 
 ## Stage 3: Integrate visitors
 **Goal**: Load one visitor on demand with consistent scale, pose, and lighting.
-**Progress**: Three downloaded visitors, static poses, 2-model cache, no automatic camera movement, 41.4° swing with tested stool clearance. Desktop and narrow overview reviewed; seated heading preserved on open and Escape.
+**Progress**: Three downloaded visitors, static poses, 2-model cache, no automatic camera movement, 30° peek with a 2.5-second hold, portal masking, soft night panorama, visitor depth clearance, and tested frame/mat/stool clearance. Desktop and narrow overview reviewed; seated heading preserved on open and Escape.
 **Success Criteria**: Local encounter works from overview and seats; no roster cost on initial load.
 **Tests**: Visual browser review, keyboard interaction, load failure and return behavior.
 **Status**: Complete

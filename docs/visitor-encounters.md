@@ -4,9 +4,9 @@ Local feature branch: `feature/door-visitors`. Not deployed. Preview: http://127
 
 ## Current experience
 
-Click the existing door. Download and prepare one visitor behind the closed leaf, open inward to **41.4°** over 1.3 seconds, hold for 6 seconds, then close before removing the visitor. The camera stays exactly where the viewer put it. Escape closes the encounter without leaving a seat or resetting the camera. Other item/seat navigation cancels the visit. No immediate repeat when multiple visitors are available.
+Click the existing door. Download and prepare one visitor behind the closed leaf, open inward to **30°** over 1.3 seconds, hold for 2.5 seconds, then close before removing the visitor. The camera stays exactly where the viewer put it. Escape closes the encounter without leaving a seat or resetting the camera. Other item/seat navigation cancels the visit. No immediate repeat when multiple visitors are available.
 
-The restricted swing clears the left stool throughout the motion. Some seated angles naturally see less of the doorway behind the leaf; there is deliberately no automatic reframing. The overview provides the clearest reveal.
+The restricted swing clears the left stool, frame, mat, and threshold throughout the motion. Each visitor is placed by its nearest surface, including accessories, to prevent the closed leaf passing through it. A stencil aperture confines the nighttime exterior to the doorway, so no extra border appears outside the room. The backdrop is a single curved panorama with soft city lights, rather than a boxed-in wall. Some seated angles naturally see less of the doorway behind the leaf; there is deliberately no automatic reframing. The overview provides the clearest reveal.
 
 Three visitors are accepted in the local preview:
 
@@ -24,7 +24,7 @@ Public artist credits live at `/visitor-credits/`, linked from View options. The
 - Two-model cache, duplicate-download protection, disposal on eviction/teardown, retry after failure.
 - All shipped visitors are below 2 MB, under 50k triangles, with textures at most 1024 px. No skeletons or animation mixers run in the browser.
 - Holding the pose uses the normal idle render rate; reduced-motion visits use a low-frequency timer and skip the swing.
-- Door motion invalidates static shadows. The hinge and exterior recess are excluded from whole-room batching.
+- Door motion invalidates static shadows. The hinge and exterior are excluded from whole-room batching.
 - Link intentionally retains float positions: quantizing its closely layered clothes introduced visible flickering. The unquantized version was inspected again and is clean.
 - Behavior tests cover lifecycle/cancellation/repeats, doorway clearance, stool clearance, asset budgets, fitting, and cache lifetime. Browser review checked the overview at desktop and narrow widths, and verified that opening and Escape preserve the turned seated view.
 - Dev-only `?visitor=pikachu`, `?visitor=link`, or `?visitor=eye` selects one visitor for repeatable visual review. Production always uses the random roster.

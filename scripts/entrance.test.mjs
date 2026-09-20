@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
+import { OBB } from 'three/addons/math/OBB.js';
 import { createEntrance } from '../src/diner/furnishings.ts';
 import { createEntranceWall } from '../src/diner/entrance-wall.ts';
 import { batchStaticMeshes } from '../src/diner/optimize.ts';
@@ -15,7 +16,7 @@ test('the hinge opens inward while the sconce and threshold remain fixed', () =>
   door.leaf.getWorldPosition(center);
   door.setOpen(1); door.group.updateMatrixWorld(true);
   const opened = door.leaf.getWorldPosition(new THREE.Vector3());
-  assert.ok(opened.x > center.x + .5);
+  assert.ok(opened.x > center.x + .4);
   assert.ok(fixed.every((child,index) => child.matrixWorld.equals(before[index])));
   door.setOpen(0); door.group.updateMatrixWorld(true);
   assert.ok(door.leaf.getWorldPosition(new THREE.Vector3()).distanceTo(center) < 1e-8);
@@ -48,5 +49,31 @@ test('the limited door swing leaves clearance around the left stool', () => {
     door.group.updateMatrixWorld(true);
     const bounds = new THREE.Box3().setFromObject(door.leaf);
     assert.ok(bounds.max.x < -3.45, `Door entered the stool footprint at ${opening}`);
+  }
+});
+
+test('the door opens only far enough for a peek', () => {
+  const door = createEntrance(palette, new THREE.Texture());
+  door.setOpen(1);
+  assert.ok(door.hinge.rotation.y <= Math.PI / 6 + 1e-8);
+  assert.ok(door.hinge.rotation.y >= Math.PI / 7);
+});
+
+test('the leaf clears the hinge jamb, threshold, and mat throughout its swing', () => {
+  const door = createEntrance(palette, new THREE.Texture());
+  for (let step = 0; step <= 20; step++) {
+    door.setOpen(step / 20);
+    door.group.updateMatrixWorld(true);
+    const bounds = new THREE.Box3().setFromObject(door.leaf, true);
+    assert.ok(bounds.min.y > .0525, 'Leaf catches the threshold or mat');
+    assert.ok(bounds.min.z > 1.795, 'Hinge heel passes through the rear jamb');
+    const toOBB = mesh => {
+      mesh.geometry.computeBoundingBox();
+      return new OBB().fromBox3(mesh.geometry.boundingBox).applyMatrix4(mesh.matrixWorld);
+    };
+    const jambs = door.group.children.slice(0, 3).map(toOBB);
+    door.leaf.traverse(mesh => {
+      if (mesh.isMesh) assert.ok(jambs.every(jamb => !jamb.intersectsOBB(toOBB(mesh))), 'Leaf intersects the frame');
+    });
   }
 });
