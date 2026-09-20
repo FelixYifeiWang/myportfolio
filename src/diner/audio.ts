@@ -181,7 +181,7 @@ export class DinerAudio {
         filter.Q.value = .5;
         this.purrGain = gain;
         gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.setTargetAtTime(.14, ctx.currentTime, .2);
+        gain.gain.setTargetAtTime(.22, ctx.currentTime, .2);
         source.connect(filter);
         filter.connect(gain);
         gain.connect(ctx.destination);
