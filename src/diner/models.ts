@@ -4,6 +4,7 @@ import { batchStaticMeshes } from './optimize';
 import { addFurnishings, addContactShadows, createBackCounter } from './furnishings';
 import type { DinerCat } from './cat';
 import { createWindowRain, type WindowRain } from './rain';
+import { createSeatedCeiling } from './ceiling';
 import { placeProp, type DinerProps } from './assets';
 import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, windowBeadsTexture } from './textures';
 export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about';
@@ -15,6 +16,7 @@ export interface DinerWorld {
     vinyl: THREE.Group;
     steam: THREE.Sprite[];
     rain: WindowRain;
+    ceiling: ReturnType<typeof createSeatedCeiling>;
     lights: THREE.Light[];
 }
 const materialCache = new Map<string, THREE.MeshStandardMaterial>();
@@ -177,8 +179,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
                     box(.015, .10, .07, cityMaterials[2 + (i + j) % 2], -5.63, 2.3 + j * .3, z - .1 + k * .2, group, 0);
     }
     box(.13, 5.4, .15, palette.darkwood, 5, 2.7, -4, group);
-    box(10.3, .16, .22, palette.darkwood, 0, 5.31, -4, group);
-    box(.2, .15, 8.2, palette.darkwood, -5, 5.32, 0, group);
+    // The wall-top timber trim belongs to the seated-only ceiling.
     // Back bar: cabinetry, tile backsplash, open shelves, and a working-looking coffee station.
     box(9.15, 1.22, .95, palette.darkwood, 0, .64, -3.36, group, .025);
     box(9.15, .15, .065, palette.darkwood, 0, 1.30, -2.854, group);
@@ -359,6 +360,8 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     addFurnishings(group, palette, doorGlassTexture());
     // Floating steam is rendered inside the room, not layered onto the page.
     const soft = softTexture();
+    const ceiling = createSeatedCeiling(props.wood.color, soft);
+    group.add(ceiling.group);
     addContactShadows(group, soft);
     const sconceGlow = mesh(new THREE.PlaneGeometry(1.55, 1.6), new THREE.MeshBasicMaterial({ map: soft, color: '#ffbd78', transparent: true, opacity: .16, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), [-5.005, 4.03, 2.65], group);
     sconceGlow.rotation.y = Math.PI / 2;
@@ -412,7 +415,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         batchStaticMeshes(object as THREE.Group, [vinyl]);
         object.traverse(child => { child.userData.action = object.userData.action; });
     }
-    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, lights };
+    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, ceiling, lights };
 }
 function addCounterDetails(parent: THREE.Object3D, props: DinerProps) {
     const bowl = placeProp(props.ramen, .34, new THREE.Vector3(-1.63, 1.85, -.59), .3, parent);
