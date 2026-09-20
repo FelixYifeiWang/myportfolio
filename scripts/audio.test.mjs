@@ -108,6 +108,26 @@ test('purring loops independently and repeated cat clicks keep one continuous so
   assert.equal(audio.playing, false);
 });
 
+test('purr breaths have audible bodies, soft edges, and quiet pauses', async t => {
+  const { audio, contexts } = fixture(t);
+  await audio.purr();
+  const ctx = contexts[0];
+  const samples = ctx.sources.filter(n => n.buffer).at(-1).buffer.getChannelData(0);
+  const rms = (start, end) => {
+    const segment = samples.slice(Math.round(start * ctx.sampleRate), Math.round(end * ctx.sampleRate));
+    return Math.sqrt(segment.reduce((sum, value) => sum + value * value, 0) / segment.length);
+  };
+  for (const start of [0, 2.4]) {
+    const body = rms(start + .7, start + 1.3);
+    assert.ok(body > .07 && body < .11, 'each breath retains its audible level');
+    assert.ok(rms(start + 1.8, start + 2.4) < .00001, 'at least 600ms of silence between breaths');
+    assert.ok(rms(start, start + .05) < body * .1, 'breath fades in gently');
+    assert.ok(rms(start + 1.7, start + 1.75) < body * .1, 'breath fades out gently');
+  }
+  assert.equal(Math.abs(samples[0]), 0);
+  assert.equal(Math.abs(samples.at(-1)), 0);
+});
+
 test('hidden tabs suspend audio and becoming visible resumes active music', async t => {
   const { audio, contexts } = fixture(t);
   await audio.nextTrack();
@@ -157,7 +177,7 @@ test('cat focus gently lowers music and restores it when leaving', async t => {
   assert.equal(rain.gain.value, rainLevel);
   const samples = contexts[0].sources.filter(n => n.buffer).at(-1).buffer.getChannelData(0);
   const rms = Math.sqrt(samples.reduce((sum, value) => sum + value * value, 0) / samples.length);
-  assert.ok(rms > .06 && rms < .08);
+  assert.ok(rms > .04 && rms < .08);
   assert.ok(samples.every(value => Math.abs(value) < 1));
   audio.stopPurr();
   assert.equal(music.gain.value, normal);

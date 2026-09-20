@@ -232,24 +232,24 @@ export class DinerAudio {
                 const body = .5 * Math.sin(2 * Math.PI * 70 * t) + Math.sin(2 * Math.PI * 140 * t) + .3 * Math.sin(2 * Math.PI * 210 * t);
                 data[i] = (noise * .4 + body * .12) * (.3 + pulse * .7) * breath;
             }
-            // Crossfade the loop seam; playback resumes after the overlapped opening.
-            const overlap = Math.floor(ctx.sampleRate * .04);
-            for (let i = 0; i < overlap; i++) {
-                const weight = i / overlap;
-                const end = data.length - overlap + i;
-                data[end] = data[end] * (1 - weight) + data[i] * weight;
-            }
-            // Set a predictable listening level; the earlier texture was nearly inaudible.
+            // Normalize before adding pauses so each purr keeps its listening level.
             const rms = Math.sqrt(data.reduce((sum, value) => sum + value * value, 0) / data.length);
             const level = .07 / Math.max(rms, .001);
-            for (let i = 0; i < data.length; i++) data[i] *= level;
+            for (let i = 0; i < data.length; i++) {
+                const breathTime = (i / ctx.sampleRate) % 2.4;
+                const fadeIn = Math.min(1, breathTime / .25);
+                const fadeOut = Math.max(0, Math.min(1, (1.75 - breathTime) / .4));
+                // Rounded edges, then 650ms of quiet before the next sleeping breath.
+                const envelope = Math.sin(fadeIn * Math.PI / 2) ** 2 * Math.sin(fadeOut * Math.PI / 2) ** 2;
+                data[i] *= level * envelope;
+            }
         }
         this.cancelSuspend();
         this.updateMix();
         const source = ctx.createBufferSource(), gain = ctx.createGain(), filter = ctx.createBiquadFilter();
         source.buffer = this.purrBuffer;
         source.loop = true;
-        source.loopStart = .04;
+        source.loopStart = 0;
         source.loopEnd = 4.8;
         filter.type = 'lowpass';
         filter.frequency.value = 420;
