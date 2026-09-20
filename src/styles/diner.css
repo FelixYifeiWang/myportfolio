@@ -210,24 +210,40 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
 @media(hover:hover) {
   .hotspot:hover { --active: 1; z-index: 2; }
 }
-/* The same quiet glass and hairline edge as the top navigation. */
+/* Keep the top bar's smoked glass; only the surface and ink gain weight on hover. */
 .hotspot-mark {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
-  border: 1px solid #ede5d52b;
-  border-radius: 50%;
-  background: #18231e80;
-  backdrop-filter: blur(12px);
-  opacity: calc(.7 + var(--active) * .3);
-  transform: scale(calc(1 + var(--active) * .06));
-  transition: opacity .18s, transform .18s, background .18s;
+  position: relative;
+  isolation: isolate;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  color: rgb(237 229 213 / calc(.42 + var(--active) * .58));
+  transition: color .2s, transform .2s, opacity .2s;
   pointer-events: none;
 }
-.hotspot-mark svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+.hotspot-mark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid #ede5d51f;
+  border-top-color: #ede5d538;
+  border-radius: inherit;
+  background: #18231e80;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 #ffffff05, 0 2px 6px #08100c0d;
+  opacity: calc(.32 + var(--active) * .68);
+  transition: opacity .2s;
+}
+.hotspot-mark svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.record-pause { display: none; }
+.hotspot[aria-pressed=true] .record-play { display: none; }
+.hotspot[aria-pressed=true] .record-pause { display: initial; }
 .hotspot:focus-visible .hotspot-mark { outline: 2px solid #eee5d580; outline-offset: 3px; }
-.hotspot:active .hotspot-mark { transform: scale(.96); }
+.hotspot:active .hotspot-mark { transform: scale(.94); }
 .hotspot-label {
   position: absolute;
   left: 50%;
@@ -237,8 +253,9 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
   padding: 6px 12px;
   border: 1px solid #ede5d51f;
   border-radius: 20px;
-  background: #18231eb3;
+  background: #18231e80;
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: var(--cream);
   font: 12px/1.4 'DM Sans',sans-serif;
   white-space: nowrap;
@@ -251,9 +268,14 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
 .hotspot[data-label-side=right] .hotspot-label { left: 18px; }
 .hotspot[data-label-side=left] { --label-shift: 0; }
 .hotspot[data-label-side=left] .hotspot-label { left: auto; right: 18px; }
-.seat-mark { opacity: var(--active); }
+.seat-mark { border-radius: 50%; opacity: var(--active); }
+.seat-mark svg { width: 19px; height: 19px; }
 @media(hover:none), (pointer:coarse) {
-  .seat-hotspot { --active: .7; }
+  .hotspot-mark { color: #ede5d5b3; }
+  .hotspot-mark::before { opacity: .7; }
+  .seat-mark { opacity: .7; }
+  .hotspot:is(:focus-visible,.object-hovered) .hotspot-mark { color: var(--cream); opacity: 1; }
+  .hotspot:is(:focus-visible,.object-hovered) .hotspot-mark::before { opacity: 1; }
 }
 .scene-toast { position: absolute; z-index: 10; bottom: 102px; left: 50%; transform: translate(-50%,8px); border: 1px solid #e8d4ac33; border-radius: 8px; background: #15241ee6; backdrop-filter: blur(12px); color: #e4d4b8; font-size: 12px; padding: 10px 16px; opacity: 0; pointer-events: none; transition: .3s; max-width: calc(100% - 40px); text-align: center; }
 .scene-toast.is-visible { opacity: 1; transform: translate(-50%,0); }
