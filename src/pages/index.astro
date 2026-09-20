@@ -41,7 +41,7 @@ import { seats } from '../diner/seats';
         <button class="hotspot" data-hotspot="about" data-action="about" aria-label="Meet Felix, the person behind the counter" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Meet the host</span></button>
         {Object.keys(seats).map((name, index) => (
           <button class="hotspot seat-hotspot" data-hotspot={name} data-action={name} aria-label={`Sit at seat ${index + 1}, ${['left end', 'left center', 'right center', 'right end'][index]} of the counter`} hidden>
-            <span class="seat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="7" ry="2.5" /><path d="M5 6.5v2c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-2M7.5 10.5 6 21m10.5-10.5L18 21M12 11v7M7 16.5c3 1.8 7 1.8 10 0" /></svg></span>
+            <span class="hotspot-dot" aria-hidden="true"></span>
           </button>
         ))}
       </div>

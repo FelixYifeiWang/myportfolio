@@ -204,8 +204,8 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
   transform: translate(-50%,-50%);
   pointer-events: auto;
 }
-.hotspot-dot { width: 9px; height: 9px; border: 1px solid #ede5d580; background: #ede5d5b3; border-radius: 50%; box-shadow: 0 0 0 5px #18231e33; opacity: .4; transition: transform .2s, background .2s, opacity .2s; }
-.hotspot-label { position: absolute; left: 50%; bottom: 44px; width: max-content; max-width: 170px; padding: 7px 11px; border-radius: 6px; border: 1px solid #ede5d51f; background: #18231e80; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #e9dfc9; font-size: 12px; line-height: 1.4; white-space: nowrap; opacity: 0; visibility: hidden; transform: translate(var(--label-shift),4px); transition: opacity .18s, transform .18s, visibility .18s; pointer-events: none; }
+.hotspot-dot { width: 9px; height: 9px; border: 1px solid #ede5d580; background: #ede5d5b3; border-radius: 50%; box-shadow: 0 0 0 5px #18231e33; opacity: .32; transition: transform .2s, background .2s, opacity .2s; }
+.hotspot-label { position: absolute; left: 50%; bottom: 44px; width: max-content; max-width: 170px; padding: 7px 11px; border-radius: 6px; border: 1px solid #ede5d51f; background: #18231e70; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #e9dfc9; font-size: 12px; line-height: 1.4; white-space: nowrap; opacity: 0; visibility: hidden; transform: translate(var(--label-shift),4px); transition: opacity .18s, transform .18s, visibility .18s; pointer-events: none; }
 .hotspot[data-label-side=right] { --label-shift: 0; }
 .hotspot[data-label-side=right] .hotspot-label { left: 18px; }
 .hotspot[data-label-side=left] { --label-shift: 0; }
@@ -216,27 +216,16 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
   .hotspot:hover .hotspot-label { opacity: 1; visibility: visible; transform: translate(var(--label-shift),0); }
   .hotspot:hover .hotspot-dot { transform: scale(1.3); background: #ede5d5; opacity: 1; }
 }
-/* The stool itself is the invitation; keep its cue quiet until explored. */
-.seat-icon {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  color: #e0d3bb;
-  opacity: 0;
-  transform: translateY(4px) scale(.9);
-  transition: opacity .18s, transform .18s;
-  pointer-events: none;
-}
-.seat-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
-.seat-hotspot:focus-visible .seat-icon,.seat-hotspot.object-hovered .seat-icon { opacity: .8; transform: none; }
+/* Seats share the room's dot cue, revealed only when explored. */
+.seat-hotspot .hotspot-dot { opacity: 0; }
+.seat-hotspot:is(:focus-visible,.object-hovered) .hotspot-dot { opacity: .85; }
 @media(hover:hover) {
-  .seat-hotspot:hover .seat-icon { opacity: .8; transform: none; }
+  .seat-hotspot:hover .hotspot-dot { opacity: .85; }
 }
 @media(hover:none), (pointer:coarse) {
-  .hotspot-dot { opacity: .7; }
-  .seat-icon { opacity: .65; transform: none; }
-  .seat-icon svg { width: 18px; height: 18px; }
+  .hotspot-dot { opacity: .65; }
+  .seat-hotspot .hotspot-dot { opacity: .55; }
+  .seat-hotspot:is(:focus-visible,.object-hovered) .hotspot-dot { opacity: .85; }
 }
 .scene-toast { position: absolute; z-index: 10; bottom: 102px; left: 50%; transform: translate(-50%,8px); border: 1px solid #e8d4ac33; border-radius: 8px; background: #15241ee6; backdrop-filter: blur(12px); color: #e4d4b8; font-size: 12px; padding: 10px 16px; opacity: 0; pointer-events: none; transition: .3s; max-width: calc(100% - 40px); text-align: center; }
 .scene-toast.is-visible { opacity: 1; transform: translate(-50%,0); }
