@@ -1,6 +1,6 @@
 # Doorway visitors
 
-Local feature branch: `feature/door-visitors`. Preview: http://127.0.0.1:4330/. This iteration has not been deployed.
+Development branch: `feature/door-visitors`. Local preview: http://127.0.0.1:4330/. Production releases are published from `main` to the shared Vercel project for felixwang.cafe and yifeifelixwang.com.
 
 ## Encounter
 
