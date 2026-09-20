@@ -9,6 +9,7 @@ export function initDiner() {
     const back = document.querySelector<HTMLButtonElement>('#panel-back')!;
     const close = document.querySelector<HTMLButtonElement>('#panel-close')!;
     const sound = document.querySelector<HTMLButtonElement>('#sound-toggle')!;
+    const record = document.querySelector<HTMLButtonElement>('[data-action=record]')!;
     const viewOptions = document.querySelector<HTMLDetailsElement>('#view-options')!;
     const viewOptionsToggle = document.querySelector<HTMLElement>('#view-options-toggle')!;
     const toast = document.querySelector<HTMLElement>('#scene-toast')!;
@@ -76,6 +77,9 @@ export function initDiner() {
         try {
             const playing = await audio.toggle();
             sound.setAttribute('aria-pressed', String(playing));
+            record.setAttribute('aria-pressed', String(playing));
+            record.querySelector('.hotspot-label')!.textContent = playing ? 'Pause' : 'Listen';
+            shell.classList.toggle('is-playing', playing);
             sound.setAttribute('aria-label', playing ? 'Turn off lounge music and rain ambience' : 'Turn on the original lounge music and rain ambience');
             sound.title = playing ? 'Sound on' : 'Sound off';
             scene?.setPlaying(playing);
@@ -184,6 +188,9 @@ export function initDiner() {
         audio.dispose();
         scene?.setPlaying(false);
         sound.setAttribute('aria-pressed', 'false');
+        record.setAttribute('aria-pressed', 'false');
+        record.querySelector('.hotspot-label')!.textContent = 'Listen';
+        shell.classList.remove('is-playing');
         sound.setAttribute('aria-label', 'Turn on the original lounge music and rain ambience');
         sound.title = 'Sound off';
         clearTimeout(openTimer);

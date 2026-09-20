@@ -3,6 +3,14 @@ import '../styles/fonts.css';
 import '../styles/diner.css';
 import { projects } from '../data/projects';
 import { seats } from '../diner/seats';
+
+const sceneObjects = [
+  { name: 'menu', label: 'Selected work', accessible: 'Pick up the menu and explore selected projects', paths: ['M4 5.5c3-1 5-.5 8 1.2 3-1.7 5-2.2 8-1.2V19c-3-1-5-.5-8 1.2C9 18.5 7 18 4 19Z', 'M12 7v13'] },
+  { name: 'notebook', label: 'Notebook', accessible: 'Open the notebook of side projects', paths: ['M14.5 5.5 18.5 9.5M5 19l4.5-1L20 7.5a2.8 2.8 0 0 0-4-4L5.5 14Z', 'M13 20h7'] },
+  { name: 'cat', label: 'Say hello', accessible: 'Say hello to the sleeping cat', paths: ['M20 5.5a5 5 0 0 0-8 1 5 5 0 0 0-8-1C.5 9.5 5 14.5 12 20c7-5.5 11.5-10.5 8-14.5Z'] },
+  { name: 'record', label: 'Listen', accessible: 'Play or pause the record player', paths: [] },
+  { name: 'about', label: 'Meet Felix', accessible: 'Meet Felix, the person behind the counter', paths: ['M15.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z', 'M5 20v-2a7 7 0 0 1 14 0v2'] },
+];
 ---
 <!doctype html>
 <html lang="en">
@@ -32,14 +40,23 @@ import { seats } from '../diner/seats';
       </header>
       <div class="scene-loading" id="scene-loading" role="status"><span></span>Turning the lights on…</div>
       <div class="hotspots" id="hotspots" aria-label="Objects in the diner">
-        <button class="hotspot" data-hotspot="menu" data-action="menu" aria-label="Pick up the menu and explore selected projects" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The menu</span></button>
-        <button class="hotspot" data-hotspot="notebook" data-action="notebook" aria-label="Open the notebook of side projects" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The notebook</span></button>
-        <button class="hotspot" data-hotspot="cat" data-action="cat" aria-label="Say hello to the sleeping cat" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The manager</span></button>
-        <button class="hotspot" data-hotspot="record" data-action="record" aria-label="Play or pause the record player" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Set the mood</span></button>
-        <button class="hotspot" data-hotspot="about" data-action="about" aria-label="Meet Felix, the person behind the counter" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Meet the host</span></button>
+        {sceneObjects.map(({ name, label, accessible, paths }) => (
+          <button class="hotspot object-hotspot" data-hotspot={name} data-action={name} aria-label={accessible} aria-pressed={name === 'record' ? 'false' : undefined} hidden>
+            <span class="hotspot-mark" aria-hidden="true">
+              <span class="hotspot-pin"></span>
+              <svg class="hotspot-icon" viewBox="0 0 24 24">
+                {paths.map(path => <path d={path} />)}
+                {name === 'record' && <><path class="record-play" d="m9 5 11 7-11 7Z" /><path class="record-pause" d="M8 5v14M16 5v14" /></>}
+              </svg>
+            </span>
+            <span class="hotspot-label" aria-hidden="true">{label}</span>
+          </button>
+        ))}
         {Object.keys(seats).map((name, index) => (
           <button class="hotspot seat-hotspot" data-hotspot={name} data-action={name} aria-label={`Sit at seat ${index + 1}, ${['left end', 'left center', 'right center', 'right end'][index]} of the counter`} hidden>
-            <span class="seat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6.5" rx="7" ry="2.5" /><path d="M5 6.5v2c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-2M7.5 10.5 6 21m10.5-10.5L18 21M12 11v7M7 16.5c3 1.8 7 1.8 10 0" /></svg></span>
+            <span class="hotspot-mark seat-mark" aria-hidden="true">
+              <svg class="hotspot-icon" viewBox="0 0 24 24"><path d="M5 6h5a5 5 0 0 1 5 5v7m-4-4 4 4 4-4" /><path class="seat-landing" d="M7 21h10" /></svg>
+            </span>
           </button>
         ))}
       </div>
