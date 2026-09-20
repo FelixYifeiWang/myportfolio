@@ -116,7 +116,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     } | null = null;
     let width = 1, height = 1;
     const views = {
-        seat: { position: new THREE.Vector3(1, 2.85, 1.95), target: new THREE.Vector3(-.15, 2.1, -2.7) },
+        seat: { position: new THREE.Vector3(1, 2.85, 2.75), target: new THREE.Vector3(-.15, 2.1, -2.7) },
         menu: { position: new THREE.Vector3(1.8, 4.5, 4.7), target: new THREE.Vector3(.05, 1.6, 0) },
         notebook: { position: new THREE.Vector3(-.2, 4.3, 4.8), target: new THREE.Vector3(-1.5, 1.65, 0) },
         cat: { position: new THREE.Vector3(-1.6, 3, 3.5), target: new THREE.Vector3(-3.32, 2.19, .08) },

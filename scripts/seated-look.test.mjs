@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { SeatedLook } from '../src/diner/seated-look.ts';
 
-const eye = new THREE.Vector3(1, 2.85, 1.95);
+const eye = new THREE.Vector3(1, 2.85, 2.75);
 const forward = new THREE.Vector3(-.15, 2.1, -2.7);
 const makeLook = () => new SeatedLook(eye, forward);
 
