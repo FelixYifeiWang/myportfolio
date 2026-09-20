@@ -190,7 +190,7 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
 .scene-unavailable .scene-fallback { opacity: 1; background: linear-gradient(90deg,#18211fe8,transparent 75%),url('/images/after-hours-counter.webp') center/cover; }
 .hotspots { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .hotspot {
-  --dot-idle: .06;
+  --dot-idle: .3;
   --label-shift: -50%;
   position: absolute;
   display: grid;
@@ -205,7 +205,7 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
   transform: translate(-50%,-50%);
   pointer-events: auto;
 }
-.hotspot[data-explored] { --dot-idle: .18; }
+.hotspot[data-explored] { --dot-idle: .38; }
 .hotspot-dot { width: 9px; height: 9px; border: 1px solid #ede5d580; background: #ede5d5b3; border-radius: 50%; box-shadow: 0 0 0 5px #18231e33; opacity: var(--dot-idle); transition: transform .2s, background .2s, opacity .2s; }
 .hotspot-label { position: absolute; left: 50%; bottom: 44px; width: max-content; max-width: 170px; padding: 7px 11px; border-radius: 6px; border: 1px solid #ede5d51f; background: #18231e60; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #e9dfc9; font-size: 12px; line-height: 1.4; white-space: nowrap; opacity: 0; visibility: hidden; transform: translate(var(--label-shift),4px); transition: opacity .18s, transform .18s, visibility .18s; pointer-events: none; }
 .hotspot[data-label-side=right] { --label-shift: 0; }
