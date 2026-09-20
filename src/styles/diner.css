@@ -99,7 +99,6 @@ img {
 .diner-brand { display: block; justify-self: start; }
 .brand-kicker { font: 10px var(--mono); letter-spacing: .24em; display: block; margin-bottom: 3px; }
 .brand-name { font: italic 43px/.95 var(--serif); letter-spacing: -.025em; display: block; }
-.brand-star { font: 21px 'DM Sans',sans-serif; display: inline-block; vertical-align: top; margin-left: 5px; color: #d4a274; }
 .diner-header nav {
   display: flex;
   align-items: center;

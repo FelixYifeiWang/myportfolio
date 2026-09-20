@@ -216,12 +216,28 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         cylinder(.22, .21, .03, palette.cream, -2.02, 1.52 + i * .032, -3.15, group);
     const sign = texturePlane(signTexture(), 4.2, 1.4, -.45, 3.57, -3.96, group, true);
     sign.renderOrder = 2;
-    // A framed print introduces the user's own art into the actual room.
+    // Frame the canvas itself, correcting the perspective of the studio photograph.
     const loader = new THREE.TextureLoader();
     const art = loader.load('/images/ow02.webp');
     art.colorSpace = THREE.SRGBColorSpace;
-    box(1.36, 1.16, .07, palette.darkwood, -3.4, 3.5, -3.92, group);
-    texturePlane(art, 1.18, .98, -3.4, 3.5, -3.873, group);
+    box(1.34, 1.34, .07, palette.darkwood, -3.4, 3.5, -3.92, group);
+    box(1.22, 1.22, .008, surface('#d1c4a8', .95), -3.4, 3.5, -3.879, group, 0);
+    const canvasGeometry = new THREE.PlaneGeometry(1.08, 1.08, 8, 8);
+    const artUV = canvasGeometry.getAttribute('uv');
+    // Inset corners exclude the easel and canvas edges; subdivision keeps the crop smooth.
+    const topLeft = new THREE.Vector2(300 / 1600, 1 - 99 / 1260);
+    const topRight = new THREE.Vector2(1268 / 1600, 1 - 80 / 1260);
+    const bottomLeft = new THREE.Vector2(344 / 1600, 1 - 1040 / 1260);
+    const bottomRight = new THREE.Vector2(1271 / 1600, 1 - 1018 / 1260);
+    for (let i = 0; i < artUV.count; i++) {
+        const u = artUV.getX(i), v = artUV.getY(i);
+        const top = topLeft.clone().lerp(topRight, u);
+        const bottom = bottomLeft.clone().lerp(bottomRight, u);
+        const source = bottom.lerp(top, v);
+        artUV.setXY(i, source.x, source.y);
+    }
+    const canvasPrint = mesh(canvasGeometry, new THREE.MeshStandardMaterial({ map: art, roughness: .94 }), [-3.4, 3.5, -3.873], group);
+    canvasPrint.castShadow = false;
     const pottery = {
         ceramic: new THREE.MeshStandardMaterial({ map: ceramicTexture(), roughness: .38, bumpMap: plasterGrain, bumpScale: .0012 }),
         clay: surface('#947456', .95),
@@ -252,7 +268,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     // A real menu on the counter. Both raycasting and keyboard controls can pick it up.
     const menu = new THREE.Group();
     menu.position.set(.12, 1.86, .05);
-    menu.rotation.set(-.08, -.16, 0);
+    menu.rotation.set(0, -.16, 0);
     group.add(menu);
     box(1.12, .040, 1.43, palette.leather, 0, 0, 0, menu, .016);
     const paper = mesh(paperGeometry(1.05, 1.36), new THREE.MeshStandardMaterial({ map: menuTexture(), roughness: .94, side: THREE.DoubleSide }), [0, .024, 0], menu);
@@ -334,7 +350,12 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     about.rotation.y = .12;
     group.add(about);
     box(.65, .53, .07, palette.brass, 0, .26, 0, about, .015);
-    const portrait = loader.load('/images/profile.webp');
+    const portrait = loader.load('/images/profile.webp', texture => {
+        // Cover the frame without squeezing the landscape photo; keep Felix centered.
+        const image = texture.image as HTMLImageElement;
+        texture.repeat.x = (.56 / .44) / (image.width / image.height);
+        texture.offset.x = .53 - texture.repeat.x / 2;
+    });
     portrait.colorSpace = THREE.SRGBColorSpace;
     texturePlane(portrait, .56, .44, 0, .26, .045, about);
     interactive('about', about, new THREE.Vector3(-.65, 1.92, -3.15));
