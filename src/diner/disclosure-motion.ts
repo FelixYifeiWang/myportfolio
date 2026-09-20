@@ -16,10 +16,17 @@ export class DisclosureMotion {
     }
 
     toggle() {
+        this.setExpanded(!this.expanded);
+    }
+
+    get isExpanded() { return this.expanded; }
+
+    setExpanded(expanded: boolean) {
+        if (this.expanded === expanded) return;
         const start = this.details.getBoundingClientRect().height;
         const opacity = this.animations.length ? getComputedStyle(this.content).opacity : this.details.open ? '1' : '0';
         this.clear();
-        this.expanded = !this.expanded;
+        this.expanded = expanded;
         this.content.inert = !this.expanded;
         if (this.reduced()) {
             this.details.open = this.expanded;
@@ -54,5 +61,16 @@ export class DisclosureMotion {
         this.animations = [];
         this.details.style.overflow = '';
         delete this.details.dataset.expanding;
+    }
+}
+
+/** Share selection across categories while each row keeps its own transition. */
+export class DisclosureGroup {
+    private entries: DisclosureMotion[];
+    constructor(entries: DisclosureMotion[]) { this.entries = entries; }
+
+    toggle(selected: DisclosureMotion) {
+        const opening = !selected.isExpanded;
+        for (const entry of this.entries) entry.setExpanded(entry === selected && opening);
     }
 }

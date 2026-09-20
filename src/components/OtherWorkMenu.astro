@@ -5,7 +5,7 @@ const categories = ['New interfaces', 'Software & AI', 'Physical systems'];
 <div class="a-la-carte">
   {categories.map(category => <section class="menu-course" aria-label={category}>
     <h3>{category}</h3>
-    {otherProjects.filter(project => project.category === category).map(project => <details class="side-dish" id={`work-${project.slug}`}>
+    {otherProjects.filter(project => project.category === category).map(project => <details class="side-dish" name="other-work" id={`work-${project.slug}`}>
       <summary><span class="side-dish-body"><span class="side-dish-name">{project.name}</span><span class="side-dish-caption">{project.brief ? project.intro : project.menuDescription}</span></span><span class="side-dish-toggle" aria-hidden="true">+</span></summary>
       <div class="side-dish-detail">
         <p>{project.story}</p>
@@ -17,15 +17,30 @@ const categories = ['New interfaces', 'Software & AI', 'Physical systems'];
   </section>)}
 </div>
 <script>
-  import { DisclosureMotion } from '../diner/disclosure-motion';
+  import { DisclosureMotion, DisclosureGroup } from '../diner/disclosure-motion';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  document.querySelectorAll<HTMLDetailsElement>('.side-dish').forEach(details => {
-    const summary = details.querySelector<HTMLElement>('summary')!;
-    const content = details.querySelector<HTMLElement>('.side-dish-detail')!;
-    const motion = new DisclosureMotion(details, summary, content, () => reduced.matches);
-    summary.addEventListener('click', event => {
-      event.preventDefault();
-      motion.toggle();
+  document.querySelectorAll('.a-la-carte').forEach(menu => {
+    const entries = Array.from(menu.querySelectorAll<HTMLDetailsElement>('.side-dish')).map(details => {
+      // Native exclusivity is the no-script fallback; JS lets the closing row animate.
+      details.removeAttribute('name');
+      const summary = details.querySelector<HTMLElement>('summary')!;
+      const content = details.querySelector<HTMLElement>('.side-dish-detail')!;
+      return { details, summary, motion: new DisclosureMotion(details, summary, content, () => reduced.matches) };
+    });
+    const group = new DisclosureGroup(entries.map(entry => entry.motion));
+    let selection = 0;
+    entries.forEach(({ summary, motion }) => {
+      summary.addEventListener('click', event => {
+        event.preventDefault();
+        const currentSelection = ++selection;
+        group.toggle(motion);
+        const transitions = entries.flatMap(entry => entry.details.getAnimations());
+        Promise.all(transitions.map(animation => animation.finished)).then(() => {
+          if (selection === currentSelection && motion.isExpanded) {
+            summary.scrollIntoView({ block: 'nearest', behavior: reduced.matches ? 'instant' : 'smooth' });
+          }
+        }).catch(() => { /* A newer selection cancels the previous transition. */ });
+      });
     });
   });
 </script>

@@ -8,35 +8,218 @@ export interface Project {
   note?: string;
 }
 const coreProjects: Project[] = [
-  { slug: 'dreamin-engine', menuDescription: 'Turn an idea into a playable game.', featured: true, name: 'DreamIn Engine', number: '01', year: '2023', type: 'AI · Creative tools', description: 'A conversational game engine that turns an idea into a playable game.', image: 'v2c', cover: 'proj3', gallery: 'i3-6', role: 'Team lead, product design, AI & UI/UX', tools: 'Unity, generative AI, cloud infrastructure', intro: 'A game engine that starts with a conversation.', story: 'DreamIn Engine lets creators turn their ideas into playable games through a conversation. I led product design, AI development, and the creation experience, connecting game generation with a website and Discord community.', approach: 'We interviewed creators, studied lightweight game-making tools, and tested the idea through a Gather Town prototype. A conversational interface became the entry point: an AI copilot asks questions and helps turn the answers into a game.', detail: 'I worked across product design, game generation, and the community experience. A connected website and Discord community let creators share games through individual links, making creation and distribution part of the same flow.', outcomes: [{ value: '3,000+', label: 'beta users' }, { value: '3,200+', label: 'games created' }, { value: '200,000+', label: 'gameplay sessions' }] },
-  { slug: 'echo-of-mobius', menuDescription: 'An RPG with AI characters.', featured: true, name: 'Echo of Mobius', number: '02', year: '2024', type: 'AI · Game design', description: 'An AI role-playing game built around player-created characters.', image: 'v1c', cover: 'proj1', gallery: 'i1-6', role: 'Team lead, game design, development & AI', tools: 'Unity, generative AI, Blender', intro: 'What if an AI companion could step out of the chat box?', story: 'Echo of Mobius brings AI characters into a role-playing game with player-created content. I led the team across game design, development, and AI, taking a Discord prototype into a launched game.', approach: 'We started with a Discord prototype to explore character creation and text adventures. Those early player interactions informed a game built around turn-based battles, illustrated storytelling, and shared community creations.', detail: 'My work connected game design with development: character-generation pipelines, a memory system for AI characters, and fixed-perspective 3D scenes. The focus was making generative technology feel like part of a world people wanted to spend time in.', outcomes: [{ value: '4,000+', label: 'players' }, { value: '300+', label: 'paying players' }, { value: '26%', label: 'week-two retention' }] },
-  { slug: 'undecimber', menuDescription: 'History, told through clothing.', featured: true, name: 'Undecimber', number: '03', year: '2021', type: 'Art · Fashion', description: 'A fashion venture taken from concept to production and market.', image: 'v5c', cover: 'proj5', gallery: 'i5-5', role: 'Team lead, product design, concept & marketing', tools: 'CLO 3D, Adobe tools, sustainable materials', intro: 'History recorded on fabric.', story: 'Undecimber is a fashion venture reflecting the events of 2020 through clothing. I led the team across product design, concept development, and marketing, working with suppliers to bring the collection to market.', approach: 'We translated themes from the year into material and visual experiments. A rainbow-reflective fabric became a way to express a silver lining: dark in everyday light, unexpectedly colorful when illuminated.', detail: 'I worked from concept through product development and marketing, balancing expressive clothing with manufacturing constraints. Profits from the project were donated to COVID-19 relief organizations.', outcomes: [{ value: '$30,000+', label: 'revenue' }, { value: '100+', label: 'artists & celebrities wore the collection' }, { value: '100%', label: 'of profits donated to COVID-19 relief' }] },
   {
-    slug: 'notion-ai-meeting-notes', menuDescription: 'Recordings into searchable knowledge.', featured: true, name: 'Notion AI Meeting Notes', number: '04', year: '2026',
-    type: 'AI · Productivity', image: 'notion-audio-upload', cover: 'notion-audio-upload', coverAlt: 'Notion AI Meeting Notes: Upload your own audio', gallery: 'notion-meeting-library', galleryAlt: 'Meeting notes organized together in a Notion workspace — official product screenshot', role: 'Software engineering intern · AI Meeting Notes',
-    tools: 'Full-stack development, AI, integrations',
-    description: 'Bringing recordings and existing meeting history into Notion.',
-    intro: 'Beyond the meeting.',
-    story: 'Useful conversations don’t always happen in a live meeting. During my Notion internship, I built Bring Your Own File: turning existing audio and video recordings into searchable transcripts and summaries, alongside the rest of your work.',
-    approach: 'I worked across the upload experience, playback, and integrations, making it easier to bring recordings into Notion and revisit the moments that matter.',
-    detail: 'I also worked on Granola migration, helping people bring their existing meeting history into Notion without starting over. The goal across both was the same: keep useful conversations connected to the work that follows.',
-    outcomes: [{ value: '~20,000', label: 'pre-recorded meetings processed at internship presentation' }, { value: 'Audio + video', label: 'file uploads shipped to production' }, { value: 'Public API', label: 'meeting-note creation shipped' }],
+    "slug": "dreamin-engine",
+    "menuDescription": "Create a game through conversation.",
+    "featured": true,
+    "name": "DreamIn Engine",
+    "number": "01",
+    "year": "2023",
+    "type": "AI · Creative tools",
+    "description": "A conversational game engine for creators without a programming background.",
+    "image": "v2c",
+    "cover": "proj3",
+    "gallery": "i3-6",
+    "role": "Team lead · product & AI",
+    "tools": "Unity, generative AI, cloud infrastructure",
+    "intro": "From a game idea to something you can play.",
+    "story": "DreamIn Engine lets creators turn an idea into a playable game without learning a traditional game engine. I led product design and AI development, from the creation experience to the community around it.",
+    "approach": "We tested demand with a small Gather Town prototype before building the engine. Creator interviews shaped a conversational flow: an AI copilot asks questions, develops the idea, and generates the game.",
+    "detail": "Sharing was part of the product from the start. We connected the website to Discord and gave every game its own link, so creators could publish their work and find players in the same flow.",
+    "outcomes": [
+      {
+        "value": "3,000+",
+        "label": "beta users"
+      },
+      {
+        "value": "3,200+",
+        "label": "games created"
+      },
+      {
+        "value": "200,000+",
+        "label": "gameplay sessions"
+      }
+    ]
   },
   {
-    slug: 'sixth', menuDescription: 'Connected learning. Offline decisions.', featured: true, name: 'SIXTH', number: '05', year: '2026', type: 'AI · Wearable systems',
-    image: 'sixth-complete', cover: 'sixth-complete', coverAlt: 'Complete SIXTH wearable concept shown in an exploded view with its textile layers, sensors, and electronics',
-    gallery: 'sixth-personalization', galleryAlt: 'SIXTH companion app concept: pairing the wearable, establishing a personal baseline, and preparing for offline use',
-    role: 'AI architecture & offline decision logic', tools: 'Time-series models, LLMs, personalized heuristics, ESP32',
-    description: 'A soft sensing wearable designed to keep making decisions when connectivity disappears.',
-    intro: 'Learn while connected. Act when offline.',
-    story: 'SIXTH is a team-built e-textile wearable prototype for female athletes in cold, high-altitude environments. Soft sensors monitor physiological signals, while haptic, audio, and thermal feedback bring information back to the body. My work focused on the AI decision system: how to make that intelligence useful beyond a reliable connection.',
-    approach: 'In connected Daily Mode, sensor streams build a personal baseline. AI interprets patterns and translates them into a compact set of deterministic rules: thresholds, severity levels, and corresponding feedback. Those rules are saved locally before the athlete heads out.',
-    detail: 'In Extreme Mode, the device evaluates incoming signals against those stored heuristics and triggers feedback without a cloud request. The design separates richer connected learning from predictable local execution, so losing Wi-Fi does not remove the decision layer.',
-    outcomes: [{ value: '4', label: 'sensing modalities in the prototype' }, { value: 'Personalized', label: 'rules derived from connected learning' }, { value: 'Offline', label: 'local decisions in Extreme Mode' }],
-    note: 'Research prototype, developed with Xixi Li, Izzy Shen, and Alfred Wong. The paper describes the architecture and fabrication work; extreme-environment field validation remains future work.',
+    "slug": "echo-of-mobius",
+    "menuDescription": "Create AI characters. Play their stories.",
+    "featured": true,
+    "name": "Echo of Mobius",
+    "number": "02",
+    "year": "2024",
+    "type": "AI · Game design",
+    "description": "A launched RPG where players create AI characters and shape their stories.",
+    "image": "v1c",
+    "cover": "proj1",
+    "gallery": "i1-6",
+    "role": "Team lead · game design, engineering & AI",
+    "tools": "Unity, generative AI, Blender",
+    "intro": "AI characters with a world to inhabit.",
+    "story": "Echo of Mobius turns player-created AI characters into a role-playing game. I led the team from a Discord prototype to launch, working across game design, engineering, and AI.",
+    "approach": "We tested character creation and text adventures in Discord before committing to a full game. Turn-based combat and illustrated storytelling gave players room to create while keeping production manageable.",
+    "detail": "I built character-generation tools and worked on memory and 3D scenes, connecting AI characters to the choices players made. Community creations and streamer collaborations helped bring the game to new players.",
+    "outcomes": [
+      {
+        "value": "4,000+",
+        "label": "players"
+      },
+      {
+        "value": "300+",
+        "label": "paying players"
+      },
+      {
+        "value": "26%",
+        "label": "week-two retention"
+      }
+    ]
   },
-  { slug: 'relicvr', menuDescription: 'Cultural heritage in VR.', featured: false, category: 'New interfaces', name: 'RelicVR', number: '05', year: '2023', type: 'VR · Cultural heritage', description: 'An invitation to step inside the places history left behind.', image: 'v3c', cover: 'proj4', gallery: 'i4-6', role: 'Product design, software development & UI/UX', tools: 'Unity VR, CloudCompare, Blender', intro: 'The preview mode of a time machine.', story: 'RelicVR turns archaeological scan data into places people can explore in virtual reality, bringing cultural heritage closer to an everyday audience.', approach: 'Inspired by Google Earth VR, I used open archaeological datasets to reconstruct historical sites. The core challenge was turning LiDAR point clouds into models suitable for an immersive experience.', detail: 'I processed the data in CloudCompare and Blender, then built the experience in Unity. Controllers and hand gestures help visitors move between sites and explore their surroundings.', outcomes: [] },
-  { slug: 'orpheus', menuDescription: 'Brainwaves meet AI.', featured: false, category: 'New interfaces', name: 'Orpheus', number: '06', year: '2024', type: 'AI · Human interfaces', description: 'Exploring a conversation between brainwaves and artificial intelligence.', image: 'v4c', cover: 'proj2', gallery: 'i2-6', role: 'Product design, BCI development, AI & UI/UX', tools: 'EEG hardware, Three.js, generative AI', intro: 'An experiment in listening beyond words.', story: 'Orpheus explores how an AI conversation might respond to brainwave signals, combining a consumer EEG headset with a visual, conversational interface.', approach: 'I began by collecting and visualizing signals from a Muse 2 headset, then worked on filtering noise and translating the data into a changing particle system.', detail: 'The interface draws on the visual language of EVA and Her. It is an exploratory prototype about human-computer interaction, rather than a clinical assessment or treatment tool.', outcomes: [] }
+  {
+    "slug": "undecimber",
+    "menuDescription": "A clothing brand, from concept to market.",
+    "featured": true,
+    "name": "Undecimber",
+    "number": "03",
+    "year": "2021",
+    "type": "Art · Fashion",
+    "description": "A clothing brand built around the events of 2020, taken from concept through production and launch.",
+    "image": "v5c",
+    "cover": "proj5",
+    "gallery": "i5-5",
+    "role": "Team lead · product & marketing",
+    "tools": "CLO 3D, Adobe tools, sustainable materials",
+    "intro": "Build the collection. Bring it to market.",
+    "story": "Undecimber translated the events of 2020 into a clothing collection. I led product design and marketing, working with suppliers to turn the concept into products we could sell.",
+    "approach": "We designed for artists and performers who would wear bold, expressive pieces. Rainbow-reflective fabric became the signature: dark in everyday light, colorful under direct illumination.",
+    "detail": "The work extended beyond the designs: sourcing materials, adapting prototypes to production constraints, and building a launch around artist collaborations. All profits went to COVID-19 relief organizations.",
+    "outcomes": [
+      {
+        "value": "$30,000+",
+        "label": "revenue"
+      },
+      {
+        "value": "100+",
+        "label": "artists & celebrities wore the collection"
+      },
+      {
+        "value": "100%",
+        "label": "of profits donated to COVID-19 relief"
+      }
+    ]
+  },
+  {
+    "slug": "notion-ai-meeting-notes",
+    "menuDescription": "Bring recordings and meeting history into Notion.",
+    "featured": true,
+    "name": "Notion AI Meeting Notes",
+    "number": "04",
+    "year": "2026",
+    "type": "AI · Productivity",
+    "image": "notion-audio-upload",
+    "cover": "notion-audio-upload",
+    "coverAlt": "Notion AI Meeting Notes: Upload your own audio",
+    "gallery": "notion-meeting-library",
+    "galleryAlt": "Meeting notes organized together in a Notion workspace — official product screenshot",
+    "role": "Software engineering intern · AI Meeting Notes",
+    "tools": "Full-stack development, AI, integrations",
+    "description": "Bringing recordings and existing meeting history into Notion.",
+    "intro": "Your recordings, part of your workspace.",
+    "story": "I built Bring Your Own File during my Notion internship, turning existing audio and video recordings into searchable transcripts and summaries. It extended AI Meeting Notes to conversations recorded outside Notion.",
+    "approach": "The work covered audio and video uploads, playback, and API support for bringing in recordings from other tools. I worked across the product experience and the systems behind it.",
+    "detail": "I also worked on Granola migration, so users could bring their meeting history with them. Uploads and migration addressed the same problem: useful context was scattered across tools.",
+    "outcomes": [
+      {
+        "value": "~20,000",
+        "label": "pre-recorded meetings processed at internship presentation"
+      },
+      {
+        "value": "Audio + video",
+        "label": "file uploads shipped to production"
+      },
+      {
+        "value": "Public API",
+        "label": "meeting-note creation shipped"
+      }
+    ]
+  },
+  {
+    "slug": "sixth",
+    "menuDescription": "A wearable designed to work off-grid.",
+    "featured": true,
+    "name": "SIXTH",
+    "number": "05",
+    "year": "2026",
+    "type": "AI · Wearable systems",
+    "image": "sixth-complete",
+    "cover": "sixth-complete",
+    "coverAlt": "Complete SIXTH wearable concept shown in an exploded view with its textile layers, sensors, and electronics",
+    "gallery": "sixth-personalization",
+    "galleryAlt": "SIXTH companion app concept: pairing the wearable, establishing a personal baseline, and preparing for offline use",
+    "role": "AI architecture & offline decision logic",
+    "tools": "Time-series models, LLMs, personalized heuristics, ESP32",
+    "description": "A wearable prototype that uses connected learning to support personalized feedback offline.",
+    "intro": "Personalized feedback, beyond Wi-Fi.",
+    "story": "SIXTH is a wearable prototype for female athletes in cold, high-altitude environments. Fabric sensors monitor the body and trigger physical feedback. I designed the AI decision system around a central constraint: connectivity could disappear.",
+    "approach": "While connected, the system learns a personal baseline and translates it into lightweight rules. The wearable stores those rules locally before an expedition.",
+    "detail": "In Extreme Mode, it uses those rules to interpret sensor readings and trigger feedback without a cloud request. Keeping learning online and decisions on the device makes the system less dependent on a reliable connection.",
+    "outcomes": [
+      {
+        "value": "4",
+        "label": "sensing modalities in the prototype"
+      },
+      {
+        "value": "Personalized",
+        "label": "rules derived from connected learning"
+      },
+      {
+        "value": "Offline",
+        "label": "local decisions in Extreme Mode"
+      }
+    ],
+    "note": "Research prototype with Xixi Li, Izzy Shen, and Alfred Wong; extreme-environment field validation remains future work."
+  },
+  {
+    "slug": "relicvr",
+    "menuDescription": "Cultural heritage in VR.",
+    "featured": false,
+    "category": "New interfaces",
+    "name": "RelicVR",
+    "number": "05",
+    "year": "2023",
+    "type": "VR · Cultural heritage",
+    "description": "An interactive VR experience built from archaeological scan data.",
+    "image": "v3c",
+    "cover": "proj4",
+    "gallery": "i4-6",
+    "role": "Product design, software development & UI/UX",
+    "tools": "Unity VR, CloudCompare, Blender",
+    "intro": "Archaeological scans you can step inside.",
+    "story": "I turned archaeological scan data into a VR experience, taking historical sites from raw point clouds to explorable environments.",
+    "approach": "I used open archaeological datasets and processed the scans into models suitable for real-time VR.",
+    "detail": "I processed the scans in CloudCompare and Blender, then built the experience in Unity with controller and hand-gesture navigation.",
+    "outcomes": []
+  },
+  {
+    "slug": "orpheus",
+    "menuDescription": "An AI interface driven by EEG signals.",
+    "featured": false,
+    "category": "New interfaces",
+    "name": "Orpheus",
+    "number": "06",
+    "year": "2024",
+    "type": "AI · Human interfaces",
+    "description": "An experimental AI interface combining EEG signals and real-time visuals.",
+    "image": "v4c",
+    "cover": "proj2",
+    "gallery": "i2-6",
+    "role": "Product design, BCI development, AI & UI/UX",
+    "tools": "EEG hardware, Three.js, generative AI",
+    "intro": "An interface that responds to brainwaves.",
+    "story": "I built an experimental interface combining a Muse 2 EEG headset, real-time visuals, and an AI conversation. The prototype explored how brainwave signals could become another input to an interface.",
+    "approach": "I began by collecting and visualizing signals from a Muse 2 headset, then worked on filtering noise and translating the data into a changing particle system.",
+    "detail": "I worked on signal collection, noise filtering, and a particle system that responds to the data. Orpheus is an interaction prototype, not a clinical tool.",
+    "outcomes": []
+  }
 ];
 
 export const projects: Project[] = [...coreProjects, ...additionalWorks.map(work => ({

@@ -1,8 +1,9 @@
 ---
 import '../styles/fonts.css';
 import '../styles/global.css';
+import { profile } from '../data/profile';
 interface Props { title?: string; description?: string; }
-const { title = 'After Hours — Yifei Felix Wang', description = 'The personal corner of Yifei Felix Wang. A selection of technology, games, art, and things made with curiosity.' } = Astro.props;
+const { title = 'After Hours — Yifei Felix Wang', description = profile.description } = Astro.props;
 ---
 <!doctype html>
 <html lang="en">

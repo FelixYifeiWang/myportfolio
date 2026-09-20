@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DisclosureMotion } from '../src/diner/disclosure-motion.ts';
+import { DisclosureMotion, DisclosureGroup } from '../src/diner/disclosure-motion.ts';
 globalThis.getComputedStyle = () => ({ opacity: '0.5', borderBottomWidth: '1px' });
 
 function fixture(reduced = false) {
@@ -53,4 +53,37 @@ test('reduced motion opens and closes immediately without animation', () => {
     motion.toggle(); assert.equal(details.open, true);
     motion.toggle(); assert.equal(details.open, false);
     assert.equal(animations.length, 0);
+});
+
+test('choosing a different entry closes the previous entry with its normal motion', () => {
+    const first = fixture(), second = fixture();
+    const group = new DisclosureGroup([first.motion, second.motion]);
+    group.toggle(first.motion); first.animations[0].finish();
+    group.toggle(second.motion);
+    assert.equal(first.content.inert, true);
+    first.animations[2].finish(); second.animations[0].finish();
+    assert.deepEqual([first.details.open, second.details.open], [false, true]);
+});
+
+test('choosing the active entry again leaves the group collapsed', () => {
+    const first = fixture(true), second = fixture(true);
+    const group = new DisclosureGroup([first.motion, second.motion]);
+    group.toggle(first.motion); group.toggle(first.motion);
+    assert.deepEqual([first.details.open, second.details.open], [false, false]);
+});
+
+test('rapid choices across entries settle on only the final selection', () => {
+    const entries = [fixture(), fixture(), fixture()];
+    const group = new DisclosureGroup(entries.map(entry => entry.motion));
+    for (const index of [0, 1, 2, 0]) group.toggle(entries[index].motion);
+    entries.forEach(entry => entry.animations.forEach(animation => animation.finish()));
+    assert.deepEqual(entries.map(entry => entry.details.open), [true, false, false]);
+});
+
+test('reduced-motion groups switch exclusively without creating animations', () => {
+    const first = fixture(true), second = fixture(true);
+    const group = new DisclosureGroup([first.motion, second.motion]);
+    group.toggle(first.motion); group.toggle(second.motion);
+    assert.deepEqual([first.details.open, second.details.open], [false, true]);
+    assert.equal(first.animations.length + second.animations.length, 0);
 });

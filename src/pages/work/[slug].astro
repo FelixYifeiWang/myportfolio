@@ -14,13 +14,13 @@ const { project, next } = Astro.props;
       <h1>{project.name}</h1>
       <p class="project-deck">{project.intro}</p>
     </div>
-    <dl class="project-meta"><div><dt>Year</dt><dd>{project.year}</dd></div><div><dt>{project.brief ? 'Focus' : 'My role'}</dt><dd>{project.role}</dd></div><div><dt>Ingredients</dt><dd>{project.tools}</dd></div></dl>
+    <dl class="project-meta"><div><dt>Year</dt><dd>{project.year}</dd></div><div><dt>My role</dt><dd>{project.role}</dd></div><div><dt>Tools</dt><dd>{project.tools}</dd></div></dl>
     {project.cover && <img class="project-cover" src={`/images/${project.cover}.webp`} alt={project.coverAlt || `${project.name} project presentation`} width="1600" height="900" fetchpriority="high" />}
-    <section class="project-story" aria-labelledby="idea-title"><h2 id="idea-title">{project.brief ? 'My contribution.' : 'The idea.'}</h2><div><p>{project.story}</p></div></section>
-    {project.approach && <section class="project-story" aria-labelledby="process-title"><h2 id="process-title">In the making.</h2><div><p>{project.approach}</p><p>{project.detail}</p></div></section>}
+    <section class="project-story" aria-labelledby="idea-title"><h2 id="idea-title">The work.</h2><div><p>{project.story}</p></div></section>
+    {project.approach && <section class="project-story" aria-labelledby="process-title"><h2 id="process-title">Key decisions.</h2><div><p>{project.approach}</p><p>{project.detail}</p></div></section>}
     {project.gallery && <img class="project-gallery" src={`/images/${project.gallery}.webp`} alt={project.galleryAlt || `A closer look at the ${project.name} project`} width="1600" height="900" loading="lazy" />}
     {project.note && <p class="source-note">{project.note}</p>}
     <a class="next-project" href={`/work/${next.slug}/`}><div><p>UP NEXT / MORE WORK</p><h2>{next.name}</h2></div><span aria-hidden="true">↗</span></a>
-    <p class="source-note">Selected work from {project.year}. <a href="mailto:wangyifeifelix@gmail.com">Get in touch to talk about the process.</a></p>
+    <p class="source-note"><a href="mailto:wangyifeifelix@gmail.com">Want to talk about the work? Get in touch.</a></p>
   </main>
 </Layout>
