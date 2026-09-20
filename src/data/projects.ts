@@ -175,8 +175,7 @@ const coreProjects: Project[] = [
         "value": "Offline",
         "label": "local decisions in Extreme Mode"
       }
-    ],
-    "note": "Research prototype with Xixi Li, Izzy Shen, and Alfred Wong; extreme-environment field validation remains future work."
+    ]
   },
   {
     "slug": "relicvr",
