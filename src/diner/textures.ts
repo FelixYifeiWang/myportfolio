@@ -85,11 +85,8 @@ export function signTexture() {
         ctx.fillText('after hours', 768, 238);
         ctx.shadowBlur = 0;
         ctx.font = '500 52px "DM Mono", monospace';
-        ctx.fillStyle = '#eee5d5';
-        // Warm ivory lettering with a restrained edge shadow, like painted enamel.
-        ctx.shadowColor = '#49372b99';
-        ctx.shadowBlur = 2;
-        ctx.shadowOffsetY = 2;
+        // Matte green ink echoes the tilework without competing with the lit title.
+        ctx.fillStyle = '#364a43';
         const byline = 'BY FELIX WANG';
         const tracking = 5;
         const widths = [...byline].map(letter => ctx.measureText(letter).width);
