@@ -61,13 +61,17 @@ test('rapid record clicks preserve order and start only one music scheduler', as
   assert.equal(audio.trackName, 'One more cup');
 });
 
-test('purring is independent of music and repeated cat clicks replace the previous purr', async t => {
+test('purring loops independently and repeated cat clicks keep one continuous source', async t => {
   const { audio, contexts } = fixture(t);
   await audio.purr();
   assert.equal(audio.playing, false);
-  const first = contexts[0].sources.filter(n => n.buffer && !n.loop).at(-1);
+  const first = contexts[0].sources.filter(n => n.buffer).at(-1);
   assert.ok(first?.started);
   await audio.purr();
+  assert.equal(first.stopped, false);
+  assert.equal(first.loop, true);
+  assert.equal(contexts[0].sources.filter(n => n.buffer).length, 2);
+  audio.stopPurr();
   assert.equal(first.stopped, true);
   assert.equal(audio.playing, false);
 });
@@ -89,4 +93,24 @@ test('disposing during an audio start cannot resurrect the player', async t => {
   assert.equal(audio.playing, false);
   assert.equal(contexts[0].state, 'closed');
   assert.equal(globalThis.setInterval.mock.callCount(), 0);
+});
+
+ test('leaving cat focus during audio activation prevents a late purr', async t => {
+  const { audio, contexts } = fixture(t);
+  const pending = audio.purr();
+  audio.stopPurr();
+  await pending;
+  assert.equal(contexts[0].sources.filter(n => n.buffer).length, 1);
+});
+ test('cat focus survives tab suspension and ends on exit', async t => {
+  const { audio, contexts } = fixture(t);
+  await audio.purr();
+  const purr = contexts[0].sources.at(-1);
+  audio.setHidden(true);
+  assert.equal(contexts[0].state, 'suspended');
+  assert.equal(purr.stopped, false);
+  audio.setHidden(false);
+  assert.equal(contexts[0].state, 'running');
+  audio.stopPurr();
+  assert.equal(purr.stopped, true);
 });

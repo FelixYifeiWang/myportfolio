@@ -10,6 +10,7 @@ import { placeProp, type DinerProps } from './assets';
 import { tileTexture, floorTexture, menuTexture, signTexture, labelTexture, softTexture, surfaceTexture, coffeeTexture, bottleLabelTexture, doorGlassTexture, windowBeadsTexture, ceramicTexture } from './textures';
 import { seats, type SeatName } from './seats';
 import { createVaseArrangement, createUtensilHolder } from './counter-props';
+import { createShelfBracket, createFootRail } from './hardware';
 import { paperGeometry, linenGeometry, createNotebook } from './paper-props';
 export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about' | SeatName;
 export interface DinerWorld {
@@ -197,8 +198,9 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     for (const y of [2.65, 3.55]) {
         box(2.65, .095, .5, palette.wood, 3.08, y, -3.67, group);
         for (const x of [2.02, 4.1]) {
-            box(.035, .35, .035, palette.brass, x, y - .19, -3.85, group);
-            box(.035, .035, .4, palette.brass, x, y - .35, -3.68, group);
+            const bracket = createShelfBracket(palette.brass);
+            bracket.position.set(x, y - .095 / 2, y > 3 ? -4.01 : -3.965);
+            group.add(bracket);
         }
         for (let i = 0; i < 3; i++)
             bottle((y > 3 ? 3.24 : 2.02) + i * .39, y + .05, -3.66, .40 + (i % 3) * .09, ['#314c32', '#653b25', '#617060'][i % 3], group);
@@ -253,12 +255,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         box(.07, 1.53, .06, palette.walnut, x, .82, .412, group, .014);
     box(8.95, .18, 1.75, palette.wood, 0, 1.75, -.12, group, .07);
     box(8.91, .018, 1.70, palette.brass, 0, 1.657, -.12, group, .009);
-    line([[-4.25, .32, .42], [-4.25, .32, .92], [4.25, .32, .92], [4.25, .32, .42]], .036, palette.brass, group);
-    for (const x of [-3, 0, 3]) {
-        const mount = cylinder(.055, .055, .025, palette.brass, x, .27, .435, group, 16);
-        mount.rotation.x = Math.PI / 2;
-        line([[x, .27, .44], [x, .27, .75], [x, .32, .92]], .018, palette.brass, group);
-    }
+    group.add(createFootRail(palette.brass));
     for (const [name, seat] of Object.entries(seats)) {
         const stool = placeProp(props.stool, 1.16, seat.stool, seat.stool.x * .06, group);
         interactive(name as SeatName, stool, new THREE.Vector3(seat.stool.x, 1.2, seat.stool.z));

@@ -8,7 +8,7 @@ import { loadDinerCat } from './cat';
 import { loadDinerProps } from './assets';
 import { buildDiner, type ObjectName } from './models';
 import { seats, isSeat } from './seats';
-type View = ObjectName | 'room';
+import { ViewHistory, type View } from './view-history';
 export interface DinerScene {
     focus: (name: View, remember?: boolean) => number;
     restoreView: () => void;
@@ -17,7 +17,7 @@ export interface DinerScene {
     setPaused: (paused: boolean) => void;
     dispose: () => void;
 }
-export async function createDiner(canvas: HTMLCanvasElement, select: (name: ObjectName) => void): Promise<DinerScene> {
+export async function createDiner(canvas: HTMLCanvasElement, select: (name: ObjectName) => void, focusChanged: (cat: boolean) => void = () => {}): Promise<DinerScene> {
     await Promise.all([
         document.fonts.load('48px "Instrument Serif"'),
         document.fonts.load('italic 48px "Instrument Serif"'),
@@ -108,13 +108,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     const createdAt = performance.now();
     let currentView: View = 'room';
     let manualView = false;
-    let savedView: {
-        position: THREE.Vector3;
-        target: THREE.Vector3;
-        view: View;
-        manual: boolean;
-        exploring: boolean;
-    } | null = null;
+    const history = new ViewHistory();
     let width = 1, height = 1;
     const views = {
         ...seats,
@@ -128,8 +122,11 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     function syncControls() {
         controls.enabled = !paused && !isSeat(currentView) && (!transition || transition.interruptible);
         shell.classList.toggle('is-seated', isSeat(currentView));
-        resetButton.hidden = currentView === 'room' && !manualView;
-        controlsHelp.textContent = isSeat(currentView) ? 'Drag or use arrow keys to look around. Escape returns to the room.' : orbitHelp;
+        resetButton.hidden = currentView === 'room' && !manualView && !history.focus;
+        const returningToSeat = history.returnView && isSeat(history.returnView);
+        resetButton.title = returningToSeat ? 'Back to your seat' : history.focus ? 'Back to previous view' : 'Room view';
+        resetButton.setAttribute('aria-label', returningToSeat ? 'Return to your previous seated view' : history.focus ? 'Return to the previous view' : 'Return to the wide view of the diner');
+        controlsHelp.textContent = isSeat(currentView) ? history.focus ? 'Escape returns to your previous view.' : 'Drag or use arrow keys to look around. Escape returns to the room.' : orbitHelp;
     }
     function finishCameraMove() {
         transition = null;
@@ -153,12 +150,15 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     function focus(name: View, remember = false) {
         clearHover();
         stopSeatedDrag();
-        if (remember && !savedView) {
-            // A second navigation click during the return animation should preserve its destination.
-            savedView = { position: (transition?.to ?? camera.position).clone(), target: (transition?.target ?? controls.target).clone(), view: currentView, manual: manualView, exploring: shell.classList.contains('is-exploring') };
+        if (remember || name === 'cat') {
+            history.enter(name === 'cat' ? 'cat' : 'panel', {
+                position: transition?.to ?? camera.position, target: transition?.target ?? controls.target,
+                view: currentView, manual: manualView, exploring: shell.classList.contains('is-exploring'),
+            });
         }
-        if (!remember) savedView = null;
-        const duration = reduced.matches ? 0 : remember ? 460 : 1100;
+        else history.clear();
+        focusChanged(history.focus === 'cat');
+        const duration = reduced.matches ? 0 : 1100;
         if (isSeat(currentView) && name !== 'room' && !isSeat(name)) {
             // Stay seated: the object changes our gaze, not our eye position or room shell.
             moveCamera(seats[currentView].position, seatedLook.targetFor(world.targets[name]), { duration });
@@ -494,18 +494,19 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         focus,
         restoreView() {
             stopSeatedDrag();
+            const savedView = history.back();
             if (!savedView) {
                 focus('room');
                 return;
             }
+            focusChanged(history.focus === 'cat');
             currentView = savedView.view;
             if (isSeat(currentView)) seatedLook = new SeatedLook(seats[currentView].position, seats[currentView].target);
             manualView = savedView.manual;
             shell.classList.toggle('is-exploring', savedView.exploring);
-            moveCamera(savedView.position, savedView.target, { duration: isSeat(currentView) ? 460 : 1100 });
-            savedView = null;
+            moveCamera(savedView.position, savedView.target);
         },
-        petCat() { petUntil = performance.now() + 6000; focus('cat'); },
+        petCat() { petUntil = performance.now() + 2600; focus('cat'); },
         setPlaying(value) { playing = value; wake(); },
         setPaused(value) {
             paused = value;

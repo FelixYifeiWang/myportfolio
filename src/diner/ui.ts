@@ -21,6 +21,7 @@ export function initDiner() {
     let openTimer: ReturnType<typeof setTimeout>;
     let hintTimer: ReturnType<typeof setTimeout>;
     let lastFocus: HTMLElement | null = null;
+    let returnKeyboardFocus = false;
     const titles: Record<string, string> = { menu: 'The midnight menu', notebook: 'Little ideas, long detours', about: 'Meet Felix' };
     function announce(message: string) {
         clearTimeout(toastTimer);
@@ -54,6 +55,7 @@ export function initDiner() {
         clearTimeout(openTimer);
         if (!dialog.open) {
             lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            returnKeyboardFocus = lastFocus?.matches(':focus-visible') ?? false;
         }
         if (dialog.open) {
             showPanel(panel);
@@ -70,7 +72,7 @@ export function initDiner() {
         shell.classList.remove('panel-open');
         scene?.setPaused(false);
         scene?.restoreView();
-        lastFocus?.focus({ preventScroll: true });
+        (returnKeyboardFocus ? lastFocus : canvas)?.focus({ preventScroll: true });
     }
     function syncSound() {
         const playing = audio.playing;
@@ -113,7 +115,6 @@ export function initDiner() {
         if (name === 'cat') {
             clearTimeout(openTimer);
             scene?.petCat();
-            void audio.purr().catch(() => announce('The manager is asleep. Audio is unavailable here.'));
             announce('The manager is taking a well-earned break.');
             return;
         }
@@ -149,7 +150,7 @@ export function initDiner() {
                 closePanel();
         }
     });
-    document.querySelector('#reset-view')!.addEventListener('click', () => { viewOptions.open = false; clearTimeout(openTimer); scene?.focus('room'); canvas.focus({ preventScroll: true }); });
+    document.querySelector('#reset-view')!.addEventListener('click', () => { viewOptions.open = false; clearTimeout(openTimer); scene?.restoreView(); canvas.focus({ preventScroll: true }); });
     document.addEventListener('pointerdown', event => {
         if (event.target instanceof Node && !viewOptions.contains(event.target)) viewOptions.open = false;
     });
@@ -162,7 +163,8 @@ export function initDiner() {
         }
         if (event.key === 'Escape' && !dialog.open) {
             clearTimeout(openTimer);
-            scene?.focus('room');
+            scene?.restoreView();
+            canvas.focus({ preventScroll: true });
         }
     });
     function fromHash() {
@@ -180,7 +182,10 @@ export function initDiner() {
         loading.textContent = 'The room couldn’t load. Explore the work above.';
     }
     document.addEventListener('diner-context-lost', () => { scene?.dispose(); scene = undefined; fallback(); });
-    import('./scene').then(module => module.createDiner(canvas, action)).then(result => {
+    import('./scene').then(module => module.createDiner(canvas, action, cat => {
+        if (cat) void audio.purr().catch(() => announce('The manager is asleep. Audio is unavailable here.'));
+        else audio.stopPurr();
+    })).then(result => {
         scene = result;
         scene.setPlaying(audio.playing);
         shell.classList.add('scene-ready');

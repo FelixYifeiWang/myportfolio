@@ -19,6 +19,7 @@ export class DinerAudio {
     private purrGain: GainNode | null = null;
     private request = 0;
     private purrRequest = 0;
+    private purrWanted = false;
     private index = 0;
     private started = false;
     private hidden = false;
@@ -39,7 +40,7 @@ export class DinerAudio {
         this.volume.connect(ctx.destination);
         const buffer = ctx.createBuffer(1, ctx.sampleRate * 3, ctx.sampleRate);
         const data = buffer.getChannelData(0);
-        for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * .08;
+        for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * .052;
         this.noise = ctx.createBufferSource();
         this.noise.buffer = buffer;
         this.noise.loop = true;
@@ -140,57 +141,82 @@ export class DinerAudio {
         return this.setPlaying(true);
     }
 
-    /** A soft, breathing purr: filtered throat noise with an irregular 26 Hz flutter. */
+    /** Low, quiet throat texture loops while the cat remains the selected focus. */
     async purr() {
+        this.purrWanted = true;
+        if (this.purrSource) return;
         const ctx = this.ensureContext(), request = ++this.purrRequest;
         this.cancelSuspend();
         if (!this.hidden) await ctx.resume();
-        if (request !== this.purrRequest || this.context !== ctx || this.hidden) return;
+        if (request !== this.purrRequest || this.context !== ctx || this.hidden || !this.purrWanted) return;
         if (!this.purrBuffer) {
-            this.purrBuffer = ctx.createBuffer(1, ctx.sampleRate * 6, ctx.sampleRate);
+            const duration = 4.8;
+            this.purrBuffer = ctx.createBuffer(1, ctx.sampleRate * duration, ctx.sampleRate);
             const data = this.purrBuffer.getChannelData(0);
             let noise = 0;
             for (let i = 0; i < data.length; i++) {
                 const t = i / ctx.sampleRate;
-                noise = noise * .88 + (Math.random() * 2 - 1) * .12;
+                noise = noise * .96 + (Math.random() * 2 - 1) * .04;
                 const breath = .35 + .65 * Math.sin(Math.PI * t / 2.4) ** 2;
-                const pulse = (.5 + .5 * Math.sin(2 * Math.PI * 26 * t + .7 * Math.sin(t * 3))) ** 3;
-                const body = Math.sin(2 * Math.PI * 83 * t + .25 * Math.sin(t * 5));
-                const fade = Math.min(1, t / .35, (6 - t) / .7);
-                data[i] = (noise * .75 + body * .12) * (.18 + pulse * .82) * breath * fade;
+                const pulse = (.5 + .5 * Math.sin(2 * Math.PI * 25 * t + .4 * Math.sin(2 * Math.PI * t / duration))) ** 2;
+                const body = Math.sin(2 * Math.PI * 70 * t);
+                data[i] = (noise * .6 + body * .10) * (.3 + pulse * .7) * breath;
+            }
+            // Crossfade the loop seam; playback resumes after the overlapped opening.
+            const overlap = Math.floor(ctx.sampleRate * .04);
+            for (let i = 0; i < overlap; i++) {
+                const weight = i / overlap;
+                const end = data.length - overlap + i;
+                data[end] = data[end] * (1 - weight) + data[i] * weight;
             }
         }
         this.cancelSuspend();
-        this.purrGain?.gain.setTargetAtTime(0, ctx.currentTime, .025);
-        this.purrSource?.stop(ctx.currentTime + .1);
-        const source = ctx.createBufferSource(), gain = ctx.createGain();
+        const source = ctx.createBufferSource(), gain = ctx.createGain(), filter = ctx.createBiquadFilter();
         source.buffer = this.purrBuffer;
+        source.loop = true;
+        source.loopStart = .04;
+        source.loopEnd = 4.8;
+        filter.type = 'lowpass';
+        filter.frequency.value = 180;
+        filter.Q.value = .5;
         this.purrGain = gain;
-        gain.gain.value = .65;
-        source.connect(gain);
+        gain.gain.setValueAtTime(0, ctx.currentTime);
+        gain.gain.setTargetAtTime(.14, ctx.currentTime, .2);
+        source.connect(filter);
+        filter.connect(gain);
         gain.connect(ctx.destination);
         this.purrSource = source;
         source.onended = () => {
             source.disconnect();
+            filter.disconnect();
             gain.disconnect();
             if (this.purrSource === source) { this.purrSource = null; this.purrGain = null; this.suspendWhenIdle(); }
         };
         source.start();
     }
+    stopPurr() {
+        this.purrWanted = false;
+        this.purrRequest++;
+        if (this.context && this.purrSource) {
+            this.purrGain?.gain.setTargetAtTime(0, this.context.currentTime, .08);
+            this.purrSource.stop(this.context.currentTime + .4);
+        }
+        this.purrSource = null;
+        this.purrGain = null;
+        this.suspendWhenIdle();
+    }
     setHidden(hidden: boolean) {
         this.hidden = hidden;
-        if (hidden) {
-            // A short interaction sound should not unexpectedly resume minutes later.
-            this.purrRequest++;
-            this.purrSource?.stop();
-            this.purrSource = null;
-            void this.context?.suspend();
+        if (hidden) void this.context?.suspend();
+        else if (this.playing || this.purrWanted) {
+            void this.context?.resume();
+            if (this.purrWanted && !this.purrSource) void this.purr();
         }
-        else if (this.playing) void this.context?.resume();
     }
     dispose() {
         this.request++;
         this.purrRequest++;
+        this.purrWanted = false;
         this.cancelSuspend();
         this.stopMusic();
         for (const timer of this.cleanupTimers) clearTimeout(timer);
