@@ -120,7 +120,7 @@ const coreProjects: Project[] = [
     "coverAlt": "Notion AI Meeting Notes: Upload your own audio",
     "gallery": "notion-meeting-library",
     "galleryAlt": "Meeting notes organized together in a Notion workspace — official product screenshot",
-    "role": "Software engineering intern · AI Meeting Notes",
+    "role": "Software engineering · AI Meeting Notes",
     "tools": "Full-stack development, AI, integrations",
     "description": "Bringing recordings and existing meeting history into Notion.",
     "intro": "Your recordings, part of your workspace.",
