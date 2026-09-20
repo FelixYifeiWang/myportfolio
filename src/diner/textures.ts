@@ -83,8 +83,11 @@ export function signTexture() {
         ctx.shadowBlur = 26;
         ctx.fillStyle = '#ffd0a0';
         ctx.fillText('after hours', 768, 238);
-        // Share the title's warm light, with a tighter halo for the smaller letters.
-        ctx.shadowBlur = 8;
+        // Warm illuminated edges surround dark letter faces.
+        ctx.strokeStyle = '#ffd0a0';
+        ctx.fillStyle = '#483b30';
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
         ctx.font = '500 52px "DM Mono", monospace';
         const byline = 'BY FELIX WANG';
         const tracking = 5;
@@ -92,6 +95,9 @@ export function signTexture() {
         let x = 768 - (widths.reduce((sum, width) => sum + width, 0) + tracking * (byline.length - 1)) / 2;
         ctx.textAlign = 'left';
         [...byline].forEach((letter, index) => {
+            ctx.shadowBlur = 8;
+            ctx.strokeText(letter, x, 416);
+            ctx.shadowBlur = 0;
             ctx.fillText(letter, x, 416);
             x += widths[index] + tracking;
         });
