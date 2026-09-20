@@ -82,18 +82,18 @@ export function signTexture() {
         ctx.shadowColor = '#ed8a46';
         ctx.shadowBlur = 26;
         ctx.fillStyle = '#ffd0a0';
-        ctx.fillText('after hours', 768, 238);
+        ctx.fillText('after hours', 768, 302);
         ctx.shadowBlur = 0;
-        ctx.font = '500 52px "DM Mono", monospace';
-        // Matte green ink echoes the tilework without competing with the lit title.
-        ctx.fillStyle = '#364a43';
+        ctx.font = '400 44px "DM Mono", monospace';
+        // A small brass signature above the neon keeps both lines in one warm palette.
+        ctx.fillStyle = '#896b49';
         const byline = 'BY FELIX WANG';
-        const tracking = 5;
+        const tracking = 10;
         const widths = [...byline].map(letter => ctx.measureText(letter).width);
         let x = 768 - (widths.reduce((sum, width) => sum + width, 0) + tracking * (byline.length - 1)) / 2;
         ctx.textAlign = 'left';
         [...byline].forEach((letter, index) => {
-            ctx.fillText(letter, x, 416);
+            ctx.fillText(letter, x, 106);
             x += widths[index] + tracking;
         });
     });
