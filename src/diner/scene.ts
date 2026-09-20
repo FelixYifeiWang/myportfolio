@@ -180,7 +180,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         if (small)
             roomPosition.multiplyScalar(Math.max(1, .68 / aspect));
         // Let the counter details fill the view; portrait screens retain more room at the edges.
-        roomPosition.sub(roomTarget).multiplyScalar(small ? .92 : .82).add(roomTarget);
+        roomPosition.sub(roomTarget).multiplyScalar(small ? .88 : .72).add(roomTarget);
         // Keep the room clear when a narrow viewport needs a more distant camera.
         const fog = scene.fog as THREE.Fog;
         fog.near = Math.max(23, roomPosition.length() + 8);
@@ -372,8 +372,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     await renderer.compileAsync(scene, camera);
     ready = true;
     if (!reduced.matches) {
-        camera.position.copy(roomPosition).sub(roomTarget).multiplyScalar(1.04 / (compact() ? .92 : .82)).add(roomTarget);
-        moveCamera(roomPosition, roomTarget, { duration: 5200, interruptible: true });
+        camera.position.copy(roomPosition).sub(roomTarget).multiplyScalar(1.04 / (compact() ? .88 : .72)).add(roomTarget);
+        moveCamera(roomPosition, roomTarget, { duration: 3000, interruptible: true });
     }
     else
         wake();
