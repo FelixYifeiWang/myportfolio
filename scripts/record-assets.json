@@ -1,0 +1,65 @@
+[
+  {
+    "file": "take-five.m4a",
+    "duration": "00:05:24.21",
+    "original_mb": 13.04,
+    "web_mb": 6.63,
+    "source_lufs": "-15.93",
+    "encoded_lufs": -20.04,
+    "sha256": "4467691eb0138eb8b3e9764f32cb8e07ee4777042c4b10fce27170d342685503"
+  },
+  {
+    "file": "wo-zhi-zai-hu-ni.m4a",
+    "duration": "00:04:15.09",
+    "original_mb": 10.27,
+    "web_mb": 5.18,
+    "source_lufs": "-10.66",
+    "encoded_lufs": -20.04,
+    "sha256": "21f5062f9eee7fe79f69de54bbfc23a06cd517b9e1828322267236fa984c2224"
+  },
+  {
+    "file": "bohemian-rhapsody.m4a",
+    "duration": "00:05:59.60",
+    "original_mb": 14.43,
+    "web_mb": 7.36,
+    "source_lufs": "-8.16",
+    "encoded_lufs": -20.07,
+    "sha256": "813ad67b5a66cb22a42eea5687010b225413db9646f344f158e527635bd8022e"
+  },
+  {
+    "file": "mizuiro-no-ame.m4a",
+    "duration": "00:03:34.07",
+    "original_mb": 8.59,
+    "web_mb": 4.39,
+    "source_lufs": "-8.35",
+    "encoded_lufs": -20.09,
+    "sha256": "173ba30fd2c1ae8c33ca4f4cd63562334c9df46c37d9679ca141692b31b984a0"
+  },
+  {
+    "file": "luther.m4a",
+    "duration": "00:03:09.60",
+    "original_mb": 7.61,
+    "web_mb": 4.01,
+    "source_lufs": "-8.35",
+    "encoded_lufs": -20.05,
+    "sha256": "491f0ca7abd77a6e2844e60ebe252f99f402224ab40d181c65868b5d601d9a63"
+  },
+  {
+    "file": "drama.m4a",
+    "duration": "00:03:54.84",
+    "original_mb": 9.44,
+    "web_mb": 4.83,
+    "source_lufs": "-9.69",
+    "encoded_lufs": -20.06,
+    "sha256": "12be6210082ac1822e51363bcb094b8cffe64c0657424a1fca2368ddcba28efe"
+  },
+  {
+    "file": "comfortably-numb.m4a",
+    "duration": "00:06:22.33",
+    "original_mb": 15.35,
+    "web_mb": 7.81,
+    "source_lufs": "-13.96",
+    "encoded_lufs": -20.08,
+    "sha256": "05cd05a78f912afcee5452eb58a847dcfe1483656b40d56661e43b1e29ea2872"
+  }
+]

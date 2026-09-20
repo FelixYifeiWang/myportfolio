@@ -1,13 +1,18 @@
-/** Original, lightweight lounge arrangements. No audio downloads or autoplay. */
-const tracks = [
-    { name: 'Last light', bpm: 72, chords: [[48, 52, 55, 59], [45, 48, 52, 55], [50, 53, 57, 60], [43, 50, 53, 57]], melody: [76, 74, 71, 67, 69, 72, 71, 67], brightness: .24 },
-    { name: 'Rain on glass', bpm: 60, chords: [[50, 53, 57, 60], [46, 50, 53, 57], [48, 52, 55, 59], [45, 52, 55, 59]], melody: [77, 76, 72, 69, 74, 72, 69, 65], brightness: .10 },
-    { name: 'One more cup', bpm: 88, chords: [[53, 57, 60, 64], [50, 53, 57, 60], [55, 59, 62, 65], [48, 55, 58, 62]], melody: [81, 79, 76, 72, 74, 77, 79, 76], brightness: .36 },
-];
+import { records } from './records.ts';
+
+/** Original opening record; supplied recordings stream only when selected. */
+const lounge = { bpm: 72, chords: [[48, 52, 55, 59], [45, 48, 52, 55], [50, 53, 57, 60], [43, 50, 53, 57]], melody: [76, 74, 71, 67, 69, 72, 71, 67], brightness: .24 };
 
 export class DinerAudio {
     private context: AudioContext | null = null;
     private volume: GainNode | null = null;
+    private rainVolume: GainNode | null = null;
+    private recordingVolume: GainNode | null = null;
+    private media: HTMLAudioElement | null = null;
+    private mediaNode: MediaElementAudioSourceNode | null = null;
+    private mediaPath: string | null = null;
+    private createMedia: () => HTMLAudioElement;
+    onChange: (() => void) | null = null;
     private noise: AudioBufferSourceNode | null = null;
     private trackBus: GainNode | null = null;
     private voices = new Set<OscillatorNode>();
@@ -27,10 +32,11 @@ export class DinerAudio {
     private createContext: () => AudioContext;
     playing = false;
 
-    constructor(createContext: () => AudioContext = () => new AudioContext()) {
+    constructor(createContext: () => AudioContext = () => new AudioContext(), createMedia: () => HTMLAudioElement = () => new Audio()) {
         this.createContext = createContext;
+        this.createMedia = createMedia;
     }
-    get trackName() { return tracks[this.index].name; }
+    get trackName(): string { return records[this.index]?.name ?? 'Sound off'; }
 
     private ensureContext() {
         if (this.context) return this.context;
@@ -48,7 +54,10 @@ export class DinerAudio {
         filter.type = 'lowpass';
         filter.frequency.value = 750;
         this.noise.connect(filter);
-        filter.connect(this.volume);
+        this.rainVolume = ctx.createGain();
+        this.rainVolume.gain.value = 0;
+        filter.connect(this.rainVolume);
+        this.rainVolume.connect(ctx.destination);
         this.noise.start();
         return ctx;
     }
@@ -80,7 +89,7 @@ export class DinerAudio {
     private playBar() {
         const ctx = this.context;
         if (!ctx || !this.playing || ctx.state !== 'running') return;
-        const track = tracks[this.index], beat = 60 / track.bpm;
+        const track = lounge, beat = 60 / track.bpm;
         const chord = track.chords[this.bar % 4], now = ctx.currentTime + .025;
         chord.forEach((note, i) => this.note(note, now + i * .025, beat * 3.8, .045, track.brightness));
         this.note(chord[0] - 12, now, beat * 1.8, .09, .08);
@@ -118,31 +127,88 @@ export class DinerAudio {
     private updateMix() {
         if (!this.context || !this.volume) return;
         this.volume.gain.setTargetAtTime(this.playing ? (this.purrWanted ? .28 : .42) : 0, this.context.currentTime, .3);
+        // Rain is independent of music ducking, so cat focus does not bury the ambience.
+        this.rainVolume?.gain.setTargetAtTime(this.playing ? .42 : 0, this.context.currentTime, .3);
+    }
+    private ensureMedia(ctx: AudioContext) {
+        if (!this.media) {
+            this.media = this.createMedia();
+            this.media.preload = 'none';
+            this.media.loop = true;
+            this.mediaNode = ctx.createMediaElementSource(this.media);
+            this.recordingVolume = ctx.createGain();
+            // Files measure -20.04 to -20.09 LUFS; the original arrangement is ~-33.4.
+            this.recordingVolume.gain.value = .215;
+            this.mediaNode.connect(this.recordingVolume);
+            this.recordingVolume.connect(this.volume!);
+        }
+        return this.media;
     }
     private async setPlaying(playing: boolean) {
         const ctx = this.ensureContext(), request = ++this.request;
         this.cancelSuspend();
         this.playing = playing;
         this.stopMusic();
+        this.media?.pause();
         if (playing) {
             this.started = true;
-            try { if (!this.hidden) await ctx.resume(); }
-            catch (error) { if (request === this.request) this.playing = false; throw error; }
-            if (request !== this.request || this.context !== ctx) return this.playing;
-            this.trackBus = ctx.createGain();
-            this.trackBus.connect(this.volume!);
-            this.bar = 0;
-            this.playBar();
-            this.timer = setInterval(() => this.playBar(), 240000 / tracks[this.index].bpm);
+            try {
+                if (!this.hidden) await ctx.resume();
+                if (request !== this.request || this.context !== ctx) return this.playing;
+                const src = records[this.index]?.src;
+                if (src) {
+                    const media = this.ensureMedia(ctx);
+                    if (this.mediaPath !== src) {
+                        media.src = src;
+                        media.load();
+                        this.mediaPath = src;
+                    }
+                    if (!this.hidden) await media.play();
+                }
+                else {
+                    // Release the previous recording's network buffer on the original track.
+                    this.unloadMedia();
+                    this.trackBus = ctx.createGain();
+                    this.trackBus.connect(this.volume!);
+                    this.bar = 0;
+                    this.playBar();
+                    this.timer = setInterval(() => this.playBar(), 240000 / lounge.bpm);
+                }
+            }
+            catch (error) {
+                if (request !== this.request || this.context !== ctx) return this.playing;
+                // Hiding the tab can abort a still-loading play request; preserve its intent.
+                if (this.hidden && error instanceof DOMException && error.name === 'AbortError') {
+                    this.updateMix();
+                    return this.playing;
+                }
+                this.playing = false;
+                this.media?.pause();
+                this.updateMix();
+                this.suspendWhenIdle();
+                throw error;
+            }
         }
+        if (request !== this.request || this.context !== ctx) return this.playing;
+        if (this.index === records.length) this.unloadMedia();
         this.updateMix();
         this.suspendWhenIdle();
         return this.playing;
     }
-    toggle() { return this.setPlaying(!this.playing); }
+    private unloadMedia() {
+        if (!this.media || !this.mediaPath) return;
+        this.media.pause();
+        this.media.removeAttribute('src');
+        this.media.load();
+        this.mediaPath = null;
+    }
+    toggle() {
+        if (!this.playing && this.index === records.length) this.index = 0;
+        return this.setPlaying(!this.playing);
+    }
     nextTrack() {
-        if (this.started) this.index = (this.index + 1) % tracks.length;
-        return this.setPlaying(true);
+        if (this.started) this.index = (this.index + 1) % (records.length + 1);
+        return this.setPlaying(this.index < records.length);
     }
 
     /** Low, quiet throat texture loops while the cat remains the selected focus. */
@@ -217,9 +283,19 @@ export class DinerAudio {
     }
     setHidden(hidden: boolean) {
         this.hidden = hidden;
-        if (hidden) void this.context?.suspend();
+        if (hidden) { this.media?.pause(); void this.context?.suspend(); }
         else if (this.playing || this.purrWanted) {
             void this.context?.resume();
+            if (this.playing && records[this.index]?.src) {
+                const request = this.request;
+                void this.media?.play().catch(() => {
+                    if (this.hidden || request !== this.request) return;
+                    this.playing = false;
+                    this.updateMix();
+                    this.suspendWhenIdle();
+                    this.onChange?.();
+                });
+            }
             if (this.purrWanted && !this.purrSource) void this.purr();
         }
     }
@@ -229,6 +305,13 @@ export class DinerAudio {
         this.purrWanted = false;
         this.cancelSuspend();
         this.stopMusic();
+        this.unloadMedia();
+        this.mediaNode?.disconnect();
+        this.recordingVolume?.disconnect();
+        this.recordingVolume = null;
+        this.media?.remove();
+        this.media = null;
+        this.mediaNode = null;
         for (const timer of this.cleanupTimers) clearTimeout(timer);
         this.cleanupTimers.clear();
         this.purrSource?.stop();
@@ -239,6 +322,7 @@ export class DinerAudio {
         void this.context?.close();
         this.noise = null;
         this.volume = null;
+        this.rainVolume = null;
         this.context = null;
         this.playing = false;
     }

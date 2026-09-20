@@ -14,7 +14,14 @@ export function initDiner() {
     const viewOptionsToggle = document.querySelector<HTMLElement>('#view-options-toggle')!;
     const toast = document.querySelector<HTMLElement>('#scene-toast')!;
     const location = document.querySelector<HTMLElement>('#dialog-location')!;
-    const audio = new DinerAudio();
+    const audio = new DinerAudio(undefined, () => {
+        const media = document.createElement('audio');
+        media.id = 'record-audio';
+        media.hidden = true;
+        document.body.append(media);
+        return media;
+    });
+    audio.onChange = () => syncSound();
     let scene: DinerScene | undefined;
     let currentPanel = 'menu';
     let toastTimer: ReturnType<typeof setTimeout>;
@@ -88,7 +95,7 @@ export function initDiner() {
             if (next) await audio.nextTrack();
             else await audio.toggle();
             syncSound();
-            announce(audio.playing ? `Now playing · ${audio.trackName}` : 'Music paused');
+            announce(audio.playing ? `Now playing · ${audio.trackName}` : audio.trackName === 'Sound off' ? 'Sound off' : 'Music paused');
         }
         catch {
             syncSound();
