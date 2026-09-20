@@ -37,6 +37,9 @@ export function createEntrance(palette: Palette, doorTexture: THREE.Texture,
     door.position.set(-4.86, 0, 2.65);
     door.rotation.y = Math.PI / 2;
 
+    // Fixed jambs conceal the cutaway plaster edges when the leaf is open.
+    for (const x of [-.90, .90]) box(.09, 3.78, .26, palette.darkwood, x, 1.90, -.06, door);
+    box(1.89, .10, .26, palette.darkwood, 0, 3.76, -.06, door);
     const hinge = new THREE.Group();
     hinge.position.x = .86;
     door.add(hinge);
@@ -68,7 +71,7 @@ export function createEntrance(palette: Palette, doorTexture: THREE.Texture,
     lathe([[0, .12], [.08, .12], [.20, 0], [.21, -.025]], palette.brass, 0, 4.24, .32, door);
 
     return { group: door, hinge, leaf, setOpen(openness: number) {
-        hinge.rotation.y = Math.max(0, Math.min(1, openness)) * Math.PI * .53;
+        hinge.rotation.y = Math.max(0, Math.min(1, openness)) * Math.PI * .23;
     } };
 }
 
@@ -130,6 +133,7 @@ export function addFurnishings(parent: THREE.Group, palette: Palette, doorTextur
         box(.56, .09, .34, material, -1.32, 1.535 + i * .10, -3.28, parent);
         box(.47, .052, .005, linen, -1.32, 1.535 + i * .10, -3.105, parent);
     }
+    return entrance;
 }
 
 function roundedRectangle(width: number, depth: number, radius: number, x = 0) {

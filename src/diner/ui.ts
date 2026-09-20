@@ -1,3 +1,4 @@
+import { isSeat } from './seats';
 import type { DinerScene } from './scene';
 import type { ObjectName } from './models';
 import { DinerAudio } from './audio';
@@ -99,7 +100,7 @@ export function initDiner() {
             showPanel(panel);
             return;
         }
-        const destination = (panel.startsWith('project-') || panel === 'other-work' ? 'menu' : panel) as ObjectName;
+        const destination = (panel.startsWith('project-') || panel === 'other-work' ? 'menu' : panel) as Exclude<ObjectName, 'door'>;
         const duration = scene?.focus(destination, true) ?? 0;
         // Give the visitor a brief sense of picking the object up before showing its content.
         openTimer = setTimeout(() => showPanel(panel), duration);
@@ -137,7 +138,7 @@ export function initDiner() {
     function action(name: ObjectName) {
         const hotspot = document.querySelector<HTMLElement>(`[data-hotspot="${name}"]`);
         if (hotspot) hotspot.dataset.explored = 'true';
-        if (name.startsWith('seat-')) {
+        if (isSeat(name)) {
             if (!scene) return;
             clearTimeout(openTimer);
             viewOptions.open = false;
@@ -145,6 +146,12 @@ export function initDiner() {
             scene.focus(name);
             canvas.focus({ preventScroll: true });
             announce('Drag or use arrow keys to look around.');
+            return;
+        }
+        if (name === 'door') {
+            clearTimeout(openTimer);
+            viewOptions.open = false;
+            scene?.openDoor();
             return;
         }
         if (name === 'record') {

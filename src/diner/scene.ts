@@ -9,10 +9,13 @@ import { loadDinerProps } from './assets';
 import { buildDiner, type ObjectName } from './models';
 import { seats, isSeat } from './seats';
 import { ViewHistory, type View } from './view-history';
+import { DoorEncounter } from './door-encounter';
+import { VisitorLibrary, visitors } from './visitor-assets';
 export interface DinerScene {
     focus: (name: View, remember?: boolean) => number;
     restoreView: () => void;
     petCat: () => void;
+    openDoor: () => void;
     setPlaying: (playing: boolean) => void;
     setPaused: (paused: boolean) => void;
     dispose: () => void;
@@ -24,7 +27,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         document.fonts.load('16px "DM Mono"'),
     ]);
     RectAreaLightUniformsLib.init();
-    const shell = canvas.closest('.diner-shell')!;
+    const shell = canvas.closest<HTMLElement>('.diner-shell')!;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const compact = () => canvas.clientWidth < 700;
     const resetButton = document.querySelector<HTMLButtonElement>('#reset-view')!;
@@ -71,7 +74,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     pmrem.dispose();
     const [catModel, props] = await Promise.all([loadDinerCat(), loadDinerProps()]);
     const world = buildDiner(catModel, props);
-    const batches = batchStaticMeshes(world.group, [...world.interactives, world.ceiling.group, world.sideWall.group]);
+    const batches = batchStaticMeshes(world.group, [...world.interactives, world.ceiling.group, world.sideWall.group, world.entrance.hinge, world.doorstep]);
     scene.add(world.group);
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: '#1b211e', roughness: 1 }));
     ground.rotation.x = -Math.PI / 2;
@@ -106,6 +109,45 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     let last = performance.now(), elapsed = 0, lastMovement = 0, lastHover = 0;
     let qualityScale = 1, slowFrames = 0, sampledFrames = 0;
     const createdAt = performance.now();
+    const visitorLibrary = new VisitorLibrary();
+    let visibleVisitor: THREE.Group | null = null;
+    const doorButton = document.querySelector<HTMLButtonElement>('[data-hotspot="door"]')!;
+    const previewVisitor = import.meta.env.DEV ? new URL(window.location.href).searchParams.get('visitor') : null;
+    const roster = visitors.some(visitor => visitor.id === previewVisitor) ? [previewVisitor!] : visitors.map(visitor => visitor.id);
+    const encounter = new DoorEncounter(roster, {
+        async load(id) {
+            const visitor = await visitorLibrary.load(id);
+            if (disposed) throw new Error('Diner is disposed.');
+            await renderer.compileAsync(visitor, camera, scene);
+            return visitor;
+        },
+        show(visitor) {
+            visibleVisitor = visitor;
+            shell.dataset.visitor = visitor.name;
+            visitor.position.set(-5.60, .04, 2.65);
+            world.doorstep.add(visitor);
+            world.doorstep.visible = true;
+            renderer.shadowMap.needsUpdate = true;
+        },
+        hide() {
+            visibleVisitor?.removeFromParent();
+            visibleVisitor = null;
+            delete shell.dataset.visitor;
+            world.doorstep.visible = false;
+            renderer.shadowMap.needsUpdate = true;
+        },
+        angle(amount) { world.entrance.setOpen(amount); renderer.shadowMap.needsUpdate = true; },
+        changed() {
+            doorButton.setAttribute('aria-busy', String(encounter.phase === 'loading'));
+            // A visible state also makes browser checks independent of scene internals.
+            shell.dataset.encounter = encounter.phase;
+            wake();
+        },
+        error(error) {
+            console.warn('Doorway visitor could not be loaded.', error);
+            document.querySelector('#scene-toast')!.textContent = 'Nobody at the door just now. Try again in a moment.';
+        },
+    });
     let currentView: View = 'room';
     let manualView = false;
     const history = new ViewHistory();
@@ -150,6 +192,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     function focus(name: View, remember = false) {
         clearHover();
         stopSeatedDrag();
+        encounter.close();
         if (remember || name === 'cat') {
             history.enter(name === 'cat' ? 'cat' : 'panel', {
                 position: transition?.to ?? camera.position, target: transition?.target ?? controls.target,
@@ -247,7 +290,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         camera.updateMatrixWorld();
         for (const hotspot of hotspots) {
             projected.copy(hotspot.point).project(camera);
-            const hidden = paused || (isSeat(hotspot.button.dataset.hotspot!) && (currentView !== 'room' || !!transition && !transition.interruptible)) || projected.z > 1 || Math.abs(projected.x) > .95 || Math.abs(projected.y) > .85;
+            const hidden = paused || (hotspot.button.dataset.hotspot === 'door' && encounter.phase !== 'closed') || (isSeat(hotspot.button.dataset.hotspot!) && (currentView !== 'room' || !!transition && !transition.interruptible)) || projected.z > 1 || Math.abs(projected.x) > .95 || Math.abs(projected.y) > .85;
             hotspot.button.hidden = hidden;
             if (hidden)
                 continue;
@@ -402,14 +445,16 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         frame = 0;
         if (disposed || document.hidden)
             return;
-        if (paused && !transition && !dirty)
+        if (paused && !transition && !dirty && encounter.phase === 'closed')
             return;
         rendering = true;
         const frameTime = now - last;
         const delta = Math.min(frameTime / 1000, .06);
         last = now;
         elapsed += delta;
-        let moving = !!transition || interacting || now - lastMovement < 250;
+        const wasSwinging = encounter.phase === 'opening' || encounter.phase === 'closing';
+        encounter.update(Math.min(frameTime / 1000, .3), reduced.matches);
+        let moving = wasSwinging || encounter.phase === 'opening' || encounter.phase === 'closing' || !!transition || interacting || now - lastMovement < 250;
         let cameraChanged = !!transition;
         if (transition) {
             const progress = Math.min((now - transition.start) / transition.duration, 1);
@@ -467,20 +512,22 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         }
         dirty = false;
         rendering = false;
-        if (paused && !transition)
+        if (paused && !transition && encounter.phase === 'closed')
             return;
         if (moving || cameraChanged)
             frame = requestAnimationFrame(update);
-        else if (!reduced.matches)
-            timer = setTimeout(() => { timer = undefined; frame = requestAnimationFrame(update); }, Math.max(0, 1000 / 24 - (performance.now() - now)));
+        else if (!reduced.matches || encounter.phase === 'holding')
+            timer = setTimeout(() => { timer = undefined; frame = requestAnimationFrame(update); }, Math.max(0, 1000 / (reduced.matches ? 4 : 24) - (performance.now() - now)));
     }
     const observer = new ResizeObserver(resize);
     observer.observe(canvas);
     resize();
     // Compile asynchronously where supported, avoiding a synchronous first-frame stall.
+    world.doorstep.visible = true;
     world.ceiling.group.visible = true;
     world.sideWall.group.visible = true;
     await renderer.compileAsync(scene, camera);
+    world.doorstep.visible = false;
     world.ceiling.group.visible = false;
     world.sideWall.group.visible = false;
     ready = true;
@@ -493,6 +540,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     return {
         focus,
         restoreView() {
+            // Escape dismisses an encounter without moving the viewer from their seat.
+            if (encounter.phase !== 'closed') { encounter.close(); return; }
             stopSeatedDrag();
             const savedView = history.back();
             // A top-level room visit exits completely in one step, including any
@@ -508,6 +557,10 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             shell.classList.toggle('is-exploring', savedView.exploring);
             moveCamera(savedView.position, savedView.target);
         },
+        openDoor() {
+            if (encounter.phase !== 'closed') return;
+            void encounter.open();
+        },
         petCat() { if (history.focus !== 'cat') focus('cat'); },
         setPlaying(value) { playing = value; wake(); },
         setPaused(value) {
@@ -519,6 +572,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         },
         dispose() {
             disposed = true;
+            encounter.dispose();
+            visitorLibrary.dispose();
             stopSeatedDrag();
             stopScheduledFrame();
             observer.disconnect();

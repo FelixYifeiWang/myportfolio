@@ -1,7 +1,7 @@
 import type { Vector3 } from 'three';
 import type { ObjectName } from './models';
 
-export type View = ObjectName | 'room';
+export type View = Exclude<ObjectName, 'door'> | 'room';
 type Focus = 'cat' | 'panel' | null;
 export interface ViewSnapshot {
     position: Vector3;

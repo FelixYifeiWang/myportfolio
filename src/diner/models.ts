@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { batchStaticMeshes } from './optimize';
+import { createEntranceWall } from './entrance-wall';
 import { addFurnishings, addContactShadows, createBackCounter } from './furnishings';
 import type { DinerCat } from './cat';
 import { createWindowRain, type WindowRain } from './rain';
@@ -12,7 +13,7 @@ import { seats, type SeatName } from './seats';
 import { createVaseArrangement, createUtensilHolder } from './counter-props';
 import { createShelfBracket, createFootRail } from './hardware';
 import { paperGeometry, linenGeometry, createNotebook } from './paper-props';
-export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about' | SeatName;
+export type ObjectName = 'menu' | 'notebook' | 'cat' | 'record' | 'about' | 'door' | SeatName;
 export interface DinerWorld {
     group: THREE.Group;
     targets: Record<ObjectName, THREE.Vector3>;
@@ -24,6 +25,8 @@ export interface DinerWorld {
     ceiling: ReturnType<typeof createSeatedCeiling>;
     sideWall: ReturnType<typeof createSeatedSideWall>;
     lights: THREE.Light[];
+    entrance: ReturnType<typeof addFurnishings>;
+    doorstep: THREE.Group;
 }
 const materialCache = new Map<string, THREE.MeshStandardMaterial>();
 function surface(color: string, roughness = .7, metalness = 0) {
@@ -151,14 +154,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     box(10, 2.2, .04, tiles, 0, 1.35, -3.99, group, 0);
     box(10, .13, .08, palette.darkwood, 0, 2.51, -3.94, group);
     box(10, .10, .1, palette.darkwood, 0, .1, -3.91, group);
-    // Window openings are built into the left wall rather than painted on it.
-    box(.2, 1.7, 8.2, plaster, -5.12, .82, 0, group);
-    box(.2, 1.0, 8.2, plaster, -5.12, 5, 0, group);
-    box(.2, 2.8, 1.6, plaster, -5.12, 3.1, -3.35, group);
-    box(.2, 2.8, 3, plaster, -5.12, 3.1, 2.65, group);
-    box(.15, 1.7, 8.1, palette.walnut, -4.99, .83, 0, group);
-    for (let z = -3.8; z < 4; z += .25)
-        box(.045, 1.65, .04, palette.darkwood, -4.89, .82, z, group, 0);
+    group.add(createEntranceWall(plaster, palette.walnut, palette.darkwood));
     for (const z of [-2.58, 1.18])
         box(.22, 2.9, .12, palette.darkwood, -5, 3.07, z, group);
     for (const y of [1.64, 4.5])
@@ -373,9 +369,25 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     mesh(new THREE.LatheGeometry(shadeProfile, 40), palette.leather, [0, .62, 0], lamp);
     cylinder(.30, .30, .015, palette.glow, 0, .62, 0, lamp);
     addCounterDetails(group, props);
-    addFurnishings(group, palette, doorGlassTexture());
+    const entrance = addFurnishings(group, palette, doorGlassTexture());
+    interactive('door', entrance.leaf, new THREE.Vector3(-4.69, 1.5, 3.20));
+    // A shallow exterior recess is visible only during a visit. Its sides conceal
+    // the cutaway edge, keeping visitors grounded rather than floating in space.
+    const doorstep = new THREE.Group();
+    doorstep.name = 'Doorstep';
+    const night = surface('#192b31', 1);
+    box(1.9, .08, 1.80, surface('#4c5350', .75), -5.70, -.005, 2.65, doorstep, 0);
+    box(.08, 3.7, 1.80, night, -6.65, 1.85, 2.65, doorstep, 0);
+    for (const z of [1.74, 3.56]) box(1.9, 3.7, .06, night, -5.70, 1.85, z, doorstep, 0);
+    batchStaticMeshes(doorstep, []);
+    doorstep.visible = false;
+    group.add(doorstep);
     // Floating steam is rendered inside the room, not layered onto the page.
     const soft = softTexture();
+    const doorstepShadow = new THREE.Mesh(new THREE.PlaneGeometry(.85, .72), new THREE.MeshBasicMaterial({ map: soft, color: '#0b1315', transparent: true, opacity: .56, depthWrite: false }));
+    doorstepShadow.rotation.x = -Math.PI / 2;
+    doorstepShadow.position.set(-5.60, .038, 2.65);
+    doorstep.add(doorstepShadow);
     const ceiling = createSeatedCeiling(props.wood.color, soft);
     const sideWall = createSeatedSideWall(props.wood.color, plasterGrain, soft);
     group.add(ceiling.group, sideWall.group);
@@ -432,7 +444,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
         batchStaticMeshes(object as THREE.Group, [vinyl]);
         object.traverse(child => { child.userData.action = object.userData.action; });
     }
-    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, ceiling, sideWall, lights };
+    return { group, targets, interactives, cat: catModel.body, vinyl, steam, rain, ceiling, sideWall, lights, entrance, doorstep };
 }
 function addCounterDetails(parent: THREE.Object3D, props: DinerProps) {
     const bowl = placeProp(props.ramen, .34, new THREE.Vector3(-1.63, 1.85, -.59), .3, parent);

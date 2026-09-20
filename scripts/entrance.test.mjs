@@ -15,7 +15,7 @@ test('the hinge opens inward while the sconce and threshold remain fixed', () =>
   door.leaf.getWorldPosition(center);
   door.setOpen(1); door.group.updateMatrixWorld(true);
   const opened = door.leaf.getWorldPosition(new THREE.Vector3());
-  assert.ok(opened.x > center.x + .7);
+  assert.ok(opened.x > center.x + .5);
   assert.ok(fixed.every((child,index) => child.matrixWorld.equals(before[index])));
   door.setOpen(0); door.group.updateMatrixWorld(true);
   assert.ok(door.leaf.getWorldPosition(new THREE.Vector3()).distanceTo(center) < 1e-8);
@@ -39,4 +39,14 @@ test('room optimization preserves the animated leaf', () => {
   const children = [...door.leaf.children];
   batchStaticMeshes(door.group,[door.hinge]);
   assert.deepEqual(door.leaf.children,children);
+});
+
+test('the limited door swing leaves clearance around the left stool', () => {
+  const door = createEntrance(palette, new THREE.Texture());
+  for (let opening = 0; opening <= 1; opening += .05) {
+    door.setOpen(opening);
+    door.group.updateMatrixWorld(true);
+    const bounds = new THREE.Box3().setFromObject(door.leaf);
+    assert.ok(bounds.max.x < -3.45, `Door entered the stool footprint at ${opening}`);
+  }
 });
