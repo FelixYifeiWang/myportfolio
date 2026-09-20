@@ -2,12 +2,12 @@
 
 ## Notion AI Meeting Notes
 
-Official product screenshots from Notion's public guide, used to illustrate the product context of the internship story (not presented as Felix's own screenshots).
+Product visuals illustrating audio upload and a connected meeting history. The gallery is product context, not a screenshot of the Granola migration flow.
 
 Source: https://www.notion.com/en-gb/help/guides/preserve-perfect-meeting-memory-with-ai-meeting-notes
 
-- `notion-meeting-notes.webp`: https://images.ctfassets.net/spoqsaf9291f/ZzgrY2T34GAGiUbBHAboe/d449ea3097fe424a37ad7ff61fc2cfb2/AI_Meeting_Notes_thumbnail.png
-- `notion-summary.webp`: https://images.ctfassets.net/spoqsaf9291f/6TT4QyftXTI5XWJBGc5Gbg/c6c4368f9318fd48dba47efa961fa154/Tagged_team_members_in_summary.png
+- `notion-audio-upload.webp`: User-supplied “AI Meeting Notes — Upload your own audio” image, September 20, 2026. Complete composition preserved.
+- `notion-meeting-library.webp`: Official Notion meeting-library screenshot: https://images.ctfassets.net/spoqsaf9291f/39IqZay7sRXfJAY4UMhNfb/867aa56d0e9e352f9ec33b7883a26d8b/Meeting_notes_DB.png
 
 ## SIXTH
 
