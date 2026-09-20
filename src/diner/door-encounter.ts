@@ -15,7 +15,7 @@ export class DoorEncounter<T> {
     private roster: readonly string[];
     private hooks: EncounterHooks<T>;
     private random: () => number;
-    private previous: string | null = null;
+    private seen = new Set<string>();
     private request = 0;
     private time = 0;
     private openness = 0;
@@ -23,14 +23,15 @@ export class DoorEncounter<T> {
     private disposed = false;
 
     constructor(roster: readonly string[], hooks: EncounterHooks<T>, random = Math.random) {
-        this.roster = roster;
+        this.roster = [...new Set(roster)];
         this.hooks = hooks;
         this.random = random;
     }
+    get remaining() { return this.roster.length - this.seen.size; }
     async open() {
         if (this.disposed || this.phase !== 'closed' || !this.roster.length) return;
-        const choices = this.roster.filter(id => id !== this.previous);
-        const candidates = choices.length ? choices : this.roster;
+        const candidates = this.roster.filter(id => !this.seen.has(id));
+        if (!candidates.length) return;
         const id = candidates[Math.min(candidates.length - 1, Math.floor(this.random() * candidates.length))];
         const request = ++this.request;
         this.phase = 'loading';
@@ -41,7 +42,7 @@ export class DoorEncounter<T> {
             const [asset] = await Promise.all([this.hooks.load(id), knock]);
             if (request !== this.request || this.disposed) return;
             this.hooks.show(asset);
-            this.previous = id;
+            this.seen.add(id);
             this.time = 0;
             this.phase = 'opening';
         }

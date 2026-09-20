@@ -111,6 +111,15 @@ export class VisitorLibrary {
         this.pending.set(id, request);
         return request;
     }
+    /** A shown visitor cannot return this session; release its GPU resources now. */
+    release(asset: THREE.Group) {
+        for (const [id, cached] of this.assets) {
+            if (cached !== asset) continue;
+            this.assets.delete(id);
+            disposeVisitor(asset);
+            break;
+        }
+    }
     dispose() {
         this.disposed = true;
         this.assets.forEach(disposeVisitor);

@@ -84,7 +84,7 @@ test('disposal cancels pending loads and all later interactions', async () => {
 
 test('each accepted visit knocks before opening; busy clicks do not knock again', async () => {
   let finishKnock, knocks = 0;
-  const encounter = new DoorEncounter(['link'], {
+  const encounter = new DoorEncounter(['link', 'kim'], {
     load: async id => id,
     knock: () => { knocks++; return new Promise(resolve => { finishKnock = resolve; }); },
     stopKnock() {}, show() {}, hide() {}, angle() {}, changed() {}, error: assert.fail,
@@ -114,4 +114,31 @@ test('escape during the knock cancels sound and cannot open a late visitor', asy
   assert.equal(stopped, true);
   assert.equal(shown, false);
   assert.equal(encounter.phase, 'closed');
+});
+
+
+test('a refresh session exhausts the roster without repeating or knocking again', async () => {
+  const { encounter, events } = fixture();
+  for (let i = 0; i < 6; i++) { await encounter.open(); tick(encounter, 10); }
+  assert.deepEqual(events.filter(([event]) => event === 'show').map(([, id]) => id), ['pikachu', 'kim', 'ranni']);
+  assert.equal(encounter.remaining, 0);
+  assert.equal(encounter.phase, 'closed');
+  const fresh = fixture();
+  await fresh.encounter.open();
+  assert.deepEqual(fresh.events[0], ['show', 'pikachu']);
+});
+
+test('cancelled downloads and failed visits do not consume a visitor', async () => {
+  let resolve, attempt = 0;
+  const { encounter, events } = fixture(id => {
+    if (++attempt === 1) return new Promise(done => { resolve = done; });
+    if (attempt === 2) return Promise.reject(new Error('offline'));
+    return Promise.resolve({ id });
+  });
+  const cancelled = encounter.open(); encounter.close(); resolve({ id: 'pikachu' }); await cancelled;
+  await encounter.open();
+  assert.equal(encounter.remaining, 3);
+  await encounter.open();
+  assert.deepEqual(events.filter(([event]) => event === 'show'), [['show', 'pikachu']]);
+  assert.equal(encounter.remaining, 2);
 });

@@ -4,11 +4,11 @@ Local feature branch: `feature/door-visitors`. Preview: http://127.0.0.1:4330/. 
 
 ## Encounter
 
-Each accepted door click plays **three recorded wooden knocks (0.625 seconds)** while preparing one random visitor. The leaf waits for both the sound and model, then opens inward to **35°** over 1.3 seconds, holds for 2.5 seconds, and closes over 1.3 seconds. Busy clicks do not restart the sound or queue another visitor. No automatic page-load knock remains. Consecutive visitors differ.
+Each accepted door click plays **three recorded wooden knocks (0.625 seconds)** while preparing one random visitor. The leaf waits for both the sound and model, then opens inward to **35°** over 1.3 seconds, holds for 2.5 seconds, and closes over 1.3 seconds. Busy clicks do not restart the sound or queue another visitor. No automatic page-load knock remains. Each visitor can appear only once per page session. After all fourteen visits, the hotspot retires and clicking the door explains that everyone has stopped by. Refreshing starts a new roster. Cancelled or failed downloads do not consume a visitor.
 
 The camera stays where the viewer put it. Escape and other item/seat navigation cancel the encounter; cancellation also stops the knock. Hidden pages stop the cue and close the encounter on resumption. Audio failure cannot block the doorway indefinitely. Music, rain, and purring keep their own controls and mix.
 
-Door geometry tests check the stool, frame, threshold, and mat throughout the full swing. Visitors remain outside the leaf and exterior wall. A stencil aperture hides portions behind the jamb; no city backdrop or extra frame is added. Some seated views naturally see less behind the door; no automatic reframing is used.
+Door geometry tests check the stool, frame, threshold, and mat throughout the full swing. Visitors remain outside the leaf and exterior wall. A stencil aperture hides portions behind the jamb; a muted blue night gradient gives the opening depth without city scenery or another frame. A broad warm area light faces outward to make faces readable; it adds no shadow map and stays registered to avoid lighting shader churn. Some seated views naturally see less behind the door; no automatic reframing is used.
 
 ## Roster review — September 20
 
@@ -36,12 +36,13 @@ Wolf and Astarion were checked in the actual doorway, as were the revised Arthas
 ## Performance
 
 - No character downloads at page load; only the selected visitor loads on demand.
-- Two-model cache, in-flight request deduplication, disposal on eviction and teardown.
+- Shown visitors release geometry, materials and textures as soon as the door closes. A two-model cache only retains unused/cancelled downloads, with in-flight request deduplication and disposal on eviction and teardown.
 - Each asset is below 2 MiB and 50,000 triangles; textures are at most 1024 px. Astarion uses the artist’s vertex painting and needs no texture downloads.
 - No skeleton or animation mixer runs in the browser. Static poses preserve source proportions.
 - Holding uses the scene’s existing idle render rate; reduced motion skips the door swing.
 - Geometry compression is selective. Link retains float positions to avoid flicker between closely layered clothes.
 - The knock is a small local AAC file, loaded only on interaction.
+- The night gradient uses 480 triangles and vertex colors, with no additional texture download. Doorway materials are configured before shader warm-up.
 
 ## Sources and preparation
 
@@ -57,8 +58,8 @@ Rejected sources are kept out of the random pool: the two featureless Wolf model
 
 ## Verification
 
-Final checks: TypeScript check and production build passed; all 165 tests passed. Desktop and narrow doorway previews were reviewed without browser errors. The build retains the existing large-bundle advisory.
+Final checks: TypeScript check and production build passed; all 170 tests passed. Desktop and narrow doorway previews were reviewed without browser errors. The build retains the existing large-bundle advisory.
 
-Tests cover cue replay/order/cancellation/failure and late callbacks; encounter lifecycle, no immediate repeats, reduced motion and disposal; physical clearances; uniform scale and human-height cap; delivery budgets; cache lifetime; and primitive baking. Run `npm run check`, `npm run build`, and `SITE_PREVIEW_URL=http://127.0.0.1:4321 npm test` against the static preview.
+Tests cover cue replay/order/cancellation/failure and late callbacks; encounter lifecycle, session-wide uniqueness, exhaustion and retry eligibility, reduced motion and disposal; physical clearances; uniform scale and human-height cap; delivery budgets; cache lifetime; and primitive baking. Run `npm run check`, `npm run build`, and `SITE_PREVIEW_URL=http://127.0.0.1:4321 npm test` against the static preview.
 
 The dev-only `?visitor=<id>` query selects a registered visitor for visual review. Production always uses the random roster. Temporary model-review pages are removed before the final build.

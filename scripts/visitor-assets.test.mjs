@@ -72,3 +72,19 @@ test('oversized source requests are capped at human height without stretching', 
   assert.ok(Math.abs(size.y - 2.8) < 1e-5);
   assert.ok(Math.abs(size.x / size.y - .04) < 1e-5);
 });
+
+test('departed visitors release geometry, material and texture exactly once', async () => {
+  const source = model(), mesh = source.children[0];
+  mesh.material.map = new THREE.Texture();
+  const retired = { geometry: 0, material: 0, texture: 0 };
+  mesh.geometry.addEventListener('dispose', () => retired.geometry++);
+  mesh.material.addEventListener('dispose', () => retired.material++);
+  mesh.material.map.addEventListener('dispose', () => retired.texture++);
+  const library = new VisitorLibrary([spec], async () => source);
+  const visitor = await library.load('a');
+  new THREE.Group().add(visitor);
+  library.release(visitor);
+  assert.equal(visitor.parent, null);
+  library.release(visitor); library.dispose();
+  assert.deepEqual(retired, { geometry: 1, material: 1, texture: 1 });
+});

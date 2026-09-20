@@ -234,7 +234,7 @@ export function initDiner() {
     import('./scene').then(module => module.createDiner(canvas, action, cat => {
         if (cat) void audio.purr().catch(() => announce('The manager is asleep. Audio is unavailable here.'));
         else audio.stopPurr();
-    })).then(result => {
+    }, announce)).then(result => {
         scene = result;
         scene.setPlaying(audio.playing);
         shell.classList.add('scene-ready');

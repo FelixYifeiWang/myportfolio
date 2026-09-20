@@ -22,7 +22,7 @@ export interface DinerScene {
     setPaused: (paused: boolean) => void;
     dispose: () => void;
 }
-export async function createDiner(canvas: HTMLCanvasElement, select: (name: ObjectName) => void, focusChanged: (cat: boolean) => void = () => {}): Promise<DinerScene> {
+export async function createDiner(canvas: HTMLCanvasElement, select: (name: ObjectName) => void, focusChanged: (cat: boolean) => void = () => {}, announce: (message: string) => void = () => {}): Promise<DinerScene> {
     await Promise.all([
         document.fonts.load('48px "Instrument Serif"'),
         document.fonts.load('italic 48px "Instrument Serif"'),
@@ -123,19 +123,19 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         async load(id) {
             const visitor = await visitorLibrary.load(id);
             if (disposed) throw new Error('Diner is disposed.');
+            placeDoorwayVisitor(visitor);
             await renderer.compileAsync(visitor, camera, scene);
             return visitor;
         },
         show(visitor) {
             visibleVisitor = visitor;
             shell.dataset.visitor = visitor.name;
-            placeDoorwayVisitor(visitor);
             world.doorstep.add(visitor);
             world.doorstep.visible = true;
             renderer.shadowMap.needsUpdate = true;
         },
         hide() {
-            visibleVisitor?.removeFromParent();
+            if (visibleVisitor) visitorLibrary.release(visibleVisitor);
             visibleVisitor = null;
             delete shell.dataset.visitor;
             world.doorstep.visible = false;
@@ -144,13 +144,15 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         angle(amount) { world.entrance.setOpen(amount); renderer.shadowMap.needsUpdate = true; },
         changed() {
             doorButton.setAttribute('aria-busy', String(encounter.phase === 'loading'));
+            doorButton.setAttribute('aria-label', encounter.remaining ? 'Open the door for a surprise visitor' : 'Everyone has stopped by tonight');
+            doorButton.setAttribute('aria-disabled', String(!encounter.remaining));
             // A visible state also makes browser checks independent of scene internals.
             shell.dataset.encounter = encounter.phase;
             wake();
         },
         error(error) {
             console.warn('Doorway visitor could not be loaded.', error);
-            document.querySelector('#scene-toast')!.textContent = 'Nobody at the door just now. Try again in a moment.';
+            announce('Nobody at the door just now. Try again in a moment.');
         },
     });
     let currentView: View = 'room';
@@ -295,7 +297,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         camera.updateMatrixWorld();
         for (const hotspot of hotspots) {
             projected.copy(hotspot.point).project(camera);
-            const hidden = paused || (hotspot.button.dataset.hotspot === 'door' && encounter.phase !== 'closed') || (isSeat(hotspot.button.dataset.hotspot!) && (currentView !== 'room' || !!transition && !transition.interruptible)) || projected.z > 1 || Math.abs(projected.x) > .95 || Math.abs(projected.y) > .85;
+            const hidden = paused || (hotspot.button.dataset.hotspot === 'door' && (encounter.phase !== 'closed' || !encounter.remaining)) || (isSeat(hotspot.button.dataset.hotspot!) && (currentView !== 'room' || !!transition && !transition.interruptible)) || projected.z > 1 || Math.abs(projected.x) > .95 || Math.abs(projected.y) > .85;
             hotspot.button.hidden = hidden;
             if (hidden)
                 continue;
@@ -565,6 +567,10 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         },
         openDoor() {
             if (encounter.phase !== 'closed') return;
+            if (!encounter.remaining) {
+                announce('Everyone has stopped by tonight.');
+                return;
+            }
             void encounter.open();
         },
         petCat() { if (history.focus !== 'cat') focus('cat'); },
