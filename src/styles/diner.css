@@ -222,10 +222,6 @@ summary:focus-visible { outline: 2px solid #e5b57f; outline-offset: 6px; }
 /* Untouched seats stay hidden; explored seats keep a faint point of reference. */
 .seat-hotspot { --dot-idle: 0; }
 .seat-hotspot[data-explored] { --dot-idle: .12; }
-@media(hover:none), (pointer:coarse) {
-  .hotspot { --dot-idle: .8; }
-  .hotspot[data-explored] { --dot-idle: .15; }
-}
 .scene-toast { position: absolute; z-index: 10; bottom: 102px; left: 50%; transform: translate(-50%,8px); border: 1px solid #e8d4ac33; border-radius: 8px; background: #15241ee6; backdrop-filter: blur(12px); color: #e4d4b8; font-size: 12px; padding: 10px 16px; opacity: 0; pointer-events: none; transition: .3s; max-width: calc(100% - 40px); text-align: center; }
 .scene-toast.is-visible { opacity: 1; transform: translate(-50%,0); }
 @media(min-width:1600px) {

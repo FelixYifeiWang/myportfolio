@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { surfaceTexture } from './textures';
 import { configureAsset } from './assets';
+import { roomAssetUrl } from './asset-urls';
 
 export interface DinerCat {
     root: THREE.Group;
@@ -10,8 +11,8 @@ export interface DinerCat {
 }
 
 /** The finished textured sculpture is generated and compressed offline. */
-export async function loadDinerCat(): Promise<DinerCat> {
-    const { scene: model } = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync('/models/diner-cat.glb');
+export async function loadDinerCat(touch = false): Promise<DinerCat> {
+    const { scene: model } = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(roomAssetUrl('cat', touch));
     const root = new THREE.Group();
     root.name = 'DinerCat';
     const body = new THREE.Group();

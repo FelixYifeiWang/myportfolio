@@ -12,6 +12,7 @@
     "astro": "astro",
     "check": "tsc --noEmit",
     "build:cat": "node scripts/prepare-assets.mjs cat",
+    "build:touch": "node scripts/prepare-touch-assets.mjs",
     "build:assets": "node scripts/prepare-assets.mjs cat espresso ramen stool plant kettle"
   },
   "dependencies": {

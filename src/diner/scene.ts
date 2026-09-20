@@ -13,6 +13,7 @@ import { placeDoorwayVisitor } from './doorway';
 import { DoorEncounter } from './door-encounter';
 import { DoorKnock } from './door-knock';
 import { VisitorLibrary, visitors } from './visitor-assets';
+import { touchAssetMedia } from './asset-urls';
 export interface DinerScene {
     focus: (name: View, remember?: boolean) => number;
     restoreView: () => void;
@@ -23,7 +24,10 @@ export interface DinerScene {
     dispose: () => void;
 }
 export async function createDiner(canvas: HTMLCanvasElement, select: (name: ObjectName) => void, focusChanged: (cat: boolean) => void = () => {}, announce: (message: string) => void = () => {}): Promise<DinerScene> {
-    await Promise.all([
+    const touch = window.matchMedia(touchAssetMedia).matches;
+    const assetsReady = Promise.all([
+        loadDinerCat(touch),
+        loadDinerProps(touch),
         document.fonts.load('48px "Instrument Serif"'),
         document.fonts.load('italic 48px "Instrument Serif"'),
         document.fonts.load('16px "DM Mono"'),
@@ -74,7 +78,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     scene.environmentIntensity = .24;
     roomEnvironment.dispose();
     pmrem.dispose();
-    const [catModel, props] = await Promise.all([loadDinerCat(), loadDinerProps()]);
+    const [catModel, props] = await assetsReady;
     const world = buildDiner(catModel, props);
     const batches = batchStaticMeshes(world.group, [...world.interactives, world.ceiling.group, world.sideWall.group, world.entrance.hinge, world.doorstep]);
     scene.add(world.group);
@@ -364,6 +368,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         hotspots.forEach(({ button }) => button.classList.remove('object-hovered'));
     }
     function pointerMove(event: PointerEvent) {
+        // Touch moves are gestures, never a persistent hover over a stool.
+        if (event.pointerType === 'touch') clearHover();
         if (seatedPointer === event.pointerId) {
             if (!multiplePointers && !paused && !transition) {
                 if (Math.hypot(event.clientX - down.x, event.clientY - down.y) >= 6) seatedDragged = true;
@@ -373,7 +379,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             }
             return;
         }
-        if (interacting || paused || transition || performance.now() - lastHover < 50)
+        if (event.pointerType === 'touch' || interacting || paused || transition || performance.now() - lastHover < 50)
             return;
         lastHover = performance.now();
         const action = hit(event);

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { roomAssetUrl, woodTextureUrl } from './asset-urls';
 
 export interface DinerProps {
     plant: THREE.Group;
@@ -11,13 +12,13 @@ export interface DinerProps {
     wood: { color: THREE.Texture; normal: THREE.Texture; roughness: THREE.Texture };
 }
 
-export async function loadDinerProps(): Promise<DinerProps> {
+export async function loadDinerProps(touch = false): Promise<DinerProps> {
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
     const names = ['plant', 'kettle', 'espresso', 'ramen', 'stool'] as const;
     const textures = new THREE.TextureLoader();
     const [loaded, wood] = await Promise.all([
-        Promise.all(names.map(name => loader.loadAsync(`/models/diner-${name}.glb`))),
-        Promise.all(['color', 'normal', 'roughness'].map(name => textures.loadAsync(`/textures/walnut-${name}.webp`))),
+        Promise.all(names.map(name => loader.loadAsync(roomAssetUrl(name, touch)))),
+        Promise.all(['color', 'normal', 'roughness'].map(name => textures.loadAsync(woodTextureUrl(name, touch)))),
     ]);
     const props = {} as DinerProps;
     loaded.forEach(({scene}, index) => {
