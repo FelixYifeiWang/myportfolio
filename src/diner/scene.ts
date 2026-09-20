@@ -50,7 +50,8 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     controls.maxDistance = 22;
     controls.minPolarAngle = .5;
     controls.maxPolarAngle = 1.43;
-    controls.minAzimuthAngle = -.22;
+    // Keep leftward rotation inside the room, hiding the exterior window backdrop.
+    controls.minAzimuthAngle = .07;
     controls.maxAzimuthAngle = 1.4;
     controls.rotateSpeed = .42;
     controls.zoomSpeed = .65;
