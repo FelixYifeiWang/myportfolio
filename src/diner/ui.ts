@@ -9,7 +9,9 @@ export function initDiner() {
     const back = document.querySelector<HTMLButtonElement>('#panel-back')!;
     const close = document.querySelector<HTMLButtonElement>('#panel-close')!;
     const sound = document.querySelector<HTMLButtonElement>('#sound-toggle')!;
-    const soundLabel = document.querySelector<HTMLElement>('#sound-label')!;
+    const takeSeat = document.querySelector<HTMLButtonElement>('#take-seat')!;
+    const viewOptions = document.querySelector<HTMLDetailsElement>('#view-options')!;
+    const viewOptionsToggle = document.querySelector<HTMLElement>('#view-options-toggle')!;
     const toast = document.querySelector<HTMLElement>('#scene-toast')!;
     const location = document.querySelector<HTMLElement>('#dialog-location')!;
     const audio = new DinerAudio();
@@ -17,6 +19,7 @@ export function initDiner() {
     let currentPanel = 'menu';
     let toastTimer: ReturnType<typeof setTimeout>;
     let openTimer: ReturnType<typeof setTimeout>;
+    let hintTimer: ReturnType<typeof setTimeout>;
     let lastFocus: HTMLElement | null = null;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const titles: Record<string, string> = { menu: 'The midnight menu', notebook: 'Little ideas, long detours', about: 'Meet Felix' };
@@ -47,6 +50,8 @@ export function initDiner() {
         close.focus({ preventScroll: true });
     }
     function openPanel(panel: string) {
+        viewOptions.open = false;
+        shell.classList.add('hint-dismissed');
         clearTimeout(openTimer);
         if (!dialog.open) {
             lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -73,9 +78,9 @@ export function initDiner() {
             const playing = await audio.toggle();
             sound.setAttribute('aria-pressed', String(playing));
             sound.setAttribute('aria-label', playing ? 'Turn off lounge music and rain ambience' : 'Turn on the original lounge music and rain ambience');
-            soundLabel.textContent = playing ? 'Sound on' : 'Sound off';
+            sound.title = playing ? 'Sound on' : 'Sound off';
             scene?.setPlaying(playing);
-            announce(playing ? 'Now playing: a little late-night daydream.' : 'Just the quiet of the room.');
+            announce(playing ? 'Lounge music & rain' : 'Sound off');
         }
         catch {
             announce('Audio is unavailable here. You can still enjoy the room.');
@@ -123,9 +128,18 @@ export function initDiner() {
                 closePanel();
         }
     });
-    document.querySelector('#take-seat')!.addEventListener('click', () => { scene?.focus('seat'); canvas.focus({ preventScroll: true }); announce('Make yourself at home. Drag or use the arrow keys to look around.'); });
-    document.querySelector('#reset-view')!.addEventListener('click', () => { clearTimeout(openTimer); scene?.focus('room'); });
+    takeSeat.addEventListener('click', () => { viewOptions.open = false; shell.classList.add('hint-dismissed'); scene?.focus('seat'); canvas.focus({ preventScroll: true }); announce('Drag or use arrow keys to look around.'); });
+    document.querySelector('#reset-view')!.addEventListener('click', () => { viewOptions.open = false; clearTimeout(openTimer); scene?.focus('room'); canvas.focus({ preventScroll: true }); });
+    document.addEventListener('pointerdown', event => {
+        if (event.target instanceof Node && !viewOptions.contains(event.target)) viewOptions.open = false;
+    });
     document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && viewOptions.open) {
+            event.preventDefault();
+            viewOptions.open = false;
+            viewOptionsToggle.focus({ preventScroll: true });
+            return;
+        }
         if (event.key === 'Escape' && !dialog.open) {
             clearTimeout(openTimer);
             scene?.focus('room');
@@ -138,13 +152,20 @@ export function initDiner() {
     }
     window.addEventListener('hashchange', fromHash);
     fromHash();
-    if (window.matchMedia('(pointer: coarse)').matches)
-        document.querySelector('#gesture-hint')!.textContent = 'Drag to look around · Pinch to move closer';
-    function fallback() { shell.classList.add('scene-unavailable'); shell.classList.remove('scene-ready'); document.querySelector('#scene-loading')!.textContent = 'The room couldn’t load here. The whole menu is still available.'; document.querySelector('#gesture-hint')!.textContent = 'All projects are available from the menu.'; }
+    function fallback() {
+        takeSeat.disabled = true;
+        shell.classList.add('scene-unavailable');
+        shell.classList.remove('scene-ready');
+        const loading = document.querySelector<HTMLElement>('#scene-loading')!;
+        loading.removeAttribute('aria-hidden');
+        loading.textContent = 'The room couldn’t load. Explore the work above.';
+    }
     document.addEventListener('diner-context-lost', () => { scene?.dispose(); scene = undefined; fallback(); });
     import('./scene').then(module => module.createDiner(canvas, action)).then(result => {
         scene = result;
         shell.classList.add('scene-ready');
+        takeSeat.disabled = false;
+        hintTimer = setTimeout(() => shell.classList.add('hint-dismissed'), 8000);
         document.querySelector('#scene-loading')!.setAttribute('aria-hidden', 'true');
         if (dialog.open)
             scene.setPaused(true);
@@ -158,8 +179,9 @@ export function initDiner() {
         scene?.setPlaying(false);
         sound.setAttribute('aria-pressed', 'false');
         sound.setAttribute('aria-label', 'Turn on the original lounge music and rain ambience');
-        soundLabel.textContent = 'Sound off';
+        sound.title = 'Sound off';
         clearTimeout(openTimer);
         clearTimeout(toastTimer);
+        clearTimeout(hintTimer);
     });
 }

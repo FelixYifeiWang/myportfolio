@@ -46,3 +46,19 @@ test('every local link, image, stylesheet, and anchor has a destination', () => 
   }
   assert.deepEqual(failures, []);
 });
+
+test('landing navigation exposes clear portfolio routes without the 3D scene', () => {
+  const html = readFileSync(join(out, 'index.html'), 'utf8');
+  for (const [name, route] of [['Work', '/work/'], ['Notebook', '/work/#side-projects'], ['About', '/work/#about-felix']]) {
+    const anchor = [...html.matchAll(/<a\b([^>]+)>([^<]+)<\/a>/g)].find(match => match[2].trim() === name);
+    assert.ok(anchor && anchor[1].includes(`href="${route}"`), `${name} must remain a direct link`);
+  }
+});
+
+test('icon-only landing utilities retain accessible names', () => {
+  const html = readFileSync(join(out, 'index.html'), 'utf8');
+  for (const id of ['sound-toggle', 'reset-view', 'view-options-toggle']) {
+    const tag = [...html.matchAll(/<(?:button|summary)\b[^>]*>/g)].find(match => match[0].includes(`id="${id}"`));
+    assert.ok(tag && /aria-label="[^"]+"/.test(tag[0]), `${id} needs an accessible name`);
+  }
+});

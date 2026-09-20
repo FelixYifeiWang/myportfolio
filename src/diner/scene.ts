@@ -26,8 +26,11 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     const shell = canvas.closest('.diner-shell')!;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const compact = () => canvas.clientWidth < 700;
-    const gestureHint = document.querySelector<HTMLElement>('#gesture-hint')!;
-    const orbitHint = gestureHint.textContent;
+    const resetButton = document.querySelector<HTMLButtonElement>('#reset-view')!;
+    const controlsHelp = document.querySelector<HTMLElement>('#controls-help')!;
+    const orbitHelp = window.matchMedia('(pointer: coarse)').matches
+        ? 'Drag to look around. Pinch to move closer.'
+        : 'Drag to look around. Scroll to move closer.';
     // Native MSAA keeps small objects crisp without a full-screen postprocessing chain.
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'default' });
     renderer.info.autoReset = false;
@@ -123,7 +126,9 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     const seatedLook = new SeatedLook(views.seat.position, views.seat.target);
     function syncControls() {
         controls.enabled = !paused && currentView !== 'seat' && (!transition || transition.interruptible);
-        gestureHint.textContent = currentView === 'seat' ? 'Drag to look around from your seat' : orbitHint;
+        shell.classList.toggle('is-seated', currentView === 'seat');
+        resetButton.hidden = currentView === 'room' && !manualView;
+        controlsHelp.textContent = currentView === 'seat' ? 'Drag or use arrow keys to look around. Escape returns to the room.' : orbitHelp;
     }
     function finishCameraMove() {
         transition = null;
@@ -145,9 +150,12 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         frame = requestAnimationFrame(update);
     }
     function focus(name: View, remember = false) {
+        clearHover();
         stopSeatedDrag();
-        if (remember)
-            savedView = { position: camera.position.clone(), target: controls.target.clone(), view: currentView, manual: manualView, exploring: shell.classList.contains('is-exploring') };
+        if (remember && !savedView) {
+            // A second navigation click during the return animation should preserve its destination.
+            savedView = { position: (transition?.to ?? camera.position).clone(), target: (transition?.target ?? controls.target).clone(), view: currentView, manual: manualView, exploring: shell.classList.contains('is-exploring') };
+        }
         currentView = name;
         manualView = false;
         shell.classList.toggle('is-exploring', name !== 'room');
@@ -238,6 +246,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             if (x !== hotspot.x || y !== hotspot.y) {
                 hotspot.button.style.left = `${x}px`;
                 hotspot.button.style.top = `${y}px`;
+                hotspot.button.dataset.labelSide = x < 100 ? 'right' : x > width - 100 ? 'left' : 'center';
                 hotspot.x = x;
                 hotspot.y = y;
             }
@@ -288,6 +297,10 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         multiplePointers = true;
         if (seatedPointer === event.pointerId) stopSeatedDrag();
     }
+    function clearHover() {
+        canvas.style.cursor = 'grab';
+        hotspots.forEach(({ button }) => button.classList.remove('object-hovered'));
+    }
     function pointerMove(event: PointerEvent) {
         if (seatedPointer === event.pointerId) {
             if (!multiplePointers && !paused && !transition) {
@@ -298,7 +311,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             }
             return;
         }
-        if (interacting || paused || performance.now() - lastHover < 50)
+        if (interacting || paused || transition || performance.now() - lastHover < 50)
             return;
         lastHover = performance.now();
         const action = hit(event);
@@ -319,7 +332,15 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         seatedLook.drag(...direction, height);
         wake();
     }
-    function startInteraction() { manualView = true; interacting = true; lastMovement = performance.now(); shell.classList.add('is-exploring'); wake(); }
+    function startInteraction() {
+        manualView = true;
+        interacting = true;
+        lastMovement = performance.now();
+        shell.classList.add('is-exploring', 'hint-dismissed');
+        clearHover();
+        syncControls();
+        wake();
+    }
     function endInteraction() { interacting = false; lastMovement = performance.now(); wake(); }
     controls.addEventListener('start', startInteraction);
     controls.addEventListener('end', endInteraction);
@@ -331,6 +352,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     canvas.addEventListener('pointerup', pointerUp);
     canvas.addEventListener('pointercancel', pointerCancel);
     canvas.addEventListener('pointermove', pointerMove);
+    canvas.addEventListener('pointerleave', clearHover);
     canvas.addEventListener('lostpointercapture', pointerCancel);
     canvas.addEventListener('keydown', seatedKeyDown);
     function stopScheduledFrame() {
@@ -492,6 +514,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             canvas.removeEventListener('pointerup', pointerUp);
             canvas.removeEventListener('pointercancel', pointerCancel);
             canvas.removeEventListener('pointermove', pointerMove);
+            canvas.removeEventListener('pointerleave', clearHover);
             canvas.removeEventListener('lostpointercapture', pointerCancel);
             canvas.removeEventListener('keydown', seatedKeyDown);
             canvas.removeEventListener('webglcontextlost', onLost);

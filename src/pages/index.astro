@@ -18,32 +18,40 @@ import { projects } from '../data/projects';
   <body>
     <main id="main" class="diner-shell">
       <div class="scene-fallback" aria-hidden="true"></div>
-      <canvas id="diner-canvas" aria-label="An interactive three-dimensional midnight diner. Use the menu, notebook, and about links to explore with a keyboard." tabindex="-1"></canvas>
+      <canvas id="diner-canvas" aria-label="An interactive three-dimensional midnight diner. Use the Work, Notebook, and About links to explore with a keyboard." tabindex="-1"></canvas>
       <div class="scene-vignette" aria-hidden="true"></div>
       <header class="diner-header">
-        <a class="diner-brand" href="/" aria-label="After Hours home"><span class="brand-kicker">FELIX WANG’S</span><span class="brand-name">after hours<span class="brand-star" aria-hidden="true">✳</span></span></a>
+        <a class="diner-brand" href="/" aria-label="After Hours home"><span class="brand-kicker">FELIX WANG’S</span><h1 class="brand-name">after hours<span class="brand-star" aria-hidden="true">✳</span></h1></a>
         <nav aria-label="Explore the diner">
-          <a id="work" href="/work/" data-open="menu">The menu</a>
+          <a id="work" href="/work/" data-open="menu">Work</a>
           <a id="on-the-side" href="/work/#side-projects" data-open="notebook">Notebook</a>
-          <a id="about" href="/work/#about-felix" data-open="about">Behind the counter</a>
+          <a id="about" href="/work/#about-felix" data-open="about">About</a>
         </nav>
-        <button class="sound-button" id="sound-toggle" type="button" aria-pressed="false" aria-label="Turn on the original lounge music and rain ambience"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="sound-label">Sound off</span></button>
+        <button class="sound-button utility-button" id="sound-toggle" type="button" aria-pressed="false" aria-label="Turn on the original lounge music and rain ambience" title="Sound off"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
       </header>
-      <div class="arrival-label"><span class="open-dot"></span> OPEN LATE. ALWAYS CURIOUS.</div>
       <div class="scene-loading" id="scene-loading" role="status"><span></span>Turning the lights on…</div>
       <div class="hotspots" id="hotspots" aria-label="Objects in the diner">
-        <button class="hotspot primary-hotspot" data-hotspot="menu" data-action="menu" aria-label="Pick up the menu and explore selected projects" hidden><span class="hotspot-dot">01</span><span class="hotspot-label">The menu <span>Selected work</span></span></button>
-        <button class="hotspot" data-hotspot="notebook" data-action="notebook" aria-label="Open the notebook of side projects" hidden><span class="hotspot-dot">02</span><span class="hotspot-label">The notebook</span></button>
-        <button class="hotspot" data-hotspot="cat" data-action="cat" aria-label="Say hello to the sleeping cat" hidden><span class="hotspot-dot">03</span><span class="hotspot-label">The manager</span></button>
-        <button class="hotspot" data-hotspot="record" data-action="record" aria-label="Play or pause the record player" hidden><span class="hotspot-dot">04</span><span class="hotspot-label">Set the mood</span></button>
-        <button class="hotspot" data-hotspot="about" data-action="about" aria-label="Meet Felix, the person behind the counter" hidden><span class="hotspot-dot">05</span><span class="hotspot-label">Meet the host</span></button>
+        <button class="hotspot" data-hotspot="menu" data-action="menu" aria-label="Pick up the menu and explore selected projects" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The menu</span></button>
+        <button class="hotspot" data-hotspot="notebook" data-action="notebook" aria-label="Open the notebook of side projects" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The notebook</span></button>
+        <button class="hotspot" data-hotspot="cat" data-action="cat" aria-label="Say hello to the sleeping cat" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">The manager</span></button>
+        <button class="hotspot" data-hotspot="record" data-action="record" aria-label="Play or pause the record player" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Set the mood</span></button>
+        <button class="hotspot" data-hotspot="about" data-action="about" aria-label="Meet Felix, the person behind the counter" hidden><span class="hotspot-dot" aria-hidden="true"></span><span class="hotspot-label" aria-hidden="true">Meet the host</span></button>
       </div>
-      <div class="welcome-copy"><p class="small-caps">TECHNOLOGY, GAMES & OTHER CURIOSITIES</p><h1>Come in.<br /><em>Stay curious.</em></h1><p>A little place for the things I make.<br />There’s a seat for you at the counter.</p></div>
       <div class="scene-toast" id="scene-toast" role="status" aria-live="polite"></div>
       <footer class="diner-controls">
-        <div class="place-label"><span class="coordinate-mark" aria-hidden="true">✳</span><div>YOUR LITTLE CORNER OF THE INTERNET<span>Best enjoyed at your own pace.</span></div></div>
-        <div class="counter-actions"><button class="pick-menu" data-action="menu">Pick up the menu <span aria-hidden="true">↗</span></button><button id="take-seat" class="take-seat">Take a seat at the counter →</button></div>
-        <div class="view-controls"><button id="reset-view" aria-label="Return to the wide view of the diner">↺ <span>Room view</span></button><p id="gesture-hint">Drag to look around · Scroll to move closer</p><a href="/work/">Just the portfolio ↗</a></div>
+        <p class="gesture-hint" id="gesture-hint">Drag to look around</p>
+        <button id="take-seat" class="take-seat" disabled>Take a seat <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></button>
+        <div class="utility-controls">
+          <button id="reset-view" class="utility-button" aria-label="Return to the wide view of the diner" title="Room view" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6" /></svg></button>
+          <details class="scene-options" id="view-options">
+            <summary class="utility-button" id="view-options-toggle" aria-label="View options" title="View options"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></svg></summary>
+            <div class="options-menu">
+              <p class="options-heading">Make yourself at home</p>
+              <p id="controls-help">Drag to look around. Scroll to move closer.</p>
+              <a href="/work/">Simple portfolio <span aria-hidden="true">↗</span></a>
+            </div>
+          </details>
+        </div>
       </footer>
       <noscript><div class="no-script">Welcome to After Hours. <a href="/work/">Explore the portfolio →</a></div></noscript>
     </main>
