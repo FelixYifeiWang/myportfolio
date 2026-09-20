@@ -619,6 +619,7 @@ a.diner-menu-item:hover {
   border-top: 1px solid #bda88a;
   font-size: 12px;
 }
+.story-footer button:only-child { margin-left: auto; }
 .story-footer button {
   border: 0;
   background: none;

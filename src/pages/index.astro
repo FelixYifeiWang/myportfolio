@@ -81,20 +81,20 @@ import { seats } from '../diner/seats';
         <section data-panel="other-work" class="paper-panel other-work-panel" hidden>
           <p class="paper-eyebrow">OTHER WORK</p><h2 class="panel-heading">À la carte.</h2>
           <OtherWorkMenu />
-          <div class="story-footer"><a href="/work/other/">Open the standalone menu ↗</a><button data-panel-back>Back to the menu →</button></div>
+          <div class="story-footer"><button data-panel-back>Back to the menu →</button></div>
         </section>
         <section data-panel="notebook" class="paper-panel notebook-panel" hidden>
-          <p class="paper-eyebrow">OFF THE MAIN MENU / PERSONAL NOTEBOOK</p><h2 class="panel-heading">Little ideas.<br /><em>Long detours.</em></h2><p class="panel-intro">Games, art, objects. Sometimes the side quest is the interesting part.</p>
-          <article class="notebook-entry"><img src="/images/ow04.webp" alt="Felix’s indie game projects" width="600" height="420" loading="lazy" /><div><span class="paper-eyebrow">01 / PLAY</span><h3>Just one more level.</h3><p>I’ve been making indie games since 2018. Worlds, characters, and the feeling of discovery keep bringing me back.</p><a href="/work/echo-of-mobius/" data-project="echo-of-mobius">A world I helped build ↗</a></div></article>
+          <p class="paper-eyebrow">OFF THE MAIN MENU / PERSONAL NOTEBOOK</p><h2 class="panel-heading">Little ideas.<br /><em>Long detours.</em></h2><p class="panel-intro">Games, art, theatre. Sometimes the side quest is the interesting part.</p>
+          <article class="notebook-entry"><img src="/images/ow04.webp" alt="Felix’s indie game projects" width="600" height="420" loading="lazy" /><div><span class="paper-eyebrow">01 / PLAY</span><h3>Just one more level.</h3><p>I’ve been making indie games since 2018. Worlds, characters, and the feeling of discovery keep bringing me back.</p></div></article>
           <article class="notebook-entry"><img src="/images/ow02.webp" alt="A selection of Felix’s fine art" width="600" height="420" loading="lazy" /><div><span class="paper-eyebrow">02 / MAKE</span><h3>Thinking with my hands.</h3><p>Drawing, making, and following an idea without needing to know exactly where it will end up. An ongoing practice since 2017.</p></div></article>
-          <article class="notebook-entry"><img src="/images/ow3.webp" alt="Custom 3D-printed toy designs made with Inkheart" width="600" height="420" loading="lazy" /><div><span class="paper-eyebrow">03 / TINKER</span><h3>Ideas you can hold.</h3><p>Custom 3D-printed toys with Inkheart. Taking something out of the screen and figuring out how it should feel in your hands.</p></div></article>
+          <article class="notebook-entry"><img src="/images/theatre.webp" alt="Felix performing in a theatre production" width="1200" height="945" loading="lazy" /><div><span class="paper-eyebrow">03 / PERFORM</span><h3>Another way to tell a story.</h3><p>I’ve been acting in theatre since 2015. A different way to explore characters, stories, and what makes people feel something.</p></div></article>
         </section>
         <section data-panel="about" class="paper-panel about-panel" hidden>
           <p class="paper-eyebrow">A NOTE FROM BEHIND THE COUNTER</p><h2 class="panel-heading">Hi, I’m Felix.<br /><em>Glad you’re here.</em></h2>
           <div class="about-portrait"><img src="/images/profile.webp" alt="Yifei Felix Wang" width="400" height="400" loading="lazy" /><span>Builder. Player.<br />Perpetually curious.</span></div>
-          <p>I build cool tech stuff to make people happy. Sometimes that’s a game, sometimes a tool, sometimes something a little harder to put in a category.</p><p>I care about how things work and how they make you feel. Outside of making things: art, cats, a very good meal, and finding the next place worth going back to.</p>
+          <p>I build cool tech stuff to make people happy. Sometimes that’s a game, sometimes a tool, sometimes something a little harder to put in a category.</p><p>I care about how things work and how they make you feel. Outside of making things: games, art, cats, a very good meal, and finding the next place worth going back to.</p>
           <div class="contact-card"><span class="paper-eyebrow">THERE’S ALWAYS ROOM FOR A CONVERSATION</span><a href="mailto:wangyifeifelix@gmail.com">Say hello <span>↗</span></a><p>wangyifeifelix@gmail.com</p></div>
-          <div class="about-links"><a href="https://github.com/FelixYifeiWang" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/felix-wang1" target="_blank" rel="noreferrer">LinkedIn ↗</a></div>
+          <div class="about-links"><a href="https://www.linkedin.com/in/felix-wang1" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="https://x.com/felixyifeiwang" target="_blank" rel="noreferrer">X ↗</a><a href="https://github.com/FelixYifeiWang" target="_blank" rel="noreferrer">GitHub ↗</a></div>
         </section>
         {featuredProjects.map(project => <section class="paper-panel project-panel" data-panel={`project-${project.slug}`} data-story-group={project.featured ? 'HOUSE SPECIAL' : 'OTHER WORK'} hidden>
           <p class="paper-eyebrow">{project.featured ? `HOUSE SPECIAL ${project.number}` : 'OTHER WORK'} / {project.type.toUpperCase()}</p><h2 class="panel-heading">{project.name}</h2><p class="project-intro">{project.intro}</p>
@@ -103,7 +103,7 @@ import { seats } from '../diner/seats';
           <div class="story-section"><h3>{project.brief ? 'My contribution.' : 'The idea.'}</h3><p>{project.story}</p></div>{project.approach && <div class="story-section"><h3>In the making.</h3><p>{project.approach}</p><p>{project.detail}</p></div>}
           {project.gallery && <img class="story-gallery" src={`/images/${project.gallery}.webp`} alt={project.galleryAlt || `A closer look at ${project.name}`} width="1600" height="900" loading="lazy" />}
           {project.note && <p class="story-note">{project.note}</p>}
-          <div class="story-footer"><a href={`/work/${project.slug}/`}>Open the standalone story ↗</a><button data-panel-back>Back to the selection →</button></div>
+          <div class="story-footer"><button data-panel-back>Back to the selection →</button></div>
         </section>)}
       </div>
     </dialog>
