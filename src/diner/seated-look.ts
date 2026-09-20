@@ -27,7 +27,7 @@ export class SeatedLook {
     }
 
     drag(dx: number, dy: number, viewportHeight: number) {
-        const sensitivity = 2.4 / Math.max(1, viewportHeight);
+        const sensitivity = 1.4 / Math.max(1, viewportHeight);
         this.desiredYaw = THREE.MathUtils.clamp(this.desiredYaw - dx * sensitivity, this.centerYaw - 1.15, this.centerYaw + 1.15);
         this.desiredPitch = THREE.MathUtils.clamp(this.desiredPitch + dy * sensitivity, -.8, .35);
     }
