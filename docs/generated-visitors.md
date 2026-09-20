@@ -11,7 +11,7 @@ The built-in image-generation tool produced single-character standing references
 | Malenia | `work/references/malenia-v1.png` | `public/models/visitors/malenia.glb` | 760,692 bytes | 38,066 |
 | Lune | `work/references/lune-v1.png` | `public/models/visitors/lune.glb` | 587,012 bytes | 39,588 |
 
-Paths are relative to `/Users/felixwang/Downloads/myportfolio`. Original generated GLBs and task receipts remain in ignored `work/tripo/`. Each output has one material, three 1024 px PBR textures, no runtime skeleton, and meshopt-compressed geometry. Models load only on interaction and are released after departure.
+Paths are relative to `/Users/felixwang/Downloads/myportfolio`. Original generated GLBs and task receipts remain in ignored `work/tripo/`. Each output has one material, three 1024 px PBR textures, no runtime skeleton, and meshopt-compressed geometry. Models load only on interaction and are released after departure. Runtime materials use 45% normal-map strength and a 0.56 roughness floor to soften generated surface relief and harsh highlights; original geometry and colors remain unchanged.
 
 Preparation: `node scripts/prepare-visitor.mjs <malenia|lune> work/tripo/<id>-v1.glb public/models/visitors/<id>.glb`.
 

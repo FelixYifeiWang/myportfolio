@@ -45,11 +45,26 @@ export function prepareVisitor(model: THREE.Group, spec: VisitorSpec) {
     orientation.scale.multiplyScalar(fittedScale);
     orientation.position.copy(new THREE.Vector3(-(bounds.min.x + bounds.max.x) / 2, -bounds.min.y, -(bounds.min.z + bounds.max.z) / 2).multiplyScalar(fittedScale));
     orientation.position.y += spec.elevation ?? 0;
+    const finishedMaterials = new Set<THREE.Material>();
     model.traverse(object => {
         if (!(object instanceof THREE.Mesh)) return;
         object.castShadow = object.receiveShadow = true;
         const materials = Array.isArray(object.material) ? object.material : [object.material];
         for (const material of materials) {
+            if (finishedMaterials.has(material)) continue;
+            finishedMaterials.add(material);
+            if ((spec.id === 'malenia' || spec.id === 'lune') && material instanceof THREE.MeshStandardMaterial) {
+                // AI detail maps can make cloth and skin look embossed. Keep the
+                // authored mesh and color, with quieter relief and broader highlights.
+                material.normalScale.multiplyScalar(.45);
+                material.onBeforeCompile = shader => {
+                    shader.fragmentShader = shader.fragmentShader.replace(
+                        '#include <roughnessmap_fragment>',
+                        '#include <roughnessmap_fragment>\nroughnessFactor = max(roughnessFactor, 0.56);',
+                    );
+                };
+                material.customProgramCacheKey = () => 'doorway-satin-v1';
+            }
             for (const value of Object.values(material)) if (value instanceof THREE.Texture) value.anisotropy = 4;
         }
     });

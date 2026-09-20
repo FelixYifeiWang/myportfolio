@@ -381,7 +381,7 @@ export function buildDiner(catModel: DinerCat, props: DinerProps): DinerWorld {
     // lighting-program recompilation on each arrival. Its small shadow map is cached.
     const doorstepLight = createDoorwayLight();
     group.add(doorstepLight, doorstepLight.target);
-    box(3, .08, 6, surface('#121a17', .92), -6.525, -.005, 2.65, doorstep, 0);
+    box(6.5, .08, 6, surface('#121a17', .92), -8.275, -.005, 2.65, doorstep, 0);
     doorstep.visible = false;
     group.add(doorstep);
     // Floating steam is rendered inside the room, not layered onto the page.
