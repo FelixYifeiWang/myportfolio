@@ -1,6 +1,6 @@
 # Mobile room delivery
 
-Touch devices use smaller embedded model textures and 512 px wood maps. Desktop keeps the original assets. Both geometry levels, material settings, proportions, and interactions are preserved; the cat keeps 1024 px textures for close views. Visitors and music still load only when requested.
+Touch devices use smaller embedded model textures and 512 px wood maps. Desktop keeps the original assets. Both geometry levels, material settings, proportions, and interactions are preserved; the cat keeps 1024 px textures for close views. Music loads only when requested. One visitor prepares after the room and entrance animation settle.
 
 `npm run build:touch` regenerates the touch assets from the finished desktop GLBs, wood maps, and scene frame images. Run it after changing those source assets. `scripts/touch-assets.test.mjs` checks matching vertex/index counts, bounds, detail levels, texture limits, and at least 40% less model/wood download data.
 
@@ -8,7 +8,7 @@ The HTML preloads only the asset set matching the primary pointer. Runtime loadi
 
 Untouched seat dots have zero idle opacity on all devices. Previously explored seats retain the existing faint dot. Touch drags do not set hover states; mouse hover and keyboard focus still reveal the controls. Item dots remain visible and stools remain tappable.
 
-Verified with a 390 × 844 touch browser: exactly six matching model downloads, no duplicate desktop set, hidden untouched seats, seat/return/cat interaction, and no browser errors. Desktop retains the original model files and seat hover behavior. The full suite has 186 passing tests.
+Verified with a 390 × 844 touch browser: exactly six matching model downloads, no duplicate desktop set, hidden untouched seats, seat/return/cat interaction, and no browser errors. Desktop retains the original model files and seat hover behavior. The full suite has 192 passing tests.
 
 ## Loading and interaction review
 
@@ -19,3 +19,9 @@ The full-screen pendant loading scene reports completion across six models and f
 Static meshes retain indexed geometry during batching and avoid repeated local transform composition. Picking visits only visible mesh levels. Visitor textures upload across frames and their color/shadow shaders prepare before the door reveal. Adaptive resolution responds to sustained slow movement, ignores isolated stalls and idle frames, and recovers after sustained smooth motion. Purr synthesis runs in a cancellable worker without changing its sound or mix.
 
 Browser checks use Chrome with Metal on macOS, a 390 × 844 touch viewport, and CPU throttling where noted; these are simulated mobile checks, not measurements from a physical phone. Verified loading, failure, reduced motion, no JavaScript, seat/return, cat audio cancellation, record playback, and visitor appearance. Every matching model and scene texture downloads once; the desktop asset set and full-size portfolio frame images are absent from touch startup.
+
+## One visitor ahead
+
+The encounter reserves one random unseen visitor, sharing the same download/preparation promise with clicks. It refills only after the door closes, and stops when the session roster is exhausted. Cancelled visits retain the reservation without consuming it; failures clear it so the next request can retry.
+
+The first background download starts after room readiness, the intro and 800 ms of settled camera motion. Fetch priority is low. Decode, fitting, individual texture uploads, and shader preparation have idle checkpoints that wait during gestures, camera moves, open project panels, and hidden tabs. Disposal aborts the fetch and pending checkpoints. A requested door visit may proceed immediately through those checkpoints. This is cooperative scheduling: an individual decode/upload already running cannot be interrupted, and an immediate click before the first reservation finishes may still wait.

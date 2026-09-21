@@ -16,6 +16,7 @@ export class DoorEncounter<T> {
     private hooks: EncounterHooks<T>;
     private random: () => number;
     private seen = new Set<string>();
+    private next: { id: string; asset: Promise<T> } | null = null;
     private request = 0;
     private time = 0;
     private openness = 0;
@@ -28,21 +29,38 @@ export class DoorEncounter<T> {
         this.random = random;
     }
     get remaining() { return this.roster.length - this.seen.size; }
-    async open() {
-        if (this.disposed || this.phase !== 'closed' || !this.roster.length) return;
+    private reserve() {
+        if (this.next) return this.next;
         const candidates = this.roster.filter(id => !this.seen.has(id));
-        if (!candidates.length) return;
+        if (!candidates.length) return null;
         const id = candidates[Math.min(candidates.length - 1, Math.floor(this.random() * candidates.length))];
+        const next = { id, asset: this.hooks.load(id) };
+        next.asset = next.asset.catch(error => {
+            if (this.next === next) this.next = null;
+            throw error;
+        });
+        this.next = next;
+        return next;
+    }
+    /** One silent reservation, shared with a click even while still preparing. */
+    async preload() {
+        if (this.disposed || this.phase !== 'closed') return;
+        await this.reserve()?.asset;
+    }
+    async open() {
+        if (this.disposed || this.phase !== 'closed' || !this.remaining) return;
         const request = ++this.request;
         this.phase = 'loading';
         this.hooks.changed();
         try {
             // Begin audio while the original click still grants playback permission.
             const knock = this.hooks.knock?.();
-            const [asset] = await Promise.all([this.hooks.load(id), knock]);
+            const next = this.reserve()!;
+            const [asset] = await Promise.all([next.asset, knock]);
             if (request !== this.request || this.disposed) return;
             this.hooks.show(asset);
-            this.seen.add(id);
+            this.seen.add(next.id);
+            this.next = null;
             this.time = 0;
             this.phase = 'opening';
         }
@@ -89,6 +107,7 @@ export class DoorEncounter<T> {
         this.request++;
         this.hooks.stopKnock?.();
         this.disposed = true;
+        this.next = null;
         this.phase = 'closed';
         this.hooks.angle(0);
         this.hooks.hide();

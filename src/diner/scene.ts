@@ -17,6 +17,7 @@ import { touchAssetMedia } from './asset-urls';
 import { RoomLoadingProgress, type LoadingSnapshot } from './loading-progress';
 import { freezeStaticTransforms, pickVisibleObject, createShadowWarmup, warmTextures } from './render-preparation';
 import { AdaptiveQuality } from './adaptive-quality';
+import { waitForVisitorIdle } from './visitor-idle';
 export interface DinerScene {
     focus: (name: View, remember?: boolean) => number;
     restoreView: () => void;
@@ -125,30 +126,46 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     let qualityScale = 1;
     const quality = new AdaptiveQuality();
     const createdAt = performance.now();
-    const visitorLibrary = new VisitorLibrary();
+    const visitorAbort = new AbortController();
+    const visitorCheckpoint = (): Promise<void> => waitForVisitorIdle(() => ready && !document.hidden && !paused &&
+        (encounter.phase === 'loading' || (!transition && !interacting && performance.now() - lastMovement > 800)), visitorAbort.signal);
+    const visitorLibrary = new VisitorLibrary(visitors, undefined, { checkpoint: visitorCheckpoint, signal: visitorAbort.signal });
+    let preloadScheduled = false;
+    function queueVisitor() {
+        if (preloadScheduled || disposed || !encounter.remaining || encounter.phase !== 'closed') return;
+        preloadScheduled = true;
+        void visitorCheckpoint().then(() => encounter.preload()).catch(error => {
+            if (!disposed) console.warn('Background visitor preparation failed; the next click can retry.', error);
+        }).finally(() => { preloadScheduled = false; });
+    }
     const doorKnock = new DoorKnock();
     let visibleVisitor: THREE.Group | null = null;
     const doorButton = document.querySelector<HTMLButtonElement>('[data-hotspot="door"]')!;
     const previewVisitor = import.meta.env.DEV ? new URL(window.location.href).searchParams.get('visitor') : null;
     const roster = visitors.some(visitor => visitor.id === previewVisitor) ? [previewVisitor!] : visitors.map(visitor => visitor.id);
-    const encounter = new DoorEncounter(roster, {
+    const encounter = new DoorEncounter<THREE.Group>(roster, {
         knock: () => doorKnock.play(),
         stopKnock: () => doorKnock.stop(),
         async load(id) {
             const visitor = await visitorLibrary.load(id);
             if (disposed) throw new Error('Diner is disposed.');
+            await visitorCheckpoint();
             placeDoorwayVisitor(visitor);
             freezeStaticTransforms(visitor);
-            await warmTextures(renderer, visitor, () => !disposed);
+            await warmTextures(renderer, visitor, () => !disposed, visitorCheckpoint);
+            await visitorCheckpoint();
             if (disposed) throw new Error('Diner is disposed.');
             await renderer.compileAsync(visitor, camera, scene);
             if (disposed) throw new Error('Diner is disposed.');
             // Color-shader compilation alone does not prepare the shadow shaders.
+            await visitorCheckpoint();
             await renderer.compileAsync(createShadowWarmup(visitor), camera, scene);
             if (disposed) throw new Error('Diner is disposed.');
+            if (import.meta.env.DEV) shell.dataset.visitorPrepared = visitor.name;
             return visitor;
         },
         show(visitor) {
+            if (import.meta.env.DEV) delete shell.dataset.visitorPrepared;
             visibleVisitor = visitor;
             shell.dataset.visitor = visitor.name;
             world.doorstep.add(visitor);
@@ -170,6 +187,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             doorButton.setAttribute('aria-disabled', String(!encounter.remaining));
             // A visible state also makes browser checks independent of scene internals.
             shell.dataset.encounter = encounter.phase;
+            if (ready && encounter.phase === 'closed') queueVisitor();
             wake();
         },
         error(error) {
@@ -500,6 +518,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
             controls.target.copy(seatedLook.target);
         }
         else cameraChanged = controls.update();
+        if (cameraChanged) lastMovement = now;
         // Reveal the roof only after the arriving camera is below it and inside the room.
         const underCeiling = isSeat(currentView) && camera.position.y < 4.9 && camera.position.z < 3.9 && Math.abs(camera.position.x) < 4.9;
         moving = world.ceiling.update(delta, underCeiling, reduced.matches) || moving;
@@ -563,6 +582,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
     }
     else
         wake();
+    queueVisitor();
     return {
         focus,
         restoreView() {
@@ -602,6 +622,7 @@ export async function createDiner(canvas: HTMLCanvasElement, select: (name: Obje
         },
         dispose() {
             disposed = true;
+            visitorAbort.abort();
             encounter.dispose();
             doorKnock.dispose();
             visitorLibrary.dispose();

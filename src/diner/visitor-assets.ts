@@ -88,17 +88,25 @@ function disposeVisitor(model: THREE.Group) {
     textures.forEach(texture => texture.dispose());
 }
 
-/** On-demand downloads, deduplicated in flight, with a two-model GPU cache. */
+/** One reserved visitor plus the visible visitor; downloads are deduplicated. */
 export class VisitorLibrary {
     private assets = new Map<string, THREE.Group>();
     private pending = new Map<string, Promise<THREE.Group>>();
     private disposed = false;
     private specs: readonly VisitorSpec[];
     private download: (url: string) => Promise<THREE.Group>;
-    constructor(specs: readonly VisitorSpec[] = visitors, download?: (url: string) => Promise<THREE.Group>) {
+    private checkpoint: () => Promise<void>;
+    constructor(specs: readonly VisitorSpec[] = visitors, download?: (url: string) => Promise<THREE.Group>, options: { checkpoint?: () => Promise<void>; signal?: AbortSignal } = {}) {
         this.specs = specs;
         const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-        this.download = download ?? (async url => (await loader.loadAsync(url)).scene);
+        this.checkpoint = options.checkpoint ?? (() => Promise.resolve());
+        this.download = download ?? (async url => {
+            const response = await fetch(url, { priority: 'low', signal: options.signal });
+            if (!response.ok) throw new Error(`Visitor download failed (${response.status}): ${url}`);
+            const data = await response.arrayBuffer();
+            await this.checkpoint();
+            return (await loader.parseAsync(data, url.slice(0, url.lastIndexOf('/') + 1))).scene;
+        });
     }
     async load(id: string): Promise<THREE.Group> {
         if (this.disposed) throw new Error('Visitor library is disposed.');
@@ -108,7 +116,10 @@ export class VisitorLibrary {
         if (pending) return pending;
         const spec = this.specs.find(visitor => visitor.id === id);
         if (!spec) throw new Error(`Unknown visitor: ${id}`);
-        const request = this.download(spec.url).then(model => {
+        const request = this.download(spec.url).then(async model => {
+            if (this.disposed) { disposeVisitor(model); throw new Error('Visitor library is disposed.'); }
+            try { await this.checkpoint(); }
+            catch (error) { disposeVisitor(model); throw error; }
             if (this.disposed) { disposeVisitor(model); throw new Error('Visitor library is disposed.'); }
             let asset: THREE.Group;
             try { asset = prepareVisitor(model, spec); }

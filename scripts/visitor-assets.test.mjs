@@ -88,3 +88,16 @@ test('departed visitors release geometry, material and texture exactly once', as
   library.release(visitor); library.dispose();
   assert.deepEqual(retired, { geometry: 1, material: 1, texture: 1 });
 });
+
+test('decoded visitors wait for idle and are released if disposed while waiting', async () => {
+  let resume;
+  const source = model(); let retired = false;
+  source.children[0].geometry.addEventListener('dispose', () => { retired = true; });
+  const library = new VisitorLibrary([spec], async () => source, { checkpoint: () => new Promise(resolve => { resume = resolve; }) });
+  const pending = library.load('a');
+  await Promise.resolve();
+  library.dispose();
+  resume();
+  await assert.rejects(pending, /disposed/);
+  assert.equal(retired, true);
+});

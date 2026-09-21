@@ -45,7 +45,7 @@ export function createShadowWarmup(root: THREE.Object3D) {
 }
 
 /** Spread texture uploads across frames before revealing a newly loaded visitor. */
-export async function warmTextures(renderer: THREE.WebGLRenderer, root: THREE.Object3D, active: () => boolean) {
+export async function warmTextures(renderer: THREE.WebGLRenderer, root: THREE.Object3D, active: () => boolean, checkpoint: () => Promise<void> = () => Promise.resolve()) {
     const textures = new Set<THREE.Texture>();
     root.traverse(object => {
         if (!(object instanceof THREE.Mesh)) return;
@@ -54,6 +54,7 @@ export async function warmTextures(renderer: THREE.WebGLRenderer, root: THREE.Ob
         }
     });
     for (const texture of textures) {
+        await checkpoint();
         if (!active()) return;
         renderer.initTexture(texture);
         await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));

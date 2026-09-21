@@ -128,17 +128,45 @@ test('a refresh session exhausts the roster without repeating or knocking again'
   assert.deepEqual(fresh.events[0], ['show', 'pikachu']);
 });
 
-test('cancelled downloads and failed visits do not consume a visitor', async () => {
-  let resolve, attempt = 0;
-  const { encounter, events } = fixture(id => {
-    if (++attempt === 1) return new Promise(done => { resolve = done; });
-    if (attempt === 2) return Promise.reject(new Error('offline'));
-    return Promise.resolve({ id });
-  });
-  const cancelled = encounter.open(); encounter.close(); resolve({ id: 'pikachu' }); await cancelled;
-  await encounter.open();
+test('background preparation reserves exactly one visitor without showing or knocking', async () => {
+  let loads = 0;
+  const { encounter, events } = fixture(async id => { loads++; return { id }; });
+  await Promise.all([encounter.preload(), encounter.preload()]);
+  assert.equal(loads, 1);
+  assert.equal(encounter.phase, 'closed');
   assert.equal(encounter.remaining, 3);
+  assert.deepEqual(events, []);
   await encounter.open();
+  assert.equal(loads, 1);
+  assert.deepEqual(events[0], ['show', 'pikachu']);
+  await encounter.preload();
+  assert.equal(loads, 1);
+  tick(encounter, 10);
+  await encounter.preload();
+  await encounter.open();
+  assert.equal(loads, 2);
+  assert.deepEqual(events.filter(([event]) => event === 'show'), [['show', 'pikachu'], ['show', 'kim']]);
+});
+
+test('clicking during preparation joins the same load and cancellation retains the reserved visitor', async () => {
+  let resolve, loads = 0;
+  const { encounter, events } = fixture(id => { loads++; return new Promise(done => { resolve = () => done({ id }); }); });
+  const preload = encounter.preload();
+  const first = encounter.open();
+  encounter.close();
+  resolve();
+  await Promise.all([preload, first]);
+  await encounter.open();
+  assert.equal(loads, 1);
   assert.deepEqual(events.filter(([event]) => event === 'show'), [['show', 'pikachu']]);
+});
+
+test('a background failure is silent and the next click retries', async () => {
+  let loads = 0;
+  const { encounter, events } = fixture(async id => { if (!loads++) throw new Error('offline'); return { id }; });
+  await assert.rejects(encounter.preload(), /offline/);
+  assert.deepEqual(events, []);
+  await encounter.open();
+  assert.equal(loads, 2);
   assert.equal(encounter.remaining, 2);
 });
